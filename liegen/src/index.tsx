@@ -1,13 +1,25 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
+import './styles.scss';
+import Game from './components/Game';
 import reportWebVitals from './reportWebVitals';
+import App2 from './App2';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+// This is the extra redux functionality
+import store from "./store";
+import { Provider } from "react-redux";
+
+
+const root = ReactDOM.createRoot(
+  document.getElementById('root') as HTMLElement
+);
 root.render(
   <React.StrictMode>
-    <App />
+    <Provider store={store}>
+      <Game />
+      {/* <App2 /> */}
+    </Provider>
   </React.StrictMode>
 );
 

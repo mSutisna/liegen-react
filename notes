@@ -1,0 +1,47 @@
+Wat is het dat ik wil doen?
+
+
+Liegen maken in React
+
+De logica goed scheiden van de frontend zodat ik goed verschillende kaartspelltjes kan maken
+
+
+Responsive maken
+
+
+
+Positions
+
+Middle
+
+install redux for 'create-react-app': 
+https://www.freecodecamp.org/news/how-to-build-a-redux-powered-react-app/
+
+https://www.delasign.com/blog/ts-react-redux-guide-2022/
+
+
+Framer motion tutorial:
+https://www.youtube.com/watch?v=o7enGcf8x1s&list=PL4cUxeGkcC9iHDnQfTHEVVceOEBsOf07i&index=5
+
+
+
+
+
+Todo:
+
+   - Liegen kunnen spelen offline
+    - Kiezen van kaarten
+    - Maken van set
+    - Volgende speler
+    - Ordenen van kaarten
+    - Busten van kaarten
+    - Uitdelen van kaarten
+   - Responsive maken van de view
+
+
+Om te doen:
+- Redux koppeling maken
+- Logica verwerken in store
+- Logica en weergave gescheiden houden
+- Animaties in React - hoe zorg je ervoor dat meerdere rerenders de animatie niet verpesten
+- Kaarten uitdelen

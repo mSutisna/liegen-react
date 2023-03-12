@@ -1,0 +1,15 @@
+export const DESKTOP_GAME_WIDTH = 1200;
+export const DESKTOP_GAME_HEIGHT = 800;
+
+
+export const DESKTOP_PRIMARY_HAND_WIDTH = 600;
+export const DESKTOP_PRIMARY_HAND_HEIGHT = 150;
+
+export const DESKTOP_HAND_WIDTH = 400;
+export const DESKTOP_HAND_HEIGHT = 150;
+
+
+export const DESKTOP_CARD_WIDTH = 170;
+export const DESKTOP_CARD_HEIGHT = 255;
+
+export const DESKTOP_CARD_GUTTER_SIZE = 200;

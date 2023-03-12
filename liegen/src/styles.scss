@@ -1,0 +1,34 @@
+.red {
+  color: red;
+}
+
+.game-wrapper {
+  background: #477148;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body > #root > .game-wrapper {
+  height: 100vh;
+  width: 100vw;
+}
+
+.game {
+  border: 1px solid black;
+  position: relative;
+}
+
+.primary-hand {
+  position: absolute;
+  border: 1px solid black;
+}
+
+.hand {
+  position: absolute;
+  border: 1px solid black;
+}
+
+.card {
+  position: absolute;
+}
