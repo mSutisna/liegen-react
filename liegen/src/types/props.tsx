@@ -6,5 +6,6 @@ export interface HandProps {
   amountOfPlayers: number,
   gameWidth: number,
   gameHeight: number,
-  cards: Array<CardInterface>
+  cards: Array<CardInterface>,
+  selectedRank: number
 }

@@ -1,19 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import PrimaryHand from './PrimaryHand';
 import Hand from './Hand';
-import Card from './Card';
-import { DESKTOP_GAME_WIDTH, DESKTOP_GAME_HEIGHT, DESKTOP_CARD_WIDTH, DESKTOP_CARD_HEIGHT } from '../constants';
-import { cardNames, getImageUrls } from '../utilities/image-store/image-urls';
-import ImageStore from '../utilities/image-store/ImageStore';
+import Middle from './Middle';
+import { 
+  DESKTOP_GAME_WIDTH, 
+  DESKTOP_GAME_HEIGHT, 
+  DESKTOP_MIDDLE_WIDTH,
+  DESKTOP_MIDDLE_HEIGHT
+ } from '../constants';
 import {
   setPlayers
 } from "../slices/gameSlice";
 import { PlayerInterface } from '../types/models';
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from '../store';
-
-const imageStore = new ImageStore();
-
 
 const generatePlayers = () : Array<PlayerInterface> => {
   const player1Cards = [
@@ -71,11 +71,17 @@ const generatePlayers = () : Array<PlayerInterface> => {
   return [
     {
       name: 'manno',
-      cards: player1Cards
+      cards: player1Cards,
+      selectedRank: 0,
+      xPoint: 0,
+      yPoint: 0
     },
     {
       name: 'manno2',
-      cards: player2Cards
+      cards: player2Cards,
+      selectedRank: 0,
+      xPoint: 0,
+      yPoint: 0
     }
   ]
 }
@@ -100,11 +106,16 @@ function Game() {
       return state.game.players;
     }
   );
-  console.log({players})
   const amountOfPlayers = players.length;
   return (
     <div className="game-wrapper">
       <div className="game" style={style}>
+        <Middle
+          width={DESKTOP_MIDDLE_WIDTH}
+          height={DESKTOP_MIDDLE_HEIGHT}
+          left={(gameWidth / 2) - (DESKTOP_MIDDLE_WIDTH / 2)}
+          top={(gameHeight / 2) - (DESKTOP_MIDDLE_HEIGHT / 2)}
+        />
         {players.map((handData, index) => {
           const data = {
             name: handData.name,
@@ -112,7 +123,8 @@ function Game() {
             amountOfPlayers,
             gameWidth,
             gameHeight,
-            cards: handData.cards
+            cards: handData.cards,
+            selectedRank: handData.selectedRank
           }
           const key = `playerIndex-${index}`;
           if (index === 0) {

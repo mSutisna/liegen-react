@@ -2,16 +2,16 @@ import { CardInterface } from '../types/models';
 import BaseModel from './BaseModel';
 
 export default class Card extends BaseModel implements CardInterface {
-  rank: string | null;
-  suit: string | null;
+  rank: string;
+  suit: string;
   selected: boolean;
   faceDown: boolean;
   received: boolean;
   originIndex: number | null;
 
   constructor(
-    rank: string | null,  
-    suit: string | null,
+    rank: string,  
+    suit: string,
     selected: boolean,
     faceDown: boolean,
     received: boolean,

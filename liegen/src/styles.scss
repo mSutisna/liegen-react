@@ -22,6 +22,7 @@ body > #root > .game-wrapper {
 .primary-hand {
   position: absolute;
   border: 1px solid black;
+  padding: 15px;
 }
 
 .hand {
@@ -29,6 +30,122 @@ body > #root > .game-wrapper {
   border: 1px solid black;
 }
 
+.middle {
+  position: absolute;
+  border: 1px solid black;
+  display: flex;
+  .card-count {
+    flex: 1;
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+  }
+  .middle-cards {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    row-gap: 20px;
+    position: relative;
+    .supposed-cards {
+      flex: 1;
+      border: 1px solid black;
+      // position: relative;
+      .card {
+        z-index: 10;
+      }
+    }
+    .real-cards {
+      flex: 1;
+      border: 1px solid black;
+      // position: relative;
+      z-index: 20;
+    }
+  }
+}
+
+.name-wrapper {
+  position: relative;
+  .name {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+  }
+}
+
+.controls-wrapper {
+  display: flex;
+  height: 100%;
+  .bust {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .cards {
+    position: relative;
+    flex: 3;
+  }
+  .make-set {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    column-gap: 10px;
+  }
+}
+
 .card {
   position: absolute;
+  &.selected {
+    border: solid green 1px;
+  }
+}
+
+.rank-control-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+
+
+
+.triangle-buttons {
+  /* Center the content */
+  align-items: center;
+  display: flex;
+  justify-content: center;
+
+  /* Spacing */
+  padding: 0.5rem;
+}
+
+.triangle-buttons__triangle {
+  border-style: solid;
+
+  /* Size */
+  height: 0px;
+  width: 0px;
+}
+
+.triangle-buttons__triangle--t {
+  border-color: transparent transparent #d1d5db;
+  border-width: 0 0.5rem 0.5rem;
+}
+
+.triangle-buttons__triangle--r {
+  border-color: transparent transparent transparent #d1d5db;
+  border-width: 0.5rem 0 0.5rem 0.5rem;
+}
+
+.triangle-buttons__triangle--b {
+  border-color: #d1d5db transparent transparent;
+  border-width: 0.5rem 0.5rem 0;
+}
+
+.triangle-buttons__triangle--l {
+  border-color: transparent #d1d5db transparent transparent;
+  border-width: 0.5rem 0.5rem 0.5rem 0;
 }

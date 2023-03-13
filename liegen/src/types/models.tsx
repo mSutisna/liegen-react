@@ -1,31 +1,35 @@
 export interface CardInterface {
-  rank: string | null,
-  suit: string | null,
+  rank: string,
+  suit: string,
   selected: boolean,
   faceDown: boolean,
   received: boolean,
   originIndex: number | null,
 }
 
-export interface MiddleCardInterface {
-  rank: string | null,
-  suit: string | null,
+export interface BaseCardInterface {
+  rank: string,
+  suit: string,
   faceDown: boolean
 }
 
 export interface PlayerInterface {
   name: string,
-  cards: Array<CardInterface>
+  cards: Array<CardInterface>,
+  selectedRank: number,
+  xPoint: number,
+  yPoint: number,
 }
 
 export interface SetInterface {
   rank: string,
   amount: number,
-  realCards: Array<MiddleCardInterface>,
-  supposedCards: Array<MiddleCardInterface> 
+  playerIndex: number,
+  realCards: Array<BaseCardInterface>,
+  supposedCards: Array<BaseCardInterface> 
 }
 
 export interface MiddleInterface {
   set: SetInterface | null,
-  previousCards: Array<MiddleCardInterface>
+  previousCards: Array<BaseCardInterface>
 }

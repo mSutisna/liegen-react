@@ -3,7 +3,7 @@ import { PlayerInterface, MiddleInterface, CardInterface } from '../models';
 interface InitialState {
   players: Array<PlayerInterface>;
   middle: MiddleInterface,
-  mainPlayerIndex: number | null,
+  mainPlayerIndex: number,
   currentPlayerIndex: number;
   previousPlayerIndex: number | null,
 }

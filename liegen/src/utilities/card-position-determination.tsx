@@ -1,5 +1,5 @@
 import { DESKTOP_CARD_HEIGHT, DESKTOP_CARD_WIDTH, DESKTOP_CARD_GUTTER_SIZE } from "../constants";
-import { CardInterface } from "../types/models";
+import { BaseCardInterface } from "../types/models";
 
 export interface CardOffsetData {
   x: number,
@@ -8,7 +8,7 @@ export interface CardOffsetData {
 }
 
 export function determineXandYForCard(
-  cards : Array<CardInterface>, 
+  cards : Array<BaseCardInterface>, 
   index : number,
   scale : number
 ) {

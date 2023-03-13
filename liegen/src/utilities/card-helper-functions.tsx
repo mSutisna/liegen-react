@@ -1,5 +1,4 @@
-const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-const suits = ['Hearts', 'Clubs', 'Diamonds', 'Spades'];
+import { RANKS, SUITS } from "../constants";
 const cardsInDeckAmount = 52;
 
 function createCardNames() {
@@ -7,18 +6,18 @@ function createCardNames() {
   let rankIndex = 0;
   let suitIndex = 0;
   for (let i = 0; i < cardsInDeckAmount; i++) {
-    if (rankIndex === ranks.length) {
+    if (rankIndex === RANKS.length) {
       rankIndex = 0;
     }
-    if (suitIndex === suits.length) {
+    if (suitIndex === SUITS.length) {
       suitIndex = 0;
     }
-    const suit = suits[suitIndex];
-    const rank = ranks[rankIndex];
+    const suit = SUITS[suitIndex];
+    const rank = RANKS[rankIndex];
     const cardKey = createCardName(suit, rank);
     cardKeys.push(cardKey);
     rankIndex += 1;
-    if (rankIndex === ranks.length) {
+    if (rankIndex === RANKS.length) {
       suitIndex += 1;
     }
   }

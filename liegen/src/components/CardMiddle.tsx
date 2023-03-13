@@ -7,15 +7,16 @@ interface CardProps {
   height: number,
   left: number,
   top: number,
-  startLeft: number,
-  startTop: number,
-  delay: number,
+  xKeyFrames: Array<number>,
+  yKeyFrames: Array<number>,
   rank: string,
   suit: string,
-  faceDown: boolean
+  faceDown: boolean,
+  delay: number,
 }
 
-function Card({url, width, height, left, top, startLeft, startTop, delay, rank, suit, faceDown }: CardProps) {
+function CardMiddle({url, width, height, left, top, xKeyFrames, yKeyFrames, delay}: CardProps) {
+  console.log({xKeyFrames, yKeyFrames})
   return (
     <motion.img 
       src={url} 
@@ -26,13 +27,9 @@ function Card({url, width, height, left, top, startLeft, startTop, delay, rank, 
         left,
         top
       }}
-      initial={{
-        x: startLeft,
-        y: startTop
-      }}
       animate={{
-        x: 0,
-        y: 0
+        x: xKeyFrames,
+        y: yKeyFrames
       }} 
       transition={{
         delay,
@@ -42,4 +39,4 @@ function Card({url, width, height, left, top, startLeft, startTop, delay, rank, 
   )
 }
 
-export default Card;
+export default CardMiddle;
