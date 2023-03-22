@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useEffect } from 'react';
 import PrimaryHand from './PrimaryHand';
 import Hand from './Hand';
 import Middle from './Middle';
@@ -9,11 +9,13 @@ import {
   DESKTOP_MIDDLE_HEIGHT
  } from '../constants';
 import {
-  setPlayers
+  setPlayers,
+  setCardUrls
 } from "../slices/gameSlice";
 import { PlayerInterface } from '../types/models';
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from '../store';
+import { getImageUrls } from '../utilities/image-store/image-urls';
 
 const generatePlayers = () : Array<PlayerInterface> => {
   const player1Cards = [
@@ -94,6 +96,11 @@ function Game() {
       dispatch(setPlayers(players));
     }
     fetchPlayers();
+    const setImageUrls = async () => {
+      const imageUrls = await getImageUrls();
+      dispatch(setCardUrls(imageUrls));
+    }
+    setImageUrls();
   }, []);
   const gameWidth = DESKTOP_GAME_WIDTH;
   const gameHeight = DESKTOP_GAME_HEIGHT;

@@ -6,6 +6,7 @@ interface InitialState {
   mainPlayerIndex: number,
   currentPlayerIndex: number;
   previousPlayerIndex: number | null,
+  cardUrls: {[k: string]: string}
 }
 
 export interface ReceiveCardPayload {

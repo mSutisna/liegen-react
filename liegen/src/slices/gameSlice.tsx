@@ -1,7 +1,6 @@
-// Please note that this gist follows the repo available at: https://github.com/delasign/react-redux-tutorial
 import InitialState, { UpdateGameAction, ReceiveCardPayload, MakeSetPayload, CallBustPayload } from "../types/redux/game";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { PlayerInterface } from "../types/models";
+import { PlayerInterface, CardUrls } from "../types/models";
 import { RANKS, SUITS } from "../constants";
 import { createCardName } from "../utilities/card-helper-functions";
 
@@ -16,6 +15,7 @@ const initialState: InitialState = {
   mainPlayerIndex: 0,
   currentPlayerIndex: 0,
   previousPlayerIndex: null,
+  cardUrls: {},
 };
 
 export const gameSlice = createSlice({
@@ -29,6 +29,9 @@ export const gameSlice = createSlice({
       const player = state.players[action.payload.playerIndex]
       player.xPoint = action.payload.x;
       player.yPoint = action.payload.y;
+    },
+    setCardUrls: (state: InitialState, action: PayloadAction<CardUrls>) => {
+      state.cardUrls = action.payload;
     },
     increaseRank: (state: InitialState) => {
       const player = state.players[state.mainPlayerIndex];
@@ -117,7 +120,7 @@ export const gameSlice = createSlice({
       }
     },
     callBust: (state : InitialState) => {
-
+      
     }
   },
 });
@@ -126,13 +129,13 @@ export const gameSlice = createSlice({
 export const { 
   setPlayers, 
   setPlayerCenterCoordinates,
+  setCardUrls,
   receiveCard, 
   makeSet, 
   callBust, 
   increaseRank, 
   decreaseRank, 
-  toggleCardSelected 
-} =
-  gameSlice.actions;
+  toggleCardSelected,
+} = gameSlice.actions;
 // You must export the reducer as follows for it to be able to be read by the store.
 export default gameSlice.reducer;

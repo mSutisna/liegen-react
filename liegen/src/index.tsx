@@ -4,7 +4,6 @@ import './index.css';
 import './styles.scss';
 import Game from './components/Game';
 import reportWebVitals from './reportWebVitals';
-import App2 from './App2';
 
 // This is the extra redux functionality
 import store from "./store";
@@ -18,7 +17,6 @@ root.render(
   <React.StrictMode>
     <Provider store={store}>
       <Game />
-      {/* <App2 /> */}
     </Provider>
   </React.StrictMode>
 );

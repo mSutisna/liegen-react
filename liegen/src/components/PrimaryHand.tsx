@@ -1,12 +1,12 @@
 import { HandProps } from '../types/props';
+import { CardUrls } from '../types/models';
 import { determinePositionCoordinates } from '../utilities/player-position-determination';
 import { DESKTOP_PRIMARY_HAND_WIDTH, DESKTOP_PRIMARY_HAND_HEIGHT, DESKTOP_CARD_WIDTH, DESKTOP_CARD_HEIGHT, RANKS, DESKTOP_CARD_SCALE } from '../constants';
-import { getImageUrls } from '../utilities/image-store/image-urls';
 import { createCardName } from '../utilities/card-helper-functions';
 import CardPrimary from '../components/CardPrimary';
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { determineXandYForCard } from '../utilities/card-position-determination';
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   increaseRank,
   decreaseRank,
@@ -14,16 +14,16 @@ import {
   callBust,
   setPlayerCenterCoordinates
 } from "../slices/gameSlice";
+import { RootState } from '../store';
 
 function PrimaryHand({name, index, amountOfPlayers, gameWidth, gameHeight, cards, selectedRank} : HandProps) {
-  const [cardUrls, setCardUrls] = useState<{[k: string]: string}>({});
+  const cardUrls: CardUrls  = useSelector(
+    (state: RootState) => {
+      return state.game.cardUrls;
+    }
+  );
   const dispatch = useDispatch();
   useEffect(() => {
-    const setImageUrls = async () => {
-      const imageUrls = await getImageUrls();
-      setCardUrls(imageUrls);
-    }
-    setImageUrls();
     let mainX = 0;
     let mainY = 0;
     if (mainContainerRef.current) {
@@ -51,7 +51,7 @@ function PrimaryHand({name, index, amountOfPlayers, gameWidth, gameHeight, cards
   const cardContainerRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="primary-hand" style={style} ref={mainContainerRef}>
+    <div className={`primary-hand player-${index}`} style={style} ref={mainContainerRef}>
       <div className="name-wrapper">
         <div className="name">
           {name}

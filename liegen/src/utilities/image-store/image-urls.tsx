@@ -1,17 +1,18 @@
 import { createCardNames } from '../card-helper-functions';
+import { CardUrls } from '../../types/models';
 
 const cardNames = createCardNames();
 
 const imageUrls = {};
 
-async function getImageUrls() : Promise<{[k: string]: string}> {
+async function getImageUrls() : Promise<CardUrls> {
   if (Object.values(imageUrls).length === 0) {
     await fillImageUrlsObject(imageUrls);
   }
   return imageUrls;
 }
 
-async function fillImageUrlsObject(imageUrls: {[k: string]: string}) {
+async function fillImageUrlsObject(imageUrls: CardUrls) {
   const promiseArray = [];
   for (const cardName of cardNames) {
     promiseArray.push(

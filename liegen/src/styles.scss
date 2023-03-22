@@ -43,24 +43,24 @@ body > #root > .game-wrapper {
   .middle-cards {
     flex: 3;
     display: flex;
-    flex-direction: column;
     padding: 10px;
     row-gap: 20px;
+    column-gap: 20px;
     position: relative;
-    .supposed-cards {
-      flex: 1;
-      border: 1px solid black;
-      // position: relative;
+    justify-content: center;
+    align-items: center;
+
+    .middle-cards-container {
+      border: solid 1px black;
+      display: flex;
+      flex-direction: column;
+      row-gap: 20px;
       .card {
-        z-index: 10;
+        position: relative;
+        visibility: hidden;
       }
     }
-    .real-cards {
-      flex: 1;
-      border: 1px solid black;
-      // position: relative;
-      z-index: 20;
-    }
+
   }
 }
 
@@ -148,4 +148,28 @@ body > #root > .game-wrapper {
 .triangle-buttons__triangle--l {
   border-color: transparent #d1d5db transparent transparent;
   border-width: 0.5rem 0.5rem 0.5rem 0;
+}
+
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 90vh;
+  width: 100%;
+}
+.item {
+  transition: 2s all;
+  cursor: pointer;
+  text-align: center;
+}
+.item-top {
+  color: red;
+}
+.item-bottom {
+  color: green;
+}
+.item-force-move {
+  transform: translateY(0) !important;
 }

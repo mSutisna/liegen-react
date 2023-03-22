@@ -33,3 +33,18 @@ export interface MiddleInterface {
   set: SetInterface | null,
   previousCards: Array<BaseCardInterface>
 }
+
+export interface Point {
+  x: number,
+  y: number
+}
+
+export interface AnimationChain {
+  element: HTMLElement | null,
+  startPoint: Point,
+  endPoint: Point
+}
+
+export interface CardUrls {
+  [k: string]: string
+}

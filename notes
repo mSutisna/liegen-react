@@ -52,3 +52,67 @@ Layout animations:
 https://www.framer.com/motion/layout-animations/
 
 
+
+
+Thought Experiments That Will Change How You Think About Life
+https://www.youtube.com/watch?v=yRaUG2Tp2xI
+
+
+
+continue here with frame motion course:
+
+https://www.youtube.com/watch?v=lY2TZXEgYUw&list=PL4cUxeGkcC9iHDnQfTHEVVceOEBsOf07i&index=9
+
+
+
+Micro front end course
+https://www.youtube.com/watch?v=lKKsjpH09dU&t=499s
+
+
+
+Move from one parent to another
+
+https://stackoverflow.com/questions/54660220/react-animation-for-moving-an-element-from-one-parent-to-another
+
+
+Orchestrated animations
+https://dev.to/wlytle/animating-content-between-components-in-react-1de5
+
+
+Chaining css animations
+https://ccscoder.medium.com/chaining-css-animations-using-javascript-1b171708360e
+
+
+
+Using requestAnimationFrame with React Hooks
+https://css-tricks.com/using-requestanimationframe-with-react-hooks/
+
+
+Dynamically chained css transitions
+https://felixblaschke.medium.com/dynamically-chained-css-transitions-5e31beb640f8
+
+
+
+Animate elements:
+https://developer.mozilla.org/en-US/docs/Web/API/Element/animate
+
+
+use element size (dyanmically save dimensions of elements in React)
+https://usehooks-ts.com/react-hook/use-element-size
+
+
+await animations
+https://codepen.io/osublake/pen/dvdoze
+
+
+
+the case async await for animations
+https://dev.to/jeremyckahn/the-case-for-async-await-based-javascript-animations-pkl
+
+
+sequencing animations
+https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Sequencing_animations
+
+
+Multiple refs (also reference to redux chess)
+https://programarivm.com/storing-multiple-refs-in-an-array-with-reacts-useref-hook
