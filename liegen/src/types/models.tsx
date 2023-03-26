@@ -35,7 +35,8 @@ export interface MiddleInterface {
   set: SetInterface | null,
   previousSet: SetInterface | null,
   burnedCards: Array<BaseCardInterface>,
-  playerToCallBust: number | null
+  playerToCallBust: number | null,
+  bustAnimationStatus: string,
 }
 
 export interface Point {
@@ -45,11 +46,12 @@ export interface Point {
 
 export interface AnimationChain {
   element: HTMLElement | null,
-  startPoint: Point,
-  endPoint: Point,
+  animationInstructions: Array<{[k: string]: string}>,
+  animationSettings?: {[k: string]: number | string}
   dontMakeVisible?: boolean,
-  afterAnimationChain?: () => AnimationChain[]
 }
+
+export type AnimationChainMultipleImplelmentations = AnimationChain | (() => AnimationChain);
 
 export interface CardUrls {
   [k: string]: string

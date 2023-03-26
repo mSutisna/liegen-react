@@ -61,7 +61,9 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
       <div className="controls-wrapper">
         <div className="bust">
           <button
-            onClick={() => dispatch(callBust())}
+            onClick={() => {
+              dispatch(callBust())
+            }}
           >
             Bust
           </button>

@@ -10,7 +10,9 @@ const initialState: InitialState = {
   // middle: {
   //   set: null,
   //   previousSet: null,
-  //   burnedCards: []
+  //   burnedCards: [],
+  //   playerToCallBust: null,
+  //   bustAnimationStatus: 'idle'
   // },
   middle: {
     set: {
@@ -31,7 +33,8 @@ const initialState: InitialState = {
     },
     previousSet: null,
     burnedCards: [],
-    playerToCallBust: null
+    playerToCallBust: null,
+    bustAnimationStatus: 'idle'
   },
   mainPlayerIndex: 0,
   currentPlayerIndex: 1,
