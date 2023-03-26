@@ -5,12 +5,13 @@ export interface CardInterface {
   faceDown: boolean,
   received: boolean,
   originIndex: number | null,
+  receiveAnimationPlayed: boolean,
 }
 
 export interface BaseCardInterface {
   rank: string,
   suit: string,
-  faceDown: boolean
+  faceDown: boolean,
 }
 
 export interface PlayerInterface {
@@ -26,12 +27,15 @@ export interface SetInterface {
   amount: number,
   playerIndex: number,
   realCards: Array<BaseCardInterface>,
-  supposedCards: Array<BaseCardInterface> 
+  supposedCards: Array<BaseCardInterface>,
+  animationFinished: boolean 
 }
 
 export interface MiddleInterface {
   set: SetInterface | null,
-  previousCards: Array<BaseCardInterface>
+  previousSet: SetInterface | null,
+  burnedCards: Array<BaseCardInterface>,
+  playerToCallBust: number | null
 }
 
 export interface Point {
@@ -42,9 +46,18 @@ export interface Point {
 export interface AnimationChain {
   element: HTMLElement | null,
   startPoint: Point,
-  endPoint: Point
+  endPoint: Point,
+  dontMakeVisible?: boolean,
+  afterAnimationChain?: () => AnimationChain[]
 }
 
 export interface CardUrls {
   [k: string]: string
+}
+
+export interface MessageModalData {
+  visible: boolean,
+  message: string,
+  modalAnimation: string,
+  disableCloseButton: boolean
 }

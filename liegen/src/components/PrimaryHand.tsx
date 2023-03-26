@@ -12,16 +12,20 @@ import {
   decreaseRank,
   makeSet,
   callBust,
-  setPlayerCenterCoordinates
+  setPlayerCenterCoordinates,
+  setMessageModalMessage,
+  hideMessageModal
 } from "../slices/gameSlice";
 import { RootState } from '../store';
 
-function PrimaryHand({name, index, amountOfPlayers, gameWidth, gameHeight, cards, selectedRank} : HandProps) {
+function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHeight, cards, selectedRank} : HandProps) {
   const cardUrls: CardUrls  = useSelector(
     (state: RootState) => {
       return state.game.cardUrls;
     }
   );
+  const mainContainerRef = useRef<HTMLDivElement>(null);
+  const cardContainerRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
   useEffect(() => {
     let mainX = 0;
@@ -46,9 +50,6 @@ function PrimaryHand({name, index, amountOfPlayers, gameWidth, gameHeight, cards
     width: DESKTOP_PRIMARY_HAND_WIDTH,
     height: DESKTOP_PRIMARY_HAND_HEIGHT
   }
-  
-  const mainContainerRef = useRef<HTMLDivElement>(null);
-  const cardContainerRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className={`primary-hand player-${index}`} style={style} ref={mainContainerRef}>
@@ -69,39 +70,42 @@ function PrimaryHand({name, index, amountOfPlayers, gameWidth, gameHeight, cards
           ref={cardContainerRef}
           className="cards"
         >
-          {cards.map((card, index) => {
-            const cardKey = createCardName(card.suit ?? '', card.rank ?? '')
-            if (!cardUrls[cardKey]) {
-              return null;
-            }
-            let containerX = 0;
-            let containerY = 0;
-            if (cardContainerRef.current) {
-              const position = cardContainerRef.current.getBoundingClientRect();
-              containerX = position.left;
-              containerY = position.top;
-            }
-            const offsetData = determineXandYForCard(cards, index, DESKTOP_CARD_SCALE);
-            const left = offsetData.x;
-            const top = offsetData.y;
-            const delay = 0.02 + (0.06 * index);
+          <div className="cards-grid">
+            {cards.map((card, cardIndex) => {
+              const cardKey = createCardName(card.suit ?? '', card.rank ?? '')
+              if (!cardUrls[cardKey]) {
+                return null;
+              }
+              let containerX = 0;
+              let containerY = 0;
+              if (cardContainerRef.current) {
+                const position = cardContainerRef.current.getBoundingClientRect();
+                containerX = position.left;
+                containerY = position.top;
+              }
+              const offsetData = determineXandYForCard(cards, cardIndex, DESKTOP_CARD_SCALE);
+              const left = offsetData.x;
+              const top = offsetData.y;
+              const delay = 0.02 + (0.06 * cardIndex);
 
-            return <CardPrimary
-              key={`cardIndex-${index}`}
-              url={cardUrls[cardKey]}
-              width={DESKTOP_CARD_WIDTH * DESKTOP_CARD_SCALE}
-              height={DESKTOP_CARD_HEIGHT * DESKTOP_CARD_SCALE}
-              left={left}
-              top={top}
-              startLeft={-containerX - left}
-              startTop={-containerY - top}
-              delay={delay}
-              rank={card.rank}
-              suit={card.suit}
-              selected={card.selected}
-              faceDown={card.faceDown}
-            />
-          })}
+              return <CardPrimary
+                key={`cardIndex-${cardIndex}`}
+                url={cardUrls[cardKey]}
+                width={DESKTOP_CARD_WIDTH * DESKTOP_CARD_SCALE}
+                height={DESKTOP_CARD_HEIGHT * DESKTOP_CARD_SCALE}
+                startLeft={-containerX - left}
+                startTop={-containerY - top}
+                delay={delay}
+                rank={card.rank}
+                suit={card.suit}
+                selected={card.selected}
+                faceDown={card.faceDown}
+                playerIndex={realIndex}
+                cardIndex={cardIndex}
+                receiveAnimationFinished={card.receiveAnimationPlayed}
+              />
+            })}
+          </div>
         </div>
         <div className="make-set">
           <div className="rank-control-wrapper"> 
@@ -117,6 +121,17 @@ function PrimaryHand({name, index, amountOfPlayers, gameWidth, gameHeight, cards
             onClick={() => dispatch(makeSet())}
           >
             Make set
+          </button>
+          <button
+            onClick={async e => {
+              e.stopPropagation();
+              await dispatch(hideMessageModal());
+              dispatch(setMessageModalMessage({
+                message: 'Hello',
+              }))
+            }}
+          >
+            Hoef je niet
           </button>
         </div>
       </div>

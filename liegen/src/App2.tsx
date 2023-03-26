@@ -11,7 +11,6 @@ function App() {
   const counter: number = useSelector(
     (state: RootState) => state.counter.value
   );
-  console.log({counter})
   const dispatch = useDispatch();
   return (
     <div>

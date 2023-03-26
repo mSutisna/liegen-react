@@ -12,13 +12,14 @@ import { createCardName } from '../utilities/card-helper-functions';
 import { RootState } from '../store';
 import Card from './Card';
 
-function Hand({name, index, amountOfPlayers, gameWidth, gameHeight, cards}: HandProps) {
+function Hand({name, index, realIndex, amountOfPlayers, gameWidth, gameHeight, cards}: HandProps) {
   const cardUrls: CardUrls  = useSelector(
     (state: RootState) => {
       return state.game.cardUrls;
     }
   );
   const mainContainerRef = useRef<HTMLDivElement>(null);
+  const cardContainerRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
   useEffect(() => {
     let mainX = 0;
@@ -44,8 +45,6 @@ function Hand({name, index, amountOfPlayers, gameWidth, gameHeight, cards}: Hand
     height: DESKTOP_HAND_HEIGHT
   }
 
-  const cardContainerRef = useRef<HTMLDivElement>(null);
-
   return (
     <div className={`hand player-${index}`} style={style} ref={mainContainerRef}>
       <div className="name-wrapper">
@@ -54,14 +53,11 @@ function Hand({name, index, amountOfPlayers, gameWidth, gameHeight, cards}: Hand
         </div>
       </div>
       <div
-          ref={cardContainerRef}
-          className="cards"
-        >
-          {cards.map((card, index) => {
-            const cardKey = createCardName(card.suit ?? '', card.rank ?? '')
-            if (!cardUrls[cardKey]) {
-              return null;
-            }
+        ref={cardContainerRef}
+        className="cards"
+      >
+        <div className="cards-grid">
+          {cards.map((card, cardIndex) => {
             let containerX = 0;
             let containerY = 0;
             if (cardContainerRef.current) {
@@ -69,27 +65,25 @@ function Hand({name, index, amountOfPlayers, gameWidth, gameHeight, cards}: Hand
               containerX = position.left;
               containerY = position.top;
             }
-            const offsetData = determineXandYForCard(cards, index, DESKTOP_CARD_SCALE);
+            const offsetData = determineXandYForCard(cards, cardIndex, DESKTOP_CARD_SCALE);
             const left = offsetData.x;
             const top = offsetData.y;
-            const delay = 0.02 + (0.06 * index);
-
+            const delay = 0.02 + (0.06 * cardIndex);
             return <Card
-              key={`cardIndex-${index}`}
-              url={cardUrls[cardKey]}
+              key={`cardIndex-${cardIndex}`}
+              url={cardUrls['Backside']}
               width={DESKTOP_CARD_WIDTH * DESKTOP_CARD_SCALE}
               height={DESKTOP_CARD_HEIGHT * DESKTOP_CARD_SCALE}
-              left={left}
-              top={top}
               startLeft={-containerX - left}
               startTop={-containerY - top}
               delay={delay}
-              rank={card.rank}
-              suit={card.suit}
-              faceDown={card.faceDown}
+              receiveAnimationFinished={card.receiveAnimationPlayed}
+              playerIndex={realIndex}
+              cardIndex={cardIndex}
             />
           })}
         </div>
+      </div>
     </div>
   )
 }

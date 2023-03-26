@@ -1,35 +1,38 @@
 import { motion } from 'framer-motion';
 
+import { useDispatch } from "react-redux";
+import {
+  setCardReceivedAnimationFinished
+} from "../slices/gameSlice";
 
 interface CardProps {
   url: string,
   width: number,
   height: number,
-  left: number,
-  top: number,
   startLeft: number,
   startTop: number,
   delay: number,
-  rank: string,
-  suit: string,
-  faceDown: boolean
+  receiveAnimationFinished: boolean,
+  playerIndex: number,
+  cardIndex: number
 }
 
-function Card({url, width, height, left, top, startLeft, startTop, delay, rank, suit, faceDown }: CardProps) {
+function Card({url, width, height, startLeft, startTop, delay, receiveAnimationFinished, playerIndex, cardIndex }: CardProps) {
+  const dispatch = useDispatch();
+  const initial = !receiveAnimationFinished
+    ? {
+      x: startLeft,
+      y: startTop
+    } : false;
   return (
     <motion.img 
       src={url} 
       className={'card'}
       style={{
         width,
-        height,
-        left,
-        top
+        height
       }}
-      initial={{
-        x: startLeft,
-        y: startTop
-      }}
+      initial={initial}
       animate={{
         x: 0,
         y: 0
@@ -37,6 +40,9 @@ function Card({url, width, height, left, top, startLeft, startTop, delay, rank, 
       transition={{
         delay,
         default: { ease: "linear" }
+      }}
+      onAnimationComplete={() => {
+        dispatch(setCardReceivedAnimationFinished({playerIndex, cardIndex}))
       }}
     />
   )

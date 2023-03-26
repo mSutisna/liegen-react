@@ -22,3 +22,6 @@ export const DESKTOP_CARD_SCALE = 0.35;
 
 export const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 export const SUITS = ['Hearts', 'Clubs', 'Diamonds', 'Spades'];
+
+export const MESSAGE_MODAL_WIN_DISPLAY_ANIMATION = 'one';
+export const MESSAGE_MODAL_REGULAR_DISPLAY_ANIMATION = 'three';

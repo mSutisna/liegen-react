@@ -1,4 +1,4 @@
-import { PlayerInterface, MiddleInterface, CardInterface } from '../models';
+import { PlayerInterface, MiddleInterface, CardInterface, MessageModalData } from '../models';
 
 interface InitialState {
   players: Array<PlayerInterface>;
@@ -6,7 +6,15 @@ interface InitialState {
   mainPlayerIndex: number,
   currentPlayerIndex: number;
   previousPlayerIndex: number | null,
-  cardUrls: {[k: string]: string}
+  cardUrls: {[k: string]: string},
+  messageModal: MessageModalData,
+  clockwise: boolean
+}
+
+export interface MessageModalPayload {
+  message: string,
+  modalAnimation?: string,
+  disableCloseButton?: boolean
 }
 
 export interface ReceiveCardPayload {

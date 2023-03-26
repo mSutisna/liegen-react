@@ -28,7 +28,92 @@ body > #root > .game-wrapper {
 .hand {
   position: absolute;
   border: 1px solid black;
+  padding: 15px;
+  display: flex;
+  flex-direction: column-reverse;
+  .name-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: end;
+    .name {
+      position: relative;
+    }
+  }
+
+  .cards {
+    position: relative;
+    flex: 4;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    .cards-grid {
+      display: grid;
+      column-gap: 15px;
+      grid-template-columns: repeat(5, 1fr);
+      img:nth-child(n+6) {
+        margin-top: -50px;
+      }
+    }
+  }
 }
+
+.name-wrapper {
+  position: relative;
+  .name {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+  }
+}
+
+.controls-wrapper {
+  display: flex;
+  height: 100%;
+  .bust {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .cards {
+    padding: 0 10px;
+    position: relative;
+    flex: 3;
+    display: flex;
+    justify-content: center;
+    .cards-grid {
+      display: grid;
+      column-gap: 15px;
+      grid-template-columns: repeat(5, 1fr);
+      img:nth-child(n+6) {
+        margin-top: -80px;
+      }
+    }
+  }
+  .make-set {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    column-gap: 10px;
+  }
+}
+
+.card {
+  // position: absolute;
+  border: solid transparent 1px;
+  &.selected {
+    border: solid green 1px;
+  }
+}
+
+.rank-control-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 
 .middle {
   position: absolute;
@@ -57,56 +142,15 @@ body > #root > .game-wrapper {
       row-gap: 20px;
       .card {
         position: relative;
-        visibility: hidden;
+        transition: transform 0.8s;
+        transform-style: preserve-3d;      
+      }
+      .card:hover {
+        transform: rotateY(180deg);
       }
     }
 
   }
-}
-
-.name-wrapper {
-  position: relative;
-  .name {
-    position: absolute;
-    top: 5px;
-    left: 5px;
-  }
-}
-
-.controls-wrapper {
-  display: flex;
-  height: 100%;
-  .bust {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .cards {
-    position: relative;
-    flex: 3;
-  }
-  .make-set {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    column-gap: 10px;
-  }
-}
-
-.card {
-  position: absolute;
-  &.selected {
-    border: solid green 1px;
-  }
-}
-
-.rank-control-wrapper {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
 }
 
 

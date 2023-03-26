@@ -116,3 +116,97 @@ https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Sequencin
 
 Multiple refs (also reference to redux chess)
 https://programarivm.com/storing-multiple-refs-in-an-array-with-reacts-useref-hook
+
+
+Learn CSS grid the easy way
+https://www.youtube.com/watch?v=rg7Fvvl3taU
+
+
+
+
+Original point on rotation
+https://stackoverflow.com/questions/24031926/find-new-left-and-top-corresponding-to-original-left-and-top-on-css-rotate
+
+Another original point on rotation
+https://stackoverflow.com/questions/11229040/how-to-get-the-position-of-element-transformed-with-css-rotate
+
+
+Todo:
+
+- van speler wisselen na turn
+- set animation wanneer er al een set ligt
+- bust animation
+
+- 2 player layout
+- 3 player layout
+- 4 player layout
+
+
+- meerdere kaarten correct tonen met grid
+- sort cards overlay
+- cards sorteren
+
+- win animatie
+
+- overige styling
+
+- repsonsive maken
+
+
+
+- integreren met back end
+
+- multiple lobbies
+
+- chat system
+
+- micro front end
+
+- zweeds pesten maken
+
+- meerdere games kunnen selecteren
+
+
+
+Todo
+- Speler wisselen na set
+- Message tonen
+
+
+
+
+Wat is nu het belangrijkste
+- spel kunnen spelen met twee personen
+ - alle animaties fixen
+- overlay maken
+- responsive layout fixen
+
+- kaarten sorteren 
+- meer dan 15 kaarten kunnen zien overlay
+
+
+- back end koppelen
+
+- meerdere lobbies
+
+- chat systeem
+
+- micro frontend
+
+
+
+
+create modal with react hooks
+https://upmostly.com/tutorials/modal-components-react-custom-hooks
+
+
+
+
+
+Spel werkend krijgen
+
+Daarna dynamisch de grid columns bepalen 
+
+Daarna responsive layout
+
+Daarna voor ieder aantal spelers een goede layout schrijven
