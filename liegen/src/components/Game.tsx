@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import PrimaryHand from './PrimaryHand';
 import Hand from './Hand';
 import Middle from './Middle';
@@ -18,7 +18,6 @@ import { RootState } from '../store';
 import { getImageUrls } from '../utilities/image-store/image-urls';
 import MessageModal from './MessageModal'; 
 import { current } from '@reduxjs/toolkit';
-import checkmark from '../assets/icons/checkmark.svg'
 
 const generatePlayers = () : Array<PlayerInterface> => {
   const player1Cards = [
@@ -124,8 +123,16 @@ const generatePlayers = () : Array<PlayerInterface> => {
   ]
 }
 
+
+
 function Game() {
   const dispatch = useDispatch();
+  const playerIndicatorCollection = useRef<(HTMLImageElement | null)[]>([]);
+  const assignIndicatorRefToCollection = (element: HTMLImageElement | null, index: number) => {
+    if (!playerIndicatorCollection.current[index]) {
+      playerIndicatorCollection.current[index] = element;
+    }
+  }
   useEffect(() => {
     const fetchPlayers = async () => {
       const players = generatePlayers();
@@ -187,15 +194,13 @@ function Game() {
   return (
     <div className="game-wrapper">
       <MessageModal />
-      <div className="very-interesting">
-        <img src={checkmark} style={{width: 10, height: 10}} />
-      </div>
       <div className="game" style={style}>
         <Middle
           width={DESKTOP_MIDDLE_WIDTH}
           height={DESKTOP_MIDDLE_HEIGHT}
           left={(gameWidth / 2) - (DESKTOP_MIDDLE_WIDTH / 2)}
           top={(gameHeight / 2) - (DESKTOP_MIDDLE_HEIGHT / 2)}
+          playerIndicatorCollection={playerIndicatorCollection}
         />
         {playersArray.map((handData, index) => {
           const realIndex = realPlayerIndexes[handData.name];
@@ -207,7 +212,8 @@ function Game() {
             gameWidth,
             gameHeight,
             cards: handData.cards,
-            selectedRank: handData.selectedRank
+            selectedRank: handData.selectedRank,
+            assignIndicatorRefToCollection
           }
           const key = `playerIndex-${index}`;
           if (index === 0) {

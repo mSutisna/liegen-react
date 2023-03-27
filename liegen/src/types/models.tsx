@@ -46,7 +46,7 @@ export interface Point {
 
 export interface AnimationChain {
   element: HTMLElement | null,
-  animationInstructions: Array<{[k: string]: string}>,
+  animationInstructions: Array<{[k: string]: string | number}>,
   animationSettings?: {[k: string]: number | string}
   dontMakeVisible?: boolean,
 }

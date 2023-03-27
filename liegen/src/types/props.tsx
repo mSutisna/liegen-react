@@ -1,3 +1,4 @@
+import React from "react";
 import { CardInterface } from "./models";
 
 export interface HandProps {
@@ -8,7 +9,8 @@ export interface HandProps {
   gameWidth: number,
   gameHeight: number,
   cards: Array<CardInterface>,
-  selectedRank: number
+  selectedRank: number,
+  assignIndicatorRefToCollection: (element: HTMLImageElement | null, index: number) => void
 }
 
 export interface ModalProps {

@@ -17,8 +17,9 @@ import {
   hideMessageModal
 } from "../slices/gameSlice";
 import { RootState } from '../store';
+import checkmark from '../assets/icons/checkmark.svg'
 
-function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHeight, cards, selectedRank} : HandProps) {
+function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHeight, cards, selectedRank, assignIndicatorRefToCollection} : HandProps) {
   const cardUrls: CardUrls  = useSelector(
     (state: RootState) => {
       return state.game.cardUrls;
@@ -53,10 +54,15 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
 
   return (
     <div className={`primary-hand player-${index}`} style={style} ref={mainContainerRef}>
-      <div className="name-wrapper">
-        <div className="name">
+      <div className="name">
+        <div className="name-value">
           {name}
         </div>
+        <img 
+          src=""
+          ref={element => assignIndicatorRefToCollection(element, index)}
+          className="indicator" 
+        />
       </div>
       <div className="controls-wrapper">
         <div className="bust">

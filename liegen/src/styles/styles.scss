@@ -25,21 +25,31 @@ body > #root > .game-wrapper {
   padding: 15px;
 }
 
+.primary-hand,.hand {
+  .name {
+    position: relative;
+    display: flex;
+    align-items: center;
+    .indicator {
+      visibility: hidden;
+      width: 30px;
+      height: 30px;
+      padding: 0 10px;
+    }
+  }
+} 
+
 .hand {
+  .name {
+    flex: 1;
+    display: flex;
+    justify-content: end;
+  }
   position: absolute;
   border: 1px solid black;
   padding: 15px;
   display: flex;
   flex-direction: column-reverse;
-  .name-wrapper {
-    flex: 1;
-    display: flex;
-    justify-content: end;
-    .name {
-      position: relative;
-    }
-  }
-
   .cards {
     position: relative;
     flex: 4;
@@ -57,7 +67,7 @@ body > #root > .game-wrapper {
   }
 }
 
-.name-wrapper {
+.name {
   position: relative;
   .name {
     position: absolute;
@@ -121,9 +131,24 @@ body > #root > .game-wrapper {
   display: flex;
   .card-count {
     flex: 1;
-    display: flex; 
-    justify-content: center;
-    align-items: center;
+    position: relative;
+    .count-inner, .cards-to-deal {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .cards-to-deal {
+      .cards-to-deal-inner {
+        position: relative;
+        .card {
+          position: absolute;
+          visibility: hidden;
+        } 
+      }
+    }
   }
   .middle-cards {
     flex: 3;
@@ -139,57 +164,47 @@ body > #root > .game-wrapper {
       border: solid 1px black;
       display: flex;
       flex-direction: column;
-      row-gap: 20px;
-      .card {
-        perspective: 600px;
-        // &:hover {
-        //   .card-inner {
-        //     // transform: rotateY(180deg);
-        //     transform: translateX(-100%) rotateY(-180deg);
-        //   } 
-        // }
-      }
-      .card-inner {
-        position:relative;
-        transition: transform 0.5s;
-        transform-style: preserve-3d;
-        transform-origin: center right;
-        &.is-flipped {
-          // transform: translateX(-100%) rotateY(-180deg);
-          transform: rotateY(-180deg);
+      align-items: center;
+      row-gap: 10px;
+      .cards-wrapper {
+        display: flex;
+        flex-direction: column;
+        row-gap: 20px;
+        .card {
+          perspective: 600px;
+          // &:hover {
+          //   .card-inner {
+          //     transform: translateX(-100%) rotateY(-180deg);
+          //   } 
+          // }
+        }
+        .card-inner {
+          position:relative;
+          transition: transform 0.5s;
+          transform-style: preserve-3d;
+          transform-origin: center right;
+        }
+  
+        .front-side, .back-side {
+          backface-visibility: hidden;
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
+        }
+  
+
+        .dont-display {
+          transform: rotateY(180deg);
         }
       }
-
-      .front-side, .back-side {
-        backface-visibility: hidden;
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
+      .indicator {
+        opacity: 0;
+        height: 20px;
+        width: 20px;
       }
-
-      // .front-side {
-      //   transform: rotateY(180deg);
-      // }
-      // .back-side {
-      //   transform: rotateY(180deg);
-      // }
-
-      .dont-display {
-        transform: rotateY(180deg);
-      }
-      // .do-display {
-      //   visibility: visible;
-      // }
-      // .card:hover .front-side {
-      //   visibility: visible;
-      // }
-      // .card:hover .back-side {
-      //   visibility: hidden;
-      // }
     }
-
   }
 }
 

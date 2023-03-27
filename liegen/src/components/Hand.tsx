@@ -11,8 +11,9 @@ import {
 import { createCardName } from '../utilities/card-helper-functions';
 import { RootState } from '../store';
 import Card from './Card';
+import checkmark from '../assets/icons/checkmark.svg'
 
-function Hand({name, index, realIndex, amountOfPlayers, gameWidth, gameHeight, cards}: HandProps) {
+function Hand({name, index, realIndex, amountOfPlayers, gameWidth, gameHeight, cards, assignIndicatorRefToCollection}: HandProps) {
   const cardUrls: CardUrls  = useSelector(
     (state: RootState) => {
       return state.game.cardUrls;
@@ -47,10 +48,15 @@ function Hand({name, index, realIndex, amountOfPlayers, gameWidth, gameHeight, c
 
   return (
     <div className={`hand player-${index}`} style={style} ref={mainContainerRef}>
-      <div className="name-wrapper">
-        <div className="name">
+      <div className="name">
+        <div className="name-value">
           {name}
         </div>
+        <img 
+          src="" 
+          className="indicator" 
+          ref={element => assignIndicatorRefToCollection(element, index)}
+        />
       </div>
       <div
         ref={cardContainerRef}
