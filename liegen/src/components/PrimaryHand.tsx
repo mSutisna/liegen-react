@@ -1,5 +1,5 @@
 import { HandProps } from '../types/props';
-import { CardUrls } from '../types/models';
+import { CardUrls, SetInterface } from '../types/models';
 import { determinePositionCoordinates } from '../utilities/player-position-determination';
 import { DESKTOP_PRIMARY_HAND_WIDTH, DESKTOP_PRIMARY_HAND_HEIGHT, DESKTOP_CARD_WIDTH, DESKTOP_CARD_HEIGHT, RANKS, DESKTOP_CARD_SCALE } from '../constants';
 import { createCardName } from '../utilities/card-helper-functions';
@@ -14,10 +14,10 @@ import {
   callBust,
   setPlayerCenterCoordinates,
   setMessageModalMessage,
-  hideMessageModal
+  hideMessageModal,
+  displayNewMessage,
 } from "../slices/gameSlice";
 import { RootState } from '../store';
-import checkmark from '../assets/icons/checkmark.svg'
 
 function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHeight, cards, selectedRank, assignIndicatorRefToCollection} : HandProps) {
   const cardUrls: CardUrls  = useSelector(
@@ -25,9 +25,16 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
       return state.game.cardUrls;
     }
   );
+  const set: (SetInterface | null) = useSelector(
+    (state: RootState) => {
+      return state.game.middle.set;
+    }
+  );
+
   const mainContainerRef = useRef<HTMLDivElement>(null);
   const cardContainerRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
+
   useEffect(() => {
     let mainX = 0;
     let mainY = 0;
@@ -67,7 +74,16 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
       <div className="controls-wrapper">
         <div className="bust">
           <button
-            onClick={() => {
+            onClick={async e => {
+              e.stopPropagation();
+              if (!set) {
+                displayNewMessage(dispatch, 'You can\'t call bust because there is no set in the middle.');
+                return;
+              }
+              if (set.playerIndex === realIndex) {
+                displayNewMessage(dispatch, 'You can\'t call bust on your own set.');
+                return;
+              }
               dispatch(callBust())
             }}
           >
@@ -133,10 +149,7 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
           <button
             onClick={async e => {
               e.stopPropagation();
-              await dispatch(hideMessageModal());
-              dispatch(setMessageModalMessage({
-                message: 'Hello',
-              }))
+              displayNewMessage(dispatch, 'hello');
             }}
           >
             Hoef je niet

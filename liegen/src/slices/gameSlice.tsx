@@ -1,41 +1,43 @@
 import InitialState, { UpdateGameAction, ReceiveCardPayload } from "../types/redux/game";
-import { createSlice, PayloadAction, current } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction, current, Dispatch, AnyAction } from "@reduxjs/toolkit";
 import { PlayerInterface, CardUrls } from "../types/models";
 import { RANKS, SUITS, MESSAGE_MODAL_REGULAR_DISPLAY_ANIMATION } from "../constants";
 import { createCardName } from "../utilities/card-helper-functions";
 import { MessageModalPayload } from "../types/redux/game";
+import { AnimationStatus } from "../types/models";
 
 const initialState: InitialState = {
   players: [],
-  // middle: {
-  //   set: null,
-  //   previousSet: null,
-  //   burnedCards: [],
-  //   playerToCallBust: null,
-  //   bustAnimationStatus: 'idle'
-  // },
   middle: {
-    set: {
-      playerIndex: 0,
-      realCards: [
-        {suit: 'Diamonds', rank: '3', faceDown: true},
-        {suit: 'Diamonds', rank: '4', faceDown: true},
-        {suit: 'Diamonds', rank: '5', faceDown: true},
-      ],
-      supposedCards: [
-        {suit: 'Diamonds', rank: 'A', faceDown: false},
-        {suit: 'Diamonds', rank: 'A', faceDown: false},
-        {suit: 'Diamonds', rank: 'A', faceDown: false},
-      ],
-      rank: 'A',
-      amount: 3,
-      animationFinished: true 
-    },
+    set: null,
     previousSet: null,
     burnedCards: [],
     playerToCallBust: null,
-    bustAnimationStatus: 'idle'
+    setAnimationStatus: AnimationStatus.IDLE,
+    bustAnimationStatus: AnimationStatus.IDLE,
   },
+  // middle: {
+  //   set: {
+  //     playerIndex: 0,
+  //     realCards: [
+  //       {suit: 'Diamonds', rank: '3', faceDown: true},
+  //       {suit: 'Diamonds', rank: '4', faceDown: true},
+  //       {suit: 'Diamonds', rank: '5', faceDown: true},
+  //     ],
+  //     supposedCards: [
+  //       {suit: 'Diamonds', rank: 'A', faceDown: false},
+  //       {suit: 'Diamonds', rank: 'A', faceDown: false},
+  //       {suit: 'Diamonds', rank: 'A', faceDown: false},
+  //     ],
+  //     rank: 'A',
+  //     amount: 3,
+  //   },
+  //   previousSet: null,
+  //   burnedCards: [],
+  //   playerToCallBust: null,
+  //   setAnimationStatus: AnimationStatus.FINISHED,
+  //   bustAnimationStatus: AnimationStatus.IDLE,
+  // },
   mainPlayerIndex: 0,
   currentPlayerIndex: 1,
   previousPlayerIndex: null,
@@ -76,7 +78,7 @@ export const gameSlice = createSlice({
       if (!state.middle.set) {
         return;
       }
-      state.middle.set.animationFinished = true;
+      state.middle.setAnimationStatus = AnimationStatus.FINISHED;
     },
     increaseRank: (state: InitialState) => {
       const player = state.players[state.currentPlayerIndex];
@@ -156,8 +158,8 @@ export const gameSlice = createSlice({
         playerIndex: state.currentPlayerIndex,
         realCards,
         supposedCards,
-        animationFinished: false
       }
+      state.middle.setAnimationStatus = AnimationStatus.IDLE;
       const endPlayerIndex = state.players.length - 1;
       if (state.clockwise) {
         state.currentPlayerIndex -= 1;
@@ -206,5 +208,24 @@ export const {
   setMessageModalMessage,
   hideMessageModal
 } = gameSlice.actions;
+
+
+const helpFunctions = {
+  displayNewMessage: async (
+    dispatch: Dispatch<AnyAction>,
+    message: string
+  ) => {
+    await dispatch(gameSlice.actions.hideMessageModal());
+    dispatch(gameSlice.actions.setMessageModalMessage({
+      message,
+    }))
+  }
+};
+
+export const {
+  displayNewMessage
+} = helpFunctions;
+
+
 // You must export the reducer as follows for it to be able to be read by the store.
 export default gameSlice.reducer;

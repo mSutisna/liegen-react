@@ -104,6 +104,33 @@ const generatePlayers = () : Array<PlayerInterface> => {
       originIndex: null,
       receiveAnimationPlayed: false
     },
+    {
+      suit: 'Spades',
+      rank: 'J',
+      faceDown: true,
+      selected: false,
+      received: false,
+      originIndex: null,
+      receiveAnimationPlayed: false
+    },
+    {
+      suit: 'Spades',
+      rank: 'K',
+      faceDown: true,
+      selected: false,
+      received: false,
+      originIndex: null,
+      receiveAnimationPlayed: false
+    },
+    {
+      suit: 'Spades',
+      rank: 'A',
+      faceDown: true,
+      selected: false,
+      received: false,
+      originIndex: null,
+      receiveAnimationPlayed: false
+    },
   ];
   return [
     {

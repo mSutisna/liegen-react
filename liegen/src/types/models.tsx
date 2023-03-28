@@ -28,7 +28,12 @@ export interface SetInterface {
   playerIndex: number,
   realCards: Array<BaseCardInterface>,
   supposedCards: Array<BaseCardInterface>,
-  animationFinished: boolean 
+}
+
+export enum AnimationStatus {
+  IDLE = 'idle',
+  RUNNING = 'running',
+  FINISHED = 'finished'
 }
 
 export interface MiddleInterface {
@@ -36,7 +41,8 @@ export interface MiddleInterface {
   previousSet: SetInterface | null,
   burnedCards: Array<BaseCardInterface>,
   playerToCallBust: number | null,
-  bustAnimationStatus: string,
+  setAnimationStatus: AnimationStatus,
+  bustAnimationStatus: AnimationStatus,
 }
 
 export interface Point {
@@ -46,7 +52,8 @@ export interface Point {
 
 export interface AnimationChain {
   element: HTMLElement | null,
-  animationInstructions: Array<{[k: string]: string | number}>,
+  executeFunction?: (element: HTMLElement | null) => Promise<void>,
+  animationInstructions?: Array<{[k: string]: string | number}>,
   animationSettings?: {[k: string]: number | string}
   dontMakeVisible?: boolean,
 }

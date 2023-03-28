@@ -15,6 +15,7 @@ import questionMark from '../assets/icons/question-mark.svg';
 import crossMark from '../assets/icons/cross-mark.svg';
 import smileyFace from '../assets/icons/smiley-face.svg';
 import frownFace from '../assets/icons/frown-face.svg';
+import { AnimationStatus } from "../types/models";
 
 interface MiddleProps {
   width: number,
@@ -22,6 +23,11 @@ interface MiddleProps {
   left: number,
   top: number,
   playerIndicatorCollection: React.RefObject<(HTMLImageElement | null)[]>
+}
+
+interface cardSetsRefCollectionInterface {
+  currentSetCardsRef: HTMLElement | null,
+  previousSetCardsRef: HTMLElement | null
 }
 
 interface cardsRefInterface {
@@ -54,7 +60,8 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
   const cardWidth = DESKTOP_CARD_WIDTH * DESKTOP_CARD_SCALE;
   const cardHeight = DESKTOP_CARD_HEIGHT * DESKTOP_CARD_SCALE;
 
-  let cardsToDisplay : Array<JSX.Element | null> = [];
+  const currentSetCardsToDisplay : Array<JSX.Element | null> = [];
+  const previousSetCardsToDisplay : Array<JSX.Element | null> = [];
   const middleSet = middle.set;
   const previousMiddleSet = middle.previousSet;
 
@@ -62,6 +69,11 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
     newSet: [],
     previousSet: []
   });
+
+  const cardSetsCollection = useRef<cardSetsRefCollectionInterface>({
+    currentSetCardsRef: null,
+    previousSetCardsRef: null
+  })
 
   const middleCardIndicatorsCollection = useRef<(HTMLImageElement | null)[]>([]);
 
@@ -102,7 +114,7 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
     }
 
     const playReceiveSetAnimation = async () => {
-      if (middleSet.animationFinished) {
+      if (middle.setAnimationStatus !== AnimationStatus.IDLE) {
         return;
       }
       if (previousSetRefs.length === 0) {
@@ -120,6 +132,7 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
           middleSet,
         };
         await playAnimationPreviousSetAndNewSet(
+          cardSetsCollection.current,
           previousSetRefs,
           refCardsBurned.current,
           cardWidth, 
@@ -136,8 +149,6 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
   if (middleSet) {
     const supposedCards = middleSet.supposedCards;
     const realCards = middleSet.realCards;
-
-
     const createRefObjectAndSetElement = (
       refCollectionData: cardsRefInterface[],
       index: number,
@@ -156,21 +167,18 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
       refCollectionData[index] = cardRefObject;
     }
 
-    const createCardElement = (refCollectionType: string, type: string, url: string, index: number, visibilityHideType = 'visibility')  => {
+    const createCardElement = (refCardCollection: Array<cardsRefInterface>, type: string, url: string, index: number, visibilityHideType = 'visibility')  => {
       const style : {[k: string]: string | number} = {
         width: cardWidth,
         height: cardHeight,
       }
       const cardStyle = {...style};
-      // if (visibilityHideType === 'visibility')  {
-      //   style.visibility = 'hidden';
-      // } else if (visibilityHideType === 'display') {
-      //   style.display = 'none';
-      // }
-      const refCollectionData = refCollection.current;
-      const refCollectionDataChosen = refCollectionType === 'newSet' 
-        ? refCollectionData.newSet
-        : refCollectionData.previousSet;
+      //Comment out if chain below to display middle set initially without problems
+      if (visibilityHideType === 'visibility')  {
+        style.visibility = 'hidden';
+      } else if (visibilityHideType === 'display') {
+        style.display = 'none';
+      }
       const frontSideDisplay = type === 'supposedCard' 
         ? 'do-display'
         : 'dont-display';
@@ -180,7 +188,7 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
       return <div
         ref={el => {
           createRefObjectAndSetElement(
-            refCollectionDataChosen,
+            refCardCollection,
             index,
             (refCollectionData) => {
               if (type === 'supposedCard') {
@@ -190,20 +198,6 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
               }
             }
           );
-          // let refMiddleCardPair = refCollectionDataChosen[index]
-          // if (!refMiddleCardPair) {
-          //   refMiddleCardPair = {
-          //     realCardRef: null,
-          //     supposedCardRef: null,
-          //     innerCardRef: null,
-          //   };
-          // }
-          // if (type === 'supposedCard') {
-          //   refMiddleCardPair.supposedCardRef = el 
-          // } else {
-          //   refMiddleCardPair.realCardRef = el
-          // }
-          // refCollectionDataChosen[index] = refMiddleCardPair;
         }}
         className="card"
         style={style}
@@ -211,7 +205,7 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
         <div 
           ref={el => {
             createRefObjectAndSetElement(
-              refCollectionDataChosen,
+              refCardCollection,
               index,
               (refCollectionData) => {
                 if (type === 'supposedCard') {
@@ -221,16 +215,6 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
                 }
               }
             );
-            // let refMiddleCardPair = refCollectionDataChosen[index]
-            // if (!refMiddleCardPair) {
-            //   refMiddleCardPair = {
-            //     innerCardRef: null,
-            //     realCardRef: null,
-            //     supposedCardRef: null
-            //   };
-            // }
-            // refMiddleCardPair.innerCardRef = el;
-            // refCollectionDataChosen[index] = refMiddleCardPair;
           }}
           className="card-inner" 
         >
@@ -246,52 +230,20 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
           />
         </div>
       </div>
-      // return <div
-   
-      // >
-      //   <img 
-      //     src={url} 
-      //     style={cardStyle}
-      //     className={`front-side ${frontSideDisplay}`}
-      //   />
-      //   <img 
-      //     src={cardUrls['Backside']} 
-      //     style={cardStyle}
-      //     className={`back-side ${backsideDisplay}`}
-      //   />
-      // </div>
-      // return <img 
-      //   ref={el => {
-      //     let refMiddleCardPair = refCollectionDataChosen[index]
-      //     if (!refMiddleCardPair) {
-      //       refMiddleCardPair = {
-      //         realCardRef: null,
-      //         supposedCardRef: null
-      //       };
-      //     }
-      //     if (type === 'supposedCard') {
-      //       refMiddleCardPair.supposedCardRef = el 
-      //     } else {
-      //       refMiddleCardPair.realCardRef = el
-      //     }
-      //     refCollectionDataChosen[index] = refMiddleCardPair;
-      //   }}
-      //   src={url} 
-      //   className="card"
-      //   style={style}
-      // />
     }
+    const refCollectionData = refCollection.current;
     for (let i = 0; i < supposedCards.length; i++) {
       const supposedCard = supposedCards[i];
       const realCard = realCards[i];
-      // const supposedCardKey = !supposedCard.faceDown ? createCardName(supposedCard.suit ?? '', supposedCard.rank ?? '') : 'Backside';
-      // const realCardKey = !realCard.faceDown ? createCardName(realCard.suit ?? '', realCard.rank ?? '') : 'Backside';
       const supposedCardKey = createCardName(supposedCard.suit ?? '', supposedCard.rank ?? '');
       const realCardKey = createCardName(realCard.suit ?? '', realCard.rank ?? '');
-      cardsToDisplay.push(<div key={`middle-cards-container-new-${i}-${middleSet.playerIndex}`} className="middle-cards-container">
+      currentSetCardsToDisplay.push(<div 
+        key={`middle-cards-container-new-${i}-${middleSet.playerIndex}`} 
+        className="middle-cards-container" 
+      >
         <div className="cards-wrapper">
-          {createCardElement('newSet', 'supposedCard', cardUrls[supposedCardKey], i, previousMiddleSet ? 'display' : 'visibility')}
-          {createCardElement('newSet', 'realCard', cardUrls[realCardKey], i, previousMiddleSet ? 'display' : 'visibility')}
+          {createCardElement(refCollectionData.newSet, 'supposedCard', cardUrls[supposedCardKey], i, previousMiddleSet ? 'display' : 'visibility')}
+          {createCardElement(refCollectionData.newSet, 'realCard', cardUrls[realCardKey], i, previousMiddleSet ? 'display' : 'visibility')}
         </div>
         <img 
           src="" 
@@ -312,10 +264,13 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
         const realCard = previousMiddleCards[i];
         const supposedCardKey = !supposedCard.faceDown ? createCardName(supposedCard.suit ?? '', supposedCard.rank ?? '') : 'Backside';
         const realCardKey = !realCard.faceDown ? createCardName(realCard.suit ?? '', realCard.rank ?? '') : 'Backside';
-        cardsToDisplay.push(<div key={`middle-cards-container-previous-${i}-${middleSet.playerIndex}`} className="middle-cards-container">
+        previousSetCardsToDisplay.push(<div 
+          key={`middle-cards-container-previous-${i}-${middleSet.playerIndex}`} 
+          className="middle-cards-container previous"
+        >
           <div className="cards-wrapper">
-            {createCardElement('previousSet', 'supposedCard', cardUrls[supposedCardKey], i, 'noHide')}
-            {createCardElement('previousSet', 'realCard', cardUrls[realCardKey], i, 'noHide')}
+            {createCardElement(refCollectionData.previousSet, 'supposedCard', cardUrls[supposedCardKey], i, 'noHide')}
+            {createCardElement(refCollectionData.previousSet, 'realCard', cardUrls[realCardKey], i, 'noHide')}
           </div>
           <img src="" className="indicator"/>
         </div>)
@@ -327,6 +282,7 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
   const cardsToDeal = [];
   for (let i = 0; i < cardsToDealAmount; i++) {
     cardsToDeal.push(<img
+      key={`card-to-deal-${i}`}
       src={cardUrls['Backside']}
       className="card"
       style={{
@@ -366,15 +322,26 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
             }}
           >
             {cardsToDeal}
-            {/* <div className="text-for-position">
-              <span className="text">Cards: {middle.burnedCards.length}</span>
-              {cardsToDeal}
-            </div> */}
           </div>
         </div>
       </div>
       <div className="middle-cards">
-        {cardsToDisplay}
+        <div 
+          className="middle-cards-inner"
+          ref={element => {
+            cardSetsCollection.current.currentSetCardsRef = element;
+          }}
+        >
+          {currentSetCardsToDisplay}
+        </div>
+        <div 
+          className="middle-cards-inner previous"
+          ref={element => {
+            cardSetsCollection.current.previousSetCardsRef = element;
+          }}
+        >
+          {previousSetCardsToDisplay}
+        </div>
       </div>
     </div>
   )
@@ -586,7 +553,7 @@ const createBurnCardsAnimationChain = (
   cardRefs: Array<cardsRefInterface>, 
   cardsBurnedRef: HTMLDivElement | null
 ) : Array<AnimationChainMultipleImplelmentations[]> => {
-  let animationChains = [];
+  const animationChains = [];
   for (const cardsRef of cardRefs) {
     const supposedCard = cardsRef?.supposedCardRef;
     const realCard = cardsRef?.realCardRef;
@@ -595,7 +562,6 @@ const createBurnCardsAnimationChain = (
     let realCardRect = realCard?.getBoundingClientRect();
     const secondStartY = (supposedCardRect?.top ?? 0) - (realCardRect?.top ?? 0);
     const secondStartX = (supposedCardRect?.left ?? 0) - (realCardRect?.left ?? 0);
-    
 
     let animationChain : Array<AnimationChainMultipleImplelmentations> = []
 
@@ -662,6 +628,7 @@ const playAnimationOnlyNewSet = async (
 }
 
 const playAnimationPreviousSetAndNewSet = async (
+  cardSetsCollection: cardSetsRefCollectionInterface,
   previousSetCardRefs: Array<cardsRefInterface>, 
   cardsBurnedRef: HTMLDivElement | null,
   cardWidth: number,
@@ -676,6 +643,24 @@ const playAnimationPreviousSetAndNewSet = async (
     previousSetCardRefs,
     cardsBurnedRef
   );
+
+  const displayCardsForSelectedSetHideForOther = (type: string) => {
+    if (!cardSetsCollection.currentSetCardsRef || !cardSetsCollection.previousSetCardsRef) {
+      return;
+    }
+    if (type === 'reset') {
+      cardSetsCollection.previousSetCardsRef.style.removeProperty('visibility');
+      cardSetsCollection.currentSetCardsRef.style.removeProperty('visibility');
+    } else if (type === 'previous') {
+      cardSetsCollection.previousSetCardsRef.style.visibility = 'visible';
+      cardSetsCollection.currentSetCardsRef.style.visibility = 'hidden';
+    } else {
+      cardSetsCollection.currentSetCardsRef.style.visibility = 'visible';
+      cardSetsCollection.previousSetCardsRef.style.visibility = 'hidden';
+    }
+  }
+
+  displayCardsForSelectedSetHideForOther('previous');
 
   await playAnimationChains(animationChains);
 
@@ -707,7 +692,11 @@ const playAnimationPreviousSetAndNewSet = async (
     cardHeight
   );
 
+  displayCardsForSelectedSetHideForOther('current');
+
   await playAnimationChains(makeSetAnimation);
+
+  displayCardsForSelectedSetHideForOther('reset');
 }
 
 export default Middle;

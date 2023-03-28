@@ -152,57 +152,67 @@ body > #root > .game-wrapper {
   }
   .middle-cards {
     flex: 3;
-    display: flex;
-    padding: 10px;
-    row-gap: 20px;
-    column-gap: 20px;
     position: relative;
-    justify-content: center;
-    align-items: center;
-
-    .middle-cards-container {
-      border: solid 1px black;
+    padding: 10px;
+    .middle-cards-inner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      &.previous {
+        visibility: hidden;
+      }
       display: flex;
-      flex-direction: column;
+      row-gap: 20px;
+      column-gap: 20px;
+      justify-content: center;
       align-items: center;
-      row-gap: 10px;
-      .cards-wrapper {
+
+      .middle-cards-container {
+        border: solid 1px black;
         display: flex;
         flex-direction: column;
-        row-gap: 20px;
-        .card {
-          perspective: 600px;
-          // &:hover {
-          //   .card-inner {
-          //     transform: translateX(-100%) rotateY(-180deg);
-          //   } 
-          // }
-        }
-        .card-inner {
-          position:relative;
-          transition: transform 0.5s;
-          transform-style: preserve-3d;
-          transform-origin: center right;
-        }
-  
-        .front-side, .back-side {
-          backface-visibility: hidden;
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          top: 0;
-          left: 0;
-        }
-  
+        align-items: center;
+        row-gap: 10px;
+        .cards-wrapper {
+          display: flex;
+          flex-direction: column;
+          row-gap: 20px;
+          .card {
+            perspective: 600px;
+            // &:hover {
+            //   .card-inner {
+            //     transform: translateX(-100%) rotateY(-180deg);
+            //   } 
+            // }
+          }
+          .card-inner {
+            position:relative;
+            transition: transform 0.5s;
+            transform-style: preserve-3d;
+            transform-origin: center right;
+          }
+    
+          .front-side, .back-side {
+            backface-visibility: hidden;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+          }
+    
 
-        .dont-display {
-          transform: rotateY(180deg);
+          .dont-display {
+            transform: rotateY(180deg);
+          }
         }
-      }
-      .indicator {
-        opacity: 0;
-        height: 20px;
-        width: 20px;
+        .indicator {
+          opacity: 0;
+          height: 20px;
+          width: 20px;
+        }
       }
     }
   }

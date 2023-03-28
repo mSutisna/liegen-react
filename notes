@@ -215,3 +215,32 @@ Daarna voor ieder aantal spelers een goede layout schrijven
 
 CSS card flip
 https://3dtransforms.desandro.com/card-flip
+
+
+
+
+
+
+TODO:
+
+
+- bust callen en ook daadwerklijk de kaarten uitdelen
+- bijhouden wanneer bust animatie bezig is
+- geen bust kunnen callen wanneer animatie bezig is
+- geen set kunnen maken wanneer animatie bezig is
+- geen bust kunnen callen op je eigen set
+
+- alleen een set kunnen maken als het jou beurt is
+- geen set kunnen maken als de animatie bezig is
+
+
+- win message tonen
+- verplicht maken om bust te callen als iemand zijn laatste kaart heeft opgegooid
+
+
+
+
+
+
+
+

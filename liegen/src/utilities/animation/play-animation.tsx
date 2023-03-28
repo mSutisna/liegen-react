@@ -1,7 +1,7 @@
 import { AnimationChain, AnimationChainMultipleImplelmentations } from "../../types/models";
 
 const playAnimation = async ({element, animationInstructions, animationSettings} : AnimationChain) => {
-  if (!element) {
+  if (!element || !animationInstructions) {
     return;
   }
 
@@ -22,6 +22,10 @@ const playAnimationChain = async (animationChain: AnimationChainMultipleImplelme
       animationData = animationData();
     }
     if (!animationData.element) {
+      continue;
+    }
+    if (animationData.executeFunction) {
+      await animationData.executeFunction(animationData.element);
       continue;
     }
     if (!animationData.dontMakeVisible) {
