@@ -1,7 +1,7 @@
 import { HandProps } from '../types/props';
-import { CardUrls, SetInterface } from '../types/models';
+import { AnimationStatus, CardUrls, MiddleInterface, PlayerInterface } from '../types/models';
 import { determinePositionCoordinates } from '../utilities/player-position-determination';
-import { DESKTOP_PRIMARY_HAND_WIDTH, DESKTOP_PRIMARY_HAND_HEIGHT, DESKTOP_CARD_WIDTH, DESKTOP_CARD_HEIGHT, RANKS, DESKTOP_CARD_SCALE } from '../constants';
+import { DESKTOP_PRIMARY_HAND_WIDTH, DESKTOP_PRIMARY_HAND_HEIGHT, DESKTOP_CARD_WIDTH, DESKTOP_CARD_HEIGHT, SUITS, RANKS, DESKTOP_CARD_SCALE } from '../constants';
 import { createCardName } from '../utilities/card-helper-functions';
 import CardPrimary from '../components/CardPrimary';
 import { useEffect, useRef } from 'react';
@@ -13,8 +13,6 @@ import {
   makeSet,
   callBust,
   setPlayerCenterCoordinates,
-  setMessageModalMessage,
-  hideMessageModal,
   displayNewMessage,
 } from "../slices/gameSlice";
 import { RootState } from '../store';
@@ -25,9 +23,19 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
       return state.game.cardUrls;
     }
   );
-  const set: (SetInterface | null) = useSelector(
+  const middle: MiddleInterface = useSelector(
     (state: RootState) => {
-      return state.game.middle.set;
+      return state.game.middle;
+    }
+  );
+  const currentPlayerIndex: (number) = useSelector(
+    (state: RootState) => {
+      return state.game.currentPlayerIndex;
+    }
+  );
+  const players: (Array<PlayerInterface> | null) = useSelector(
+    (state: RootState) => {
+      return state.game.players;
     }
   );
 
@@ -76,11 +84,15 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
           <button
             onClick={async e => {
               e.stopPropagation();
-              if (!set) {
+              console.log({bustAnimation: middle.bustAnimationStatus})
+              if (middle.bustAnimationStatus !== AnimationStatus.IDLE || middle.setAnimationStatus == AnimationStatus.RUNNING) {
+                return;
+              }
+              if (!middle.set) {
                 displayNewMessage(dispatch, 'You can\'t call bust because there is no set in the middle.');
                 return;
               }
-              if (set.playerIndex === realIndex) {
+              if (middle.set.playerIndex === realIndex) {
                 displayNewMessage(dispatch, 'You can\'t call bust on your own set.');
                 return;
               }
@@ -96,7 +108,7 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
         >
           <div className="cards-grid">
             {cards.map((card, cardIndex) => {
-              const cardKey = createCardName(card.suit ?? '', card.rank ?? '')
+              const cardKey = createCardName(SUITS[card.suitIndex] ?? '', RANKS[card.rankIndex] ?? '')
               if (!cardUrls[cardKey]) {
                 return null;
               }
@@ -120,13 +132,13 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
                 startLeft={-containerX - left}
                 startTop={-containerY - top}
                 delay={delay}
-                rank={card.rank}
-                suit={card.suit}
+                rank={RANKS[card.rankIndex]}
+                suit={SUITS[card.suitIndex]}
                 selected={card.selected}
                 faceDown={card.faceDown}
                 playerIndex={realIndex}
                 cardIndex={cardIndex}
-                receiveAnimationFinished={card.receiveAnimationPlayed}
+                receiveAnimationStatus={card.receiveAnimationStatus}
               />
             })}
           </div>
@@ -142,17 +154,53 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
             </button>
           </div>
           <button
-            onClick={() => dispatch(makeSet())}
-          >
-            Make set
-          </button>
-          <button
-            onClick={async e => {
+            onClick={e => {
               e.stopPropagation();
-              displayNewMessage(dispatch, 'hello');
+              if (middle.setAnimationStatus !== AnimationStatus.IDLE || middle.bustAnimationStatus == AnimationStatus.RUNNING) {
+                return;
+              }
+              const player = players[realIndex];
+              if (currentPlayerIndex !== realIndex) {
+                displayNewMessage(dispatch, 'You can\'t make a set because it is not your turn.');
+                return;
+              }
+              for (const player of players) {
+                if (player.cards.length === 0) {
+                  displayNewMessage(dispatch, `Player '${player.name}' has no more cards left. Someone must call bust on ${player.name}'s set!`);
+                  return;
+                }
+              }
+              if (!player || player.cards.filter(card => card.selected).length === 0) {
+                displayNewMessage(dispatch, 'You must select at least one card to make a set.');
+                return;
+              }
+              if (middle.set) {
+                const belowRank = (middle.set.rank - 1) >= 0 
+                  ? middle.set.rank - 1
+                  : RANKS.length - 1;
+                const aboveRank = (middle.set.rank + 1) <= (RANKS.length - 1)
+                  ? middle.set.rank + 1
+                  : 0;
+  
+                const validRankIndexes = [
+                  belowRank,
+                  middle.set.rank,
+                  aboveRank
+                ];
+
+                const rankLabels = validRankIndexes.map(index => {
+                  return RANKS[index];
+                })
+
+                if (!validRankIndexes.includes(player.selectedRank)) {
+                  displayNewMessage(dispatch, `You can only select one of the following ranks '${rankLabels.join(', ')}' because the rank of the current set is '${RANKS[middle.set.rank]}'.`);
+                  return;
+                }
+              }
+              dispatch(makeSet())
             }}
           >
-            Hoef je niet
+            Make set
           </button>
         </div>
       </div>

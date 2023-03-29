@@ -6,130 +6,134 @@ import {
   DESKTOP_GAME_WIDTH, 
   DESKTOP_GAME_HEIGHT, 
   DESKTOP_MIDDLE_WIDTH,
-  DESKTOP_MIDDLE_HEIGHT
+  DESKTOP_MIDDLE_HEIGHT,
+  CardRanks, 
+  CardSuits
  } from '../constants';
 import {
   setPlayers,
-  setCardUrls
+  setCardUrls,
+  setPlayersView
 } from "../slices/gameSlice";
-import { PlayerInterface } from '../types/models';
+import { AnimationStatus, CardInterface, PlayerInterface, PlayerViewInterface } from '../types/models';
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from '../store';
 import { getImageUrls } from '../utilities/image-store/image-urls';
 import MessageModal from './MessageModal'; 
 import { current } from '@reduxjs/toolkit';
+import { createPlayersView } from '../utilities/general-helper-functions';
 
-const generatePlayers = () : Array<PlayerInterface> => {
-  const player1Cards = [
+const generatePlayers = (currentPlayerIndex: number) : Array<PlayerInterface> => {
+  const player1Cards : Array<CardInterface> = [
     {
-      suit: 'Hearts',
-      rank: 'A',
+      suitIndex: CardSuits.HEARTS,
+      rankIndex: CardRanks.ACE,
       faceDown: true,
       selected: false,
       received: false,
       originIndex: null,
-      receiveAnimationPlayed: false
+      receiveAnimationStatus: AnimationStatus.IDLE
     },
     {
-      suit: 'Hearts',
-      rank: '2',
+      suitIndex: CardSuits.HEARTS,
+      rankIndex: CardRanks.TWO,
       faceDown: true,
       selected: false,
       received: false,
       originIndex: null,
-      receiveAnimationPlayed: false
+      receiveAnimationStatus: AnimationStatus.IDLE
     },
     {
-      suit: 'Hearts',
-      rank: '3',
+      suitIndex: CardSuits.HEARTS,
+      rankIndex: CardRanks.THREE,
       faceDown: true,
       selected: false,
       received: false,
       originIndex: null,
-      receiveAnimationPlayed: false
+      receiveAnimationStatus: AnimationStatus.IDLE
     },
     {
-      suit: 'Diamonds',
-      rank: '3',
+      suitIndex: CardSuits.DIAMONDS,
+      rankIndex: CardRanks.THREE,
       faceDown: true,
       selected: false,
       received: false,
       originIndex: null,
-      receiveAnimationPlayed: false
+      receiveAnimationStatus: AnimationStatus.IDLE
     },
     {
-      suit: 'Diamonds',
-      rank: '4',
+      suitIndex: CardSuits.DIAMONDS,
+      rankIndex: CardRanks.FOUR,
       faceDown: true,
       selected: false,
       received: false,
       originIndex: null,
-      receiveAnimationPlayed: false
+      receiveAnimationStatus: AnimationStatus.IDLE
     },
     {
-      suit: 'Diamonds',
-      rank: '5',
+      suitIndex: CardSuits.DIAMONDS,
+      rankIndex: CardRanks.FIVE,
       faceDown: true,
       selected: false,
       received: false,
       originIndex: null,
-      receiveAnimationPlayed: false
+      receiveAnimationStatus: AnimationStatus.IDLE
     }
   ];
   const player2Cards = [
     {
-      suit: 'Diamonds',
-      rank: '3',
+      suitIndex: CardSuits.DIAMONDS,
+      rankIndex: CardRanks.SEVEN,
       faceDown: true,
       selected: false,
       received: false,
       originIndex: null,
-      receiveAnimationPlayed: false
+      receiveAnimationStatus: AnimationStatus.IDLE
     },
     {
-      suit: 'Diamonds',
-      rank: '4',
+      suitIndex: CardSuits.DIAMONDS,
+      rankIndex: CardRanks.EIGHT,
       faceDown: true,
       selected: false,
       received: false,
       originIndex: null,
-      receiveAnimationPlayed: false
+      receiveAnimationStatus: AnimationStatus.IDLE
     },
     {
-      suit: 'Diamonds',
-      rank: '5',
+      suitIndex: CardSuits.DIAMONDS,
+      rankIndex: CardRanks.NINE,
       faceDown: true,
       selected: false,
       received: false,
       originIndex: null,
-      receiveAnimationPlayed: false
+      receiveAnimationStatus: AnimationStatus.IDLE
     },
     {
-      suit: 'Spades',
-      rank: 'J',
+      suitIndex: CardSuits.SPADES,
+      rankIndex: CardRanks.JACK,
       faceDown: true,
       selected: false,
       received: false,
       originIndex: null,
-      receiveAnimationPlayed: false
+      receiveAnimationStatus: AnimationStatus.IDLE
     },
     {
-      suit: 'Spades',
-      rank: 'K',
+      suitIndex: CardSuits.SPADES,
+      rankIndex: CardRanks.KING,
       faceDown: true,
       selected: false,
       received: false,
       originIndex: null,
-      receiveAnimationPlayed: false
+      receiveAnimationStatus: AnimationStatus.IDLE
     },
     {
-      suit: 'Spades',
-      rank: 'A',
+      suitIndex: CardSuits.SPADES,
+      rankIndex: CardRanks.ACE,
       faceDown: true,
       selected: false,
       received: false,
       originIndex: null,
-      receiveAnimationPlayed: false
+      receiveAnimationStatus: AnimationStatus.IDLE
     },
   ];
   return [
@@ -147,10 +151,8 @@ const generatePlayers = () : Array<PlayerInterface> => {
       xPoint: 0,
       yPoint: 0
     }
-  ]
+  ];
 }
-
-
 
 function Game() {
   const dispatch = useDispatch();
@@ -160,10 +162,23 @@ function Game() {
       playerIndicatorCollection.current[index] = element;
     }
   }
+  const players: Array<PlayerViewInterface> = useSelector(
+    (state: RootState) => {
+      return state.game.playersView;
+    }
+  );
+  const currentPlayerIndex: number = useSelector(
+    (state: RootState) => {
+      return state.game.currentPlayerIndex;
+    }
+  )
+  const amountOfPlayers = players.length;
   useEffect(() => {
     const fetchPlayers = async () => {
-      const players = generatePlayers();
+      const players = generatePlayers(currentPlayerIndex);
+      const playersView = createPlayersView(players, currentPlayerIndex);
       dispatch(setPlayers(players));
+      dispatch(setPlayersView(playersView))
     }
     fetchPlayers();
     const setImageUrls = async () => {
@@ -178,45 +193,6 @@ function Game() {
     width: gameWidth,
     height: gameHeight
   }
-  const players: Array<PlayerInterface> = useSelector(
-    (state: RootState) => {
-      return state.game.players;
-    }
-  );
-  const currentPlayerIndex: number = useSelector(
-    (state: RootState) => {
-      return state.game.currentPlayerIndex;
-    }
-  )
-  const amountOfPlayers = players.length;
-
-  let realPlayerIndexes: {
-    [k: string]: number
-  } = {};
-  let index = 0;
-  for (const player of players) {
-    realPlayerIndexes[player.name] = index;
-    index++;
-  }
-
-  const createPlayersArray = (players: Array<PlayerInterface>, currentPlayerIndex: number) : Array<PlayerInterface> => {
-    if (players.length === 0) {
-      return [];
-    }
-    const endIndex = players.length - 1;
-    let iterationIndex = currentPlayerIndex;
-    let playersArray = [];
-    do {
-      playersArray.push(players[iterationIndex])
-      iterationIndex -= 1;
-      if (iterationIndex < 0) {
-        iterationIndex = endIndex;
-      }
-    } while (iterationIndex !== currentPlayerIndex);
-    return playersArray;
-  }
-
-  const playersArray = createPlayersArray(players, currentPlayerIndex);
 
   return (
     <div className="game-wrapper">
@@ -229,12 +205,11 @@ function Game() {
           top={(gameHeight / 2) - (DESKTOP_MIDDLE_HEIGHT / 2)}
           playerIndicatorCollection={playerIndicatorCollection}
         />
-        {playersArray.map((handData, index) => {
-          const realIndex = realPlayerIndexes[handData.name];
+        {players.map((handData, index) => {
           const data = {
             name: handData.name,
             index,
-            realIndex: realIndex,
+            realIndex: handData.index,
             amountOfPlayers,
             gameWidth,
             gameHeight,

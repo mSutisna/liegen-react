@@ -238,6 +238,32 @@ TODO:
 - verplicht maken om bust te callen als iemand zijn laatste kaart heeft opgegooid
 
 
+Todo:
+- Kaarten uitdelen na bust
+- Geen set of bust kunnen doen zodra er een animatie bezig is
+- Game over screen tonen
+- Volledige testronde doen
+
+- Grid layout voor 2 players
+- Responsive maken grid layout
+- Aparte layouts maken voor 3 en 4 players
+
+
+- Lobby verwerken het spel
+- Backend verwerken in het spel
+- Volledige testronde doen in multiplayer
+
+- Overlay maken om te kunnen spelen terwijl de main player een excess aan kaarten heeft
+- Indicator tonen als er een excess aan kaarten is (tonen hoeveel kaarten er in excess zijn)
+- Kaarten kunnen sorteren
+
+- Multiple lobbies
+- Spectator mode
+- Chat systeem
+
+
+
+- NIEUW KAART SPELLETJE MAKEN (zweeds pesten / pesten / pokeren / andere?)
 
 
 

@@ -1,16 +1,18 @@
+import { CardRanks, CardSuits } from "../constants";
+
 export interface CardInterface {
-  rank: string,
-  suit: string,
+  rankIndex: CardRanks,
+  suitIndex: CardSuits,
   selected: boolean,
   faceDown: boolean,
   received: boolean,
   originIndex: number | null,
-  receiveAnimationPlayed: boolean,
+  receiveAnimationStatus: AnimationStatus,
 }
 
 export interface BaseCardInterface {
-  rank: string,
-  suit: string,
+  rankIndex: CardRanks,
+  suitIndex: CardSuits,
   faceDown: boolean,
 }
 
@@ -22,8 +24,12 @@ export interface PlayerInterface {
   yPoint: number,
 }
 
+export interface PlayerViewInterface extends PlayerInterface {
+  index: number,
+}
+
 export interface SetInterface {
-  rank: string,
+  rank: number,
   amount: number,
   playerIndex: number,
   realCards: Array<BaseCardInterface>,

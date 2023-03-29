@@ -2,7 +2,8 @@ import { motion } from 'framer-motion';
 import { createCardName } from '../utilities/card-helper-functions';
 
 import { useDispatch } from 'react-redux';
-import { toggleCardSelected, setCardReceivedAnimationFinished } from '../slices/gameSlice';
+import { toggleCardSelected, setCardReceivedAnimationStatus } from '../slices/gameSlice';
+import { AnimationStatus } from '../types/models';
 
 interface CardProps {
   url: string,
@@ -17,21 +18,21 @@ interface CardProps {
   faceDown: boolean,
   playerIndex: number,
   cardIndex: number,
-  receiveAnimationFinished: boolean
+  receiveAnimationStatus: AnimationStatus
 }
 
-function CardPrimary({url, width, height, startLeft, startTop, delay, rank, suit, selected, playerIndex, cardIndex, receiveAnimationFinished }: CardProps) {
+function CardPrimary({url, width, height, startLeft, startTop, delay, rank, suit, selected, playerIndex, cardIndex, receiveAnimationStatus }: CardProps) {
   const dispatch = useDispatch();
   const cardName = createCardName(suit, rank);
   let className = 'card';
   if (selected) {
     className += ' selected';
   }
-  const initial = !receiveAnimationFinished
-  ? {
-    x: startLeft,
-    y: startTop
-  } : false;
+  const initial = receiveAnimationStatus === AnimationStatus.IDLE
+    ? {
+      x: startLeft,
+      y: startTop
+    } : false;
   return (
     <motion.img 
       src={url} 
@@ -50,8 +51,11 @@ function CardPrimary({url, width, height, startLeft, startTop, delay, rank, suit
         delay,
         default: { ease: "linear" }
       }}
+      onAnimationStart={() => {
+        dispatch(setCardReceivedAnimationStatus({playerIndex, cardIndex, status: AnimationStatus.RUNNING}))
+      }}
       onAnimationComplete={() => {
-        dispatch(setCardReceivedAnimationFinished({playerIndex, cardIndex}))
+        dispatch(setCardReceivedAnimationStatus({playerIndex, cardIndex, status: AnimationStatus.FINISHED}))
       }}
     />
   )

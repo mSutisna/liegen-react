@@ -2,8 +2,9 @@ import { motion } from 'framer-motion';
 
 import { useDispatch } from "react-redux";
 import {
-  setCardReceivedAnimationFinished
+  setCardReceivedAnimationStatus
 } from "../slices/gameSlice";
+import { AnimationStatus } from '../types/models';
 
 interface CardProps {
   url: string,
@@ -12,14 +13,14 @@ interface CardProps {
   startLeft: number,
   startTop: number,
   delay: number,
-  receiveAnimationFinished: boolean,
+  receiveAnimationStatus: AnimationStatus,
   playerIndex: number,
   cardIndex: number
 }
 
-function Card({url, width, height, startLeft, startTop, delay, receiveAnimationFinished, playerIndex, cardIndex }: CardProps) {
+function Card({url, width, height, startLeft, startTop, delay, receiveAnimationStatus, playerIndex, cardIndex }: CardProps) {
   const dispatch = useDispatch();
-  const initial = !receiveAnimationFinished
+  const initial = receiveAnimationStatus === AnimationStatus.IDLE
     ? {
       x: startLeft,
       y: startTop
@@ -41,8 +42,11 @@ function Card({url, width, height, startLeft, startTop, delay, receiveAnimationF
         delay,
         default: { ease: "linear" }
       }}
+      onAnimationStart={() => {
+        dispatch(setCardReceivedAnimationStatus({playerIndex, cardIndex, status: AnimationStatus.RUNNING}))
+      }}
       onAnimationComplete={() => {
-        dispatch(setCardReceivedAnimationFinished({playerIndex, cardIndex}))
+        dispatch(setCardReceivedAnimationStatus({playerIndex, cardIndex, status: AnimationStatus.FINISHED}))
       }}
     />
   )

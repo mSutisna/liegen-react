@@ -1,7 +1,8 @@
-import { PlayerInterface, MiddleInterface, CardInterface, MessageModalData } from '../models';
+import { PlayerInterface, MiddleInterface, CardInterface, MessageModalData, PlayerViewInterface } from '../models';
 
 interface InitialState {
   players: Array<PlayerInterface>;
+  playersView: Array<PlayerViewInterface>;
   middle: MiddleInterface,
   mainPlayerIndex: number,
   currentPlayerIndex: number;

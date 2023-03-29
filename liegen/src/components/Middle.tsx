@@ -1,21 +1,26 @@
 import { useSelector, useDispatch } from "react-redux";
-import { Dispatch } from 'react'; 
 import { RootState } from '../store';
 import { MiddleInterface, PlayerInterface, SetInterface } from "../types/models";
 import { createCardName } from "../utilities/card-helper-functions";
 import { useState, useRef, useLayoutEffect } from "react";
 import { getImageUrls } from "../utilities/image-store/image-urls";
-import CardCombinationMiddle from "./CardCombinationMiddle";
-import { Point, AnimationChain, AnimationChainMultipleImplelmentations } from '../types/models'
-import { DESKTOP_GAME_WIDTH, DESKTOP_GAME_HEIGHT, DESKTOP_CARD_HEIGHT, DESKTOP_CARD_WIDTH, DESKTOP_CARD_SCALE, DESKTOP_MIDDLE_WIDTH } from "../constants";
+import { AnimationChain, AnimationChainMultipleImplelmentations, AnimationStatus } from '../types/models'
+import { 
+  DESKTOP_CARD_HEIGHT, 
+  DESKTOP_CARD_WIDTH, 
+  DESKTOP_CARD_SCALE,
+  RANKS,
+  SUITS 
+} from "../constants";
 import { playAnimationChains } from "../utilities/animation/play-animation";
-import { setSetAnimationFinished } from "../slices/gameSlice";
+import { setSetAnimationStatus, setBustAnimationStatus } from "../slices/gameSlice";
 import exclamationMark from '../assets/icons/exclamation-mark.svg';
 import questionMark from '../assets/icons/question-mark.svg';
 import crossMark from '../assets/icons/cross-mark.svg';
+import checkMark from '../assets/icons/check-mark.svg';
 import smileyFace from '../assets/icons/smiley-face.svg';
 import frownFace from '../assets/icons/frown-face.svg';
-import { AnimationStatus } from "../types/models";
+import { determineSetIsALieAndGetIndexes } from "../utilities/general-helper-functions";
 
 interface MiddleProps {
   width: number,
@@ -98,6 +103,13 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
     const previousSetRefs = refCollection.current.previousSet;
     if (middle.playerToCallBust !== null) {
       const playBustAnimation = async () => {
+        if (
+          (middle.bustAnimationStatus === AnimationStatus.RUNNING || middle.setAnimationStatus === AnimationStatus.RUNNING)
+          || middle.bustAnimationStatus === AnimationStatus.FINISHED
+        ) {
+          return;
+        }
+        dispatch(setBustAnimationStatus(AnimationStatus.RUNNING));
         await playBustAnimationInner(
           players, 
           middle, 
@@ -108,15 +120,20 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
           refCardsBurnedText.current,
           cardsToDealCollection.current
         );
+        dispatch(setBustAnimationStatus(AnimationStatus.FINISHED));
       }
       playBustAnimation();
       return;
     }
 
     const playReceiveSetAnimation = async () => {
-      if (middle.setAnimationStatus !== AnimationStatus.IDLE) {
+      if (
+        (middle.bustAnimationStatus === AnimationStatus.RUNNING || middle.setAnimationStatus === AnimationStatus.RUNNING)
+        || middle.setAnimationStatus === AnimationStatus.FINISHED
+      ) {
         return;
       }
+      dispatch(setSetAnimationStatus(AnimationStatus.RUNNING));
       if (previousSetRefs.length === 0) {
         await playAnimationOnlyNewSet(
           newSetRefs, 
@@ -140,7 +157,7 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
           newSetData
         )
       }
-      dispatch(setSetAnimationFinished());
+      dispatch(setSetAnimationStatus(AnimationStatus.FINISHED));
     }
     playReceiveSetAnimation();
   }, [middle])
@@ -174,11 +191,11 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
       }
       const cardStyle = {...style};
       //Comment out if chain below to display middle set initially without problems
-      if (visibilityHideType === 'visibility')  {
-        style.visibility = 'hidden';
-      } else if (visibilityHideType === 'display') {
-        style.display = 'none';
-      }
+      // if (visibilityHideType === 'visibility')  {
+      //   style.visibility = 'hidden';
+      // } else if (visibilityHideType === 'display') {
+      //   style.display = 'none';
+      // }
       const frontSideDisplay = type === 'supposedCard' 
         ? 'do-display'
         : 'dont-display';
@@ -235,8 +252,8 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
     for (let i = 0; i < supposedCards.length; i++) {
       const supposedCard = supposedCards[i];
       const realCard = realCards[i];
-      const supposedCardKey = createCardName(supposedCard.suit ?? '', supposedCard.rank ?? '');
-      const realCardKey = createCardName(realCard.suit ?? '', realCard.rank ?? '');
+      const supposedCardKey = createCardName(SUITS[supposedCard.suitIndex] ?? '', RANKS[supposedCard.rankIndex] ?? '');
+      const realCardKey = createCardName(SUITS[realCard.suitIndex] ?? '', RANKS[realCard.rankIndex] ?? '');
       currentSetCardsToDisplay.push(<div 
         key={`middle-cards-container-new-${i}-${middleSet.playerIndex}`} 
         className="middle-cards-container" 
@@ -262,8 +279,8 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
       for (let i = 0; i < previousSupposedCards.length; i++) {
         const supposedCard = previousSupposedCards[i];
         const realCard = previousMiddleCards[i];
-        const supposedCardKey = !supposedCard.faceDown ? createCardName(supposedCard.suit ?? '', supposedCard.rank ?? '') : 'Backside';
-        const realCardKey = !realCard.faceDown ? createCardName(realCard.suit ?? '', realCard.rank ?? '') : 'Backside';
+        const supposedCardKey = !supposedCard.faceDown ? createCardName(SUITS[supposedCard.suitIndex] ?? '', RANKS[supposedCard.rankIndex] ?? '') : 'Backside';
+        const realCardKey = !realCard.faceDown ? createCardName(SUITS[realCard.suitIndex] ?? '', RANKS[realCard.rankIndex] ?? '') : 'Backside';
         previousSetCardsToDisplay.push(<div 
           key={`middle-cards-container-previous-${i}-${middleSet.playerIndex}`} 
           className="middle-cards-container previous"
@@ -360,15 +377,35 @@ const playBustAnimationInner = async (
   if (
     !middleCardIndicatorsCollection
     || !playerIndicatorCollection
-    || (!playerIndicatorCollection[0] || !playerIndicatorCollection[1])
+    || (middle.playerToCallBust === null)
+    || !middle.set
+    || (middle.set.playerIndex === null)
     || !cardsToDeal
     || !cardsBurnedRef
     || !cardsBurnedRefText
   ) {
     return
   }
-  const indicatorBeingChecked = playerIndicatorCollection[1];
-  const indicatorCalledBust =  playerIndicatorCollection[0];
+  const indicatorCalledBust = playerIndicatorCollection[middle.playerToCallBust];
+  const indicatorBeingChecked = playerIndicatorCollection[middle.set.playerIndex];
+
+  const setIsALieData = determineSetIsALieAndGetIndexes(middle);
+  
+  if (!setIsALieData) {
+    return;
+  }
+
+  const {
+    playerToWinSetIndex,
+    playerToLoseSetIndex,
+  } = setIsALieData;
+
+  const playerToWinSet = playerIndicatorCollection[playerToWinSetIndex];
+  const playerToLoseSet = playerIndicatorCollection[playerToLoseSetIndex];
+
+  if (!indicatorCalledBust || !indicatorBeingChecked || !playerToWinSet || !playerToLoseSet) {
+    return;
+  }
   const flipCardsAndShowAwaitSymbols = () => {
     const animationChains : Array<AnimationChainMultipleImplelmentations[]> = [];
     let delay = 0;
@@ -382,7 +419,7 @@ const playBustAnimationInner = async (
 
     let animationChain = [];
     animationChain.push({
-      element: playerIndicatorCollection[0],
+      element: indicatorCalledBust,
       animationInstructions: [
         {transform: `translate(${startX}px, ${startY}px) scale(20)`},
         {transform: `translate(${0}px, ${0}px) scale(1)`}
@@ -422,12 +459,16 @@ const playBustAnimationInner = async (
   const showMiddleCardIndicators = () => {
     const animationChains : Array<AnimationChainMultipleImplelmentations[]> = [];
     let delay = 0;
+    let index = 0;
     for (const middleCardIndicator of middleCardIndicatorsCollection) {
       const animationChain = [];
-      if (!middleCardIndicator) {
+      if (!middleCardIndicator || !middle.set) {
         continue;
       }
-      middleCardIndicator.src = crossMark;
+      const cardIsALie = middle.set.realCards[index].rankIndex !== middle.set.rank;
+      middleCardIndicator.src = !cardIsALie
+       ? checkMark
+       : crossMark;
       animationChain.push({
         element: middleCardIndicator,
         animationInstructions: [
@@ -437,19 +478,20 @@ const playBustAnimationInner = async (
         animationSettings: {
           duration: 500,
           iterations: 1,
-          fill: "forwards",
+          fill: 'forwards',
           delay
         }
       })
       delay += 200;
       animationChains.push(animationChain);
+      index++;
     }
     return animationChains;
   };
   await playAnimationChains(showMiddleCardIndicators());
   const showResultSymbolsAndBurnCards = () => {
-    indicatorBeingChecked.src = frownFace;
-    indicatorCalledBust.src = smileyFace;
+    playerToLoseSet.src = frownFace;
+    playerToWinSet.src = smileyFace;
     return createBurnCardsAnimationChain(
       newSetCardRefs,
       cardsBurnedRef,
@@ -460,7 +502,7 @@ const playBustAnimationInner = async (
   await (new Promise<void>(resolve => setTimeout(() => resolve(), 500)))
   const dealCards = () => {
     const animationChains : Array<AnimationChainMultipleImplelmentations[]> = [];
-    const receivingPlayer = players[1];
+    const receivingPlayer = players[playerToLoseSetIndex];
     if (!middleCardIndicatorsCollection[0]) {
       return animationChains;
     }

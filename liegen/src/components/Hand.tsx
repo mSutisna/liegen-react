@@ -83,7 +83,7 @@ function Hand({name, index, realIndex, amountOfPlayers, gameWidth, gameHeight, c
               startLeft={-containerX - left}
               startTop={-containerY - top}
               delay={delay}
-              receiveAnimationFinished={card.receiveAnimationPlayed}
+              receiveAnimationStatus={card.receiveAnimationStatus}
               playerIndex={realIndex}
               cardIndex={cardIndex}
             />
