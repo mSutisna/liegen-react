@@ -30,6 +30,11 @@ export enum CardSuits {
   SPADES = 3,
 }
 
+export enum BurnType {
+  CURRENT_SET = 'current_set',
+  PREVIOUS_SET = 'previous_set',
+}
+
 export enum CardRanks {
   ACE = 0,
   TWO = 1,

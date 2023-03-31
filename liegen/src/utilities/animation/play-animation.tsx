@@ -32,6 +32,9 @@ const playAnimationChain = async (animationChain: AnimationChainMultipleImplelme
       animationData.element.style.visibility = 'visible';
     }
     await playAnimation(animationData);
+    if (typeof animationData.afterAnimationFunction === 'function') {
+      await animationData.afterAnimationFunction();
+    }
   }
 }
 

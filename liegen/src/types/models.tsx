@@ -1,30 +1,39 @@
 import { CardRanks, CardSuits } from "../constants";
 
-export interface CardInterface {
-  rankIndex: CardRanks,
-  suitIndex: CardSuits,
-  selected: boolean,
-  faceDown: boolean,
-  received: boolean,
-  originIndex: number | null,
-  receiveAnimationStatus: AnimationStatus,
-}
-
 export interface BaseCardInterface {
   rankIndex: CardRanks,
   suitIndex: CardSuits,
   faceDown: boolean,
 }
 
-export interface PlayerInterface {
-  name: string,
-  cards: Array<CardInterface>,
-  selectedRank: number,
-  xPoint: number,
-  yPoint: number,
+export interface RegularCardInterface extends BaseCardInterface {
+  originPoint: Point | null,
+  receiveAnimationStatus: AnimationStatus,
 }
 
-export interface PlayerViewInterface extends PlayerInterface {
+export interface PrimaryCardInterface extends RegularCardInterface {
+  selected: boolean,
+}
+
+export interface PlayerInterface {
+  name: string,
+  originPoint: Point | null
+}
+
+export interface RegularPlayerInterface extends PlayerInterface {
+  cards: Array<RegularCardInterface>,
+}
+
+export interface PrimaryPlayerInterface extends PlayerInterface { 
+  cards: Array<PrimaryCardInterface>,
+  selectedRank: number,
+}
+
+export interface PrimaryPlayerViewInterface extends PrimaryPlayerInterface  {
+  index: number,
+}
+
+export interface RegularPlayerViewInterface extends RegularPlayerInterface {
   index: number,
 }
 
@@ -62,6 +71,7 @@ export interface AnimationChain {
   animationInstructions?: Array<{[k: string]: string | number}>,
   animationSettings?: {[k: string]: number | string}
   dontMakeVisible?: boolean,
+  afterAnimationFunction?: () => Promise<void>
 }
 
 export type AnimationChainMultipleImplelmentations = AnimationChain | (() => AnimationChain);

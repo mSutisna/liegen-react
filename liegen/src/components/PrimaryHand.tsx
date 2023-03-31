@@ -1,5 +1,5 @@
 import { HandProps } from '../types/props';
-import { AnimationStatus, CardUrls, MiddleInterface, PlayerInterface } from '../types/models';
+import { AnimationStatus, CardUrls, MiddleInterface, PlayerInterface, PrimaryPlayerInterface } from '../types/models';
 import { determinePositionCoordinates } from '../utilities/player-position-determination';
 import { DESKTOP_PRIMARY_HAND_WIDTH, DESKTOP_PRIMARY_HAND_HEIGHT, DESKTOP_CARD_WIDTH, DESKTOP_CARD_HEIGHT, SUITS, RANKS, DESKTOP_CARD_SCALE } from '../constants';
 import { createCardName } from '../utilities/card-helper-functions';
@@ -33,7 +33,7 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
       return state.game.currentPlayerIndex;
     }
   );
-  const players: (Array<PlayerInterface> | null) = useSelector(
+  const players: (Array<PrimaryPlayerInterface> | null) = useSelector(
     (state: RootState) => {
       return state.game.players;
     }
@@ -84,7 +84,6 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
           <button
             onClick={async e => {
               e.stopPropagation();
-              console.log({bustAnimation: middle.bustAnimationStatus})
               if (middle.bustAnimationStatus !== AnimationStatus.IDLE || middle.setAnimationStatus == AnimationStatus.RUNNING) {
                 return;
               }
@@ -119,18 +118,22 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
                 containerX = position.left;
                 containerY = position.top;
               }
-              const offsetData = determineXandYForCard(cards, cardIndex, DESKTOP_CARD_SCALE);
-              const left = offsetData.x;
-              const top = offsetData.y;
+              // const offsetData = determineXandYForCard(cards, cardIndex, DESKTOP_CARD_SCALE);
+              // const left = offsetData.x;
+              // const top = offsetData.y;
+              let adjustedOriginPoint = null;
+              if (card.originPoint) {
+                adjustedOriginPoint = {...card.originPoint};
+                adjustedOriginPoint.x = -containerX - card.originPoint.x;
+                adjustedOriginPoint.y = -containerY - card.originPoint.y;
+              }
               const delay = 0.02 + (0.06 * cardIndex);
-
               return <CardPrimary
                 key={`cardIndex-${cardIndex}`}
                 url={cardUrls[cardKey]}
                 width={DESKTOP_CARD_WIDTH * DESKTOP_CARD_SCALE}
                 height={DESKTOP_CARD_HEIGHT * DESKTOP_CARD_SCALE}
-                startLeft={-containerX - left}
-                startTop={-containerY - top}
+                originPoint={adjustedOriginPoint}
                 delay={delay}
                 rank={RANKS[card.rankIndex]}
                 suit={SUITS[card.suitIndex]}
@@ -156,7 +159,8 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
           <button
             onClick={e => {
               e.stopPropagation();
-              if (middle.setAnimationStatus !== AnimationStatus.IDLE || middle.bustAnimationStatus == AnimationStatus.RUNNING) {
+              if (middle.setAnimationStatus === AnimationStatus.RUNNING || middle.bustAnimationStatus === AnimationStatus.RUNNING) {
+                console.log('BIG FAIL!!!', middle);
                 return;
               }
               const player = players[realIndex];

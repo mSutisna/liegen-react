@@ -4,27 +4,26 @@ import { useDispatch } from "react-redux";
 import {
   setCardReceivedAnimationStatus
 } from "../slices/gameSlice";
-import { AnimationStatus } from '../types/models';
+import { AnimationStatus, Point } from '../types/models';
 
 interface CardProps {
   url: string,
   width: number,
   height: number,
-  startLeft: number,
-  startTop: number,
+  originPoint: Point | null,
   delay: number,
   receiveAnimationStatus: AnimationStatus,
   playerIndex: number,
   cardIndex: number
 }
 
-function Card({url, width, height, startLeft, startTop, delay, receiveAnimationStatus, playerIndex, cardIndex }: CardProps) {
+function Card({url, width, height, originPoint, delay, receiveAnimationStatus, playerIndex, cardIndex }: CardProps) {
   const dispatch = useDispatch();
-  const initial = receiveAnimationStatus === AnimationStatus.IDLE
-    ? {
-      x: startLeft,
-      y: startTop
-    } : false;
+  let initial : Point | false = false;
+  if (originPoint) {
+    initial = receiveAnimationStatus === AnimationStatus.IDLE
+    ? originPoint : false;
+  }
   return (
     <motion.img 
       src={url} 

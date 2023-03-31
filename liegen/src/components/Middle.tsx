@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from '../store';
-import { MiddleInterface, PlayerInterface, SetInterface } from "../types/models";
+import { MiddleInterface, PlayerInterface, PrimaryPlayerInterface, PrimaryPlayerViewInterface, SetInterface } from "../types/models";
 import { createCardName } from "../utilities/card-helper-functions";
 import { useState, useRef, useLayoutEffect } from "react";
 import { getImageUrls } from "../utilities/image-store/image-urls";
@@ -10,10 +10,17 @@ import {
   DESKTOP_CARD_WIDTH, 
   DESKTOP_CARD_SCALE,
   RANKS,
-  SUITS 
+  SUITS, 
+  BurnType
 } from "../constants";
 import { playAnimationChains } from "../utilities/animation/play-animation";
-import { setSetAnimationStatus, setBustAnimationStatus } from "../slices/gameSlice";
+import { 
+  setSetAnimationStatus, 
+  setBustAnimationStatus, 
+  receiveCard,
+  afterBustSetNextTurn,
+  burnCards
+} from "../slices/gameSlice";
 import exclamationMark from '../assets/icons/exclamation-mark.svg';
 import questionMark from '../assets/icons/question-mark.svg';
 import crossMark from '../assets/icons/cross-mark.svg';
@@ -21,6 +28,7 @@ import checkMark from '../assets/icons/check-mark.svg';
 import smileyFace from '../assets/icons/smiley-face.svg';
 import frownFace from '../assets/icons/frown-face.svg';
 import { determineSetIsALieAndGetIndexes } from "../utilities/general-helper-functions";
+import { Dispatch, AnyAction } from "@reduxjs/toolkit";
 
 interface MiddleProps {
   width: number,
@@ -55,10 +63,20 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
       return state.game.middle;
     }
   );
-
-  const players: Array<PlayerInterface> = useSelector(
+  // const burnedCardsCount: number = useSelector(
+  //   (state: RootState) => {
+  //     return state.game.middle.burnedCards.length;
+  //   }
+  // );
+  const players: Array<PrimaryPlayerInterface> = useSelector(
     (state: RootState) => {
       return state.game.players;
+    }
+  );
+
+  const playersView: Array<PrimaryPlayerViewInterface> = useSelector(
+    (state: RootState) => {
+      return state.game.playersView;
     }
   );
 
@@ -86,8 +104,6 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
 
   const refCardsBurned = useRef<HTMLDivElement>(null);
 
-  const refCardsBurnedText = useRef<HTMLSpanElement>(null);
-
   useLayoutEffect(() => {
     const setImageUrls = async () => {
       const imageUrls = await getImageUrls();
@@ -112,13 +128,14 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
         dispatch(setBustAnimationStatus(AnimationStatus.RUNNING));
         await playBustAnimationInner(
           players, 
+          playersView,
           middle, 
           newSetRefs, 
           playerIndicatorCollection.current, 
           middleCardIndicatorsCollection.current, 
           refCardsBurned.current,
-          refCardsBurnedText.current,
-          cardsToDealCollection.current
+          cardsToDealCollection.current,
+          dispatch
         );
         dispatch(setBustAnimationStatus(AnimationStatus.FINISHED));
       }
@@ -154,7 +171,8 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
           refCardsBurned.current,
           cardWidth, 
           cardHeight,
-          newSetData
+          newSetData,
+          dispatch
         )
       }
       dispatch(setSetAnimationStatus(AnimationStatus.FINISHED));
@@ -191,11 +209,11 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
       }
       const cardStyle = {...style};
       //Comment out if chain below to display middle set initially without problems
-      // if (visibilityHideType === 'visibility')  {
-      //   style.visibility = 'hidden';
-      // } else if (visibilityHideType === 'display') {
-      //   style.display = 'none';
-      // }
+      if (visibilityHideType === 'visibility')  {
+        style.visibility = 'hidden';
+      } else if (visibilityHideType === 'display') {
+        style.display = 'none';
+      }
       const frontSideDisplay = type === 'supposedCard' 
         ? 'do-display'
         : 'dont-display';
@@ -295,9 +313,13 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
     }
   }
 
-  const cardsToDealAmount = middle.burnedCards.length + (middleSet?.realCards.length ?? 0)
+  let cardObjects = [...middle.burnedCards];
+  if (middleSet?.realCards) {
+    cardObjects = [...cardObjects, ...middleSet.realCards]
+  }
   const cardsToDeal = [];
-  for (let i = 0; i < cardsToDealAmount; i++) {
+  for (let i = 0; i < cardObjects.length; i++) {
+    const cardObject = cardObjects[i];
     cardsToDeal.push(<img
       key={`card-to-deal-${i}`}
       src={cardUrls['Backside']}
@@ -311,6 +333,8 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
           cardsToDealCollection.current[i] = element;
         }
       }}
+      data-suit={cardObject.suitIndex}
+      data-rank={cardObject.rankIndex}
     />)
   }
 
@@ -327,7 +351,7 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
       <div className="card-count" ref={refCardsBurned}>
         <div className="count-inner">
           <div className="label">
-            <span>Cards: </span><span ref={refCardsBurnedText}>{middle.burnedCards.length}</span>
+            <span>Cards: </span><span>{middle.burnedCards.length}</span>
           </div>
         </div>
         <div className="cards-to-deal">
@@ -365,14 +389,15 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
 }
 
 const playBustAnimationInner = async (
-  players: Array<PlayerInterface>,
+  players: Array<PrimaryPlayerInterface>,
+  playersView: Array<PrimaryPlayerViewInterface>,
   middle: MiddleInterface,
   newSetCardRefs: Array<cardsRefInterface>,
   playerIndicatorCollection: Array<HTMLImageElement | null> | null,
   middleCardIndicatorsCollection: Array<HTMLImageElement | null> | null,
   cardsBurnedRef: HTMLDivElement | null,
-  cardsBurnedRefText: HTMLSpanElement | null,
-  cardsToDeal: Array<HTMLImageElement | null> | null
+  cardsToDeal: Array<HTMLImageElement | null> | null,
+  dispatch: Dispatch<AnyAction>,
 ) : Promise<void> => {
   if (
     !middleCardIndicatorsCollection
@@ -382,7 +407,6 @@ const playBustAnimationInner = async (
     || (middle.set.playerIndex === null)
     || !cardsToDeal
     || !cardsBurnedRef
-    || !cardsBurnedRefText
   ) {
     return
   }
@@ -498,12 +522,12 @@ const playBustAnimationInner = async (
     );
   };
   await playAnimationChains(showResultSymbolsAndBurnCards());
-  cardsBurnedRefText.innerHTML = (middle.burnedCards.length + (middle.set?.realCards.length ?? 0)).toString();
+  await dispatch(burnCards(BurnType.CURRENT_SET));
   await (new Promise<void>(resolve => setTimeout(() => resolve(), 500)))
   const dealCards = () => {
     const animationChains : Array<AnimationChainMultipleImplelmentations[]> = [];
     const receivingPlayer = players[playerToLoseSetIndex];
-    if (!middleCardIndicatorsCollection[0]) {
+    if (!middleCardIndicatorsCollection[0] || !receivingPlayer.originPoint) {
       return animationChains;
     }
     let delay = 0;
@@ -512,9 +536,18 @@ const playBustAnimationInner = async (
         continue;
       }
       const cardRect = cardToDeal.getBoundingClientRect();
-      const endX = (receivingPlayer.xPoint - (cardRect.width / 2)) - (cardRect?.left ?? 0);
-      const endY = (receivingPlayer.yPoint - (cardRect.height / 2)) - (cardRect?.top ?? 0);
+      const endX = (receivingPlayer.originPoint.x - (cardRect.width / 2)) - (cardRect?.left ?? 0);
+      const endY = (receivingPlayer.originPoint.y - (cardRect.height / 2)) - (cardRect?.top ?? 0);
       const animationChain = [];
+
+      let receivingPlayerIndex = 0;
+      for (let i = 0; i < playersView.length; i++) {
+        const playerView = playersView[i];
+        if (playerView.index === playerToLoseSetIndex) {
+          receivingPlayerIndex = i;
+          break;
+        }
+      }
       animationChain.push({
         element: cardToDeal,
         animationInstructions: [
@@ -526,8 +559,24 @@ const playBustAnimationInner = async (
           iterations: 1,
           fill: "forwards",
           delay
+        },
+        afterAnimationFunction: async () => {
+          console.log({
+            rank: cardToDeal.dataset.rank,
+            suit: cardToDeal.dataset.suit
+          })
+          const rankIndex = Number(cardToDeal.dataset.rank);
+          const suitIndex = Number(cardToDeal.dataset.suit);
+          await dispatch(receiveCard({
+            receivingPlayerIndex,
+            card: {
+              rankIndex,
+              suitIndex,
+              faceDown: false
+            }
+          }))
         }
-      })
+      });
       delay += 200;
       animationChains.push(animationChain);
     }
@@ -542,6 +591,15 @@ const playBustAnimationInner = async (
     }
     middleCardIndicator.style.visibility = 'hidden';
   }
+  let receivingPlayerIndex = 0;
+  for (let i = 0; i < playersView.length; i++) {
+    const playerView = playersView[i];
+    if (playerView.index === playerToLoseSetIndex) {
+      receivingPlayerIndex = i;
+      break;
+    }
+  }
+  await dispatch(afterBustSetNextTurn(receivingPlayerIndex));
 }
 
 const makeSetAnimationChain = (
@@ -551,14 +609,18 @@ const makeSetAnimationChain = (
   cardWidth: number,
   cardHeight: number 
 ) : Array<AnimationChain[]> => {
-  let animationChains = [];
+  let animationChains : Array<AnimationChain[]> = [];
+  const originPlayer = players[middleSet.playerIndex];
+  if (!originPlayer.originPoint) {
+    return animationChains;
+  }
+  const originX = originPlayer.originPoint.x;
+  const originY = originPlayer.originPoint.y;
   for (const cardsRef of newSetCardRefs) {
     const supposedCard = cardsRef?.supposedCardRef;
     const realCard = cardsRef?.realCardRef;
     const supposedCardRect = supposedCard?.getBoundingClientRect();
-    const originPlayer = players[middleSet.playerIndex];
-    const originX = originPlayer.xPoint;
-    const originY = originPlayer.yPoint;
+
       
     const startX = (originX - (cardWidth / 2)) - (supposedCardRect?.left ?? 0);
     const startY = (originY - (cardHeight / 2)) - (supposedCardRect?.top ?? 0);
@@ -679,7 +741,8 @@ const playAnimationPreviousSetAndNewSet = async (
     newSetCardRefs: Array<cardsRefInterface>, 
     players: Array<PlayerInterface>,
     middleSet: SetInterface,
-  }
+  },
+  dispatch: Dispatch<AnyAction>,
 ) => {
   const animationChains = createBurnCardsAnimationChain(
     previousSetCardRefs,
@@ -705,6 +768,8 @@ const playAnimationPreviousSetAndNewSet = async (
   displayCardsForSelectedSetHideForOther('previous');
 
   await playAnimationChains(animationChains);
+
+  await dispatch(burnCards(BurnType.PREVIOUS_SET));
 
   for (const ref of previousSetCardRefs) {
     if (ref?.realCardRef?.style) {

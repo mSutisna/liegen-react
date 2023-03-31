@@ -1,5 +1,5 @@
 import React from "react";
-import { CardInterface } from "./models";
+import { BaseCardInterface, PrimaryCardInterface } from "./models";
 
 export interface HandProps {
   name: string,
@@ -8,7 +8,7 @@ export interface HandProps {
   amountOfPlayers: number,
   gameWidth: number,
   gameHeight: number,
-  cards: Array<CardInterface>,
+  cards: Array<PrimaryCardInterface>,
   selectedRank: number,
   assignIndicatorRefToCollection: (element: HTMLImageElement | null, index: number) => void
 }

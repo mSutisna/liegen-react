@@ -1,7 +1,16 @@
-import InitialState, { UpdateGameAction, ReceiveCardPayload } from "../types/redux/game";
+import InitialState, { UpdateGameAction, ReceiveCardPayload, ToggleCardSelectedPayload } from "../types/redux/game";
 import { createSlice, PayloadAction, current, Dispatch, AnyAction } from "@reduxjs/toolkit";
-import { PlayerInterface, PlayerViewInterface, CardUrls } from "../types/models";
-import { RANKS, SUITS, MESSAGE_MODAL_REGULAR_DISPLAY_ANIMATION, CardRanks, CardSuits } from "../constants";
+import { 
+  RegularPlayerInterface, 
+  PrimaryPlayerInterface,
+  RegularCardInterface,
+  PrimaryCardInterface,
+  PrimaryPlayerViewInterface,
+  RegularPlayerViewInterface,
+  CardUrls, 
+  Point
+} from "../types/models";
+import { RANKS, SUITS, MESSAGE_MODAL_REGULAR_DISPLAY_ANIMATION, CardRanks, CardSuits, BurnType } from "../constants";
 import { createCardName } from "../utilities/card-helper-functions";
 import { MessageModalPayload } from "../types/redux/game";
 import { AnimationStatus } from "../types/models";
@@ -10,36 +19,36 @@ import { createPlayersView } from "../utilities/general-helper-functions";
 const initialState: InitialState = {
   players: [],
   playersView: [],
-  // middle: {
-  //   set: null,
-  //   previousSet: null,
-  //   burnedCards: [],
-  //   playerToCallBust: null,
-  //   setAnimationStatus: AnimationStatus.IDLE,
-  //   bustAnimationStatus: AnimationStatus.IDLE,
-  // },
   middle: {
-    set: {
-      playerIndex: 0,
-      realCards: [
-        {suitIndex: CardSuits.HEARTS, rankIndex: CardRanks.KING, faceDown: true},
-        {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: true},
-        {suitIndex: CardSuits.SPADES, rankIndex: CardRanks.ACE, faceDown: true},
-      ],
-      supposedCards: [
-        {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: false},
-        {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: false},
-        {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: false},
-      ],
-      rank: CardRanks.ACE,
-      amount: 3,
-    },
+    set: null,
     previousSet: null,
     burnedCards: [],
     playerToCallBust: null,
-    setAnimationStatus: AnimationStatus.FINISHED,
+    setAnimationStatus: AnimationStatus.IDLE,
     bustAnimationStatus: AnimationStatus.IDLE,
   },
+  // middle: {
+  //   set: {
+  //     playerIndex: 0,
+  //     realCards: [
+  //       {suitIndex: CardSuits.HEARTS, rankIndex: CardRanks.KING, faceDown: true},
+  //       {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: true},
+  //       {suitIndex: CardSuits.SPADES, rankIndex: CardRanks.ACE, faceDown: true},
+  //     ],
+  //     supposedCards: [
+  //       {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: false},
+  //       {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: false},
+  //       {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: false},
+  //     ],
+  //     rank: CardRanks.ACE,
+  //     amount: 3,
+  //   },
+  //   previousSet: null,
+  //   burnedCards: [],
+  //   playerToCallBust: null,
+  //   setAnimationStatus: AnimationStatus.FINISHED,
+  //   bustAnimationStatus: AnimationStatus.IDLE,
+  // },
   mainPlayerIndex: 0,
   currentPlayerIndex: 1,
   previousPlayerIndex: null,
@@ -57,16 +66,18 @@ export const gameSlice = createSlice({
   name: UpdateGameAction,
   initialState: initialState,
   reducers: {
-    setPlayers: (state : InitialState, action: PayloadAction<Array<PlayerInterface>>) => {
+    setPlayers: (state : InitialState, action: PayloadAction<Array<PrimaryPlayerInterface>>) => {
       state.players = action.payload;
     },
-    setPlayersView: (state: InitialState, action: PayloadAction<Array<PlayerViewInterface>>) => {
+    setPlayersView: (state: InitialState, action: PayloadAction<Array<PrimaryPlayerViewInterface>>) => {
       state.playersView = action.payload;
     },
     setPlayerCenterCoordinates: (state: InitialState, action: PayloadAction<{playerIndex: number, x: number, y: number}>) => {
       const player = state.players[action.payload.playerIndex]
-      player.xPoint = action.payload.x;
-      player.yPoint = action.payload.y;
+      player.originPoint = {
+        x: action.payload.x,
+        y: action.payload.y
+      };
     },
     setCardUrls: (state: InitialState, action: PayloadAction<CardUrls>) => {
       state.cardUrls = action.payload;
@@ -85,42 +96,73 @@ export const gameSlice = createSlice({
     setBustAnimationStatus: (state: InitialState, action: PayloadAction<AnimationStatus>) => {
       state.middle.bustAnimationStatus = action.payload;
     },
+    burnCards: (state: InitialState, action: PayloadAction<BurnType>) => {
+      const setKey = action.payload === BurnType.CURRENT_SET
+        ? 'set'
+        : 'previousSet';
+      const set = state.middle[setKey];
+      if (!set) {
+        return;
+      }
+      let cardsToBurn = [];
+      for (const cardToBurn of set.realCards) {
+        cardsToBurn.push({...cardToBurn});
+      }
+      state.middle.burnedCards = [...state.middle.burnedCards, ...cardsToBurn];
+      state.middle[setKey] = null;
+    },
+    afterBustSetNextTurn: (state: InitialState, action: PayloadAction<number>) => {
+      state.middle.set = null;
+      state.middle.previousSet = null;
+      state.middle.burnedCards = [];
+      state.middle.playerToCallBust = null;
+      state.middle.setAnimationStatus = AnimationStatus.IDLE;
+      state.middle.bustAnimationStatus = AnimationStatus.IDLE;
+      state.currentPlayerIndex = action.payload;
+      state.playersView = createPlayersView(state.players, state.currentPlayerIndex);
+    },
     increaseRank: (state: InitialState) => {
-      const player = state.players[state.currentPlayerIndex];
+      const player = state.players[state.currentPlayerIndex] as PrimaryPlayerInterface;
       let selectedRank = player.selectedRank += 1;
       if (selectedRank > (RANKS.length - 1)) {
         selectedRank = 0;
       }
       player.selectedRank = selectedRank;
+      state.playersView = createPlayersView(state.players, state.currentPlayerIndex);
     },
     decreaseRank: (state: InitialState) => {
-      const player = state.players[state.currentPlayerIndex];
+      const player = state.players[state.currentPlayerIndex] as PrimaryPlayerInterface;
       let selectedRank = player.selectedRank -= 1;
       if (selectedRank < 0) {
         selectedRank = RANKS.length - 1;
       }
       player.selectedRank = selectedRank;
+      state.playersView = createPlayersView(state.players, state.currentPlayerIndex);
     },
-    toggleCardSelected: (state: InitialState, action: PayloadAction<string>) => {
-      const cards = state.players[state.currentPlayerIndex].cards;
-      const index = cards.findIndex(card => createCardName(SUITS[card.suitIndex], RANKS[card.rankIndex]) === action.payload);
+    toggleCardSelected: (state: InitialState, action: PayloadAction<ToggleCardSelectedPayload>) => {
+      const cards = state.players[action.payload.playerIndex].cards as Array<PrimaryCardInterface>;
+      const index = cards.findIndex(card => createCardName(SUITS[card.suitIndex], RANKS[card.rankIndex]) === action.payload.cardName);
       if (index === -1) {
         return;
       }
       cards[index].selected = !cards[index].selected;
+      state.playersView = createPlayersView(state.players, state.currentPlayerIndex);
     },
     receiveCard: (state : InitialState, action: PayloadAction<ReceiveCardPayload>) => {
       const receivingPlayerIndex = action.payload.receivingPlayerIndex;
-      const originPlayerIndex = action.payload.originPlayerIndex;
       const receivingPlayer = state.players[receivingPlayerIndex];
-      const card = action.payload.card;
-      card.originIndex = originPlayerIndex;
-      card.faceDown = state.mainPlayerIndex === receivingPlayerIndex;
-      card.received = false;
+      const payloadCard = action.payload.card;
+      const card : PrimaryCardInterface = {
+        ...payloadCard,
+        selected: false,
+        originPoint: null,
+        receiveAnimationStatus: AnimationStatus.IDLE
+      }
       receivingPlayer.cards.push(card);
+      state.playersView = createPlayersView(state.players, state.currentPlayerIndex);
     },
     makeSet: (state : InitialState) => {
-      const player = state.players[state.currentPlayerIndex];
+      const player = state.players[state.currentPlayerIndex] as PrimaryPlayerInterface;
       const playerCards = player.cards;
       const selectedCards = playerCards.filter(playerCard => playerCard.selected);
       const leftOverCards = playerCards.filter(playerCard => !playerCard.selected);
@@ -142,16 +184,16 @@ export const gameSlice = createSlice({
           faceDown: false,
         })
       }
-      const previousMiddleSet = state.middle.set;
-      if (previousMiddleSet) {
-        for (const setCard of previousMiddleSet.realCards) {
-          state.middle.burnedCards.push({
-            rankIndex: setCard.rankIndex,
-            suitIndex: setCard.suitIndex,
-            faceDown: true
-          })
-        }
-      }
+      // const previousMiddleSet = state.middle.set;
+      // if (previousMiddleSet) {
+      //   for (const setCard of previousMiddleSet.realCards) {
+      //     state.middle.burnedCards.push({
+      //       rankIndex: setCard.rankIndex,
+      //       suitIndex: setCard.suitIndex,
+      //       faceDown: true
+      //     })
+      //   }
+      // }
       player.cards = leftOverCards;
       player.selectedRank = 0;
       state.middle.previousSet = state.middle.set;
@@ -182,9 +224,6 @@ export const gameSlice = createSlice({
     callBust: (state : InitialState) => {
       state.middle.playerToCallBust = state.currentPlayerIndex;
     },
-    callBustFinal: (state: InitialState) => {
-
-    },
     callBustFinished: (state: InitialState) => {
       state.middle.playerToCallBust = null;
     },
@@ -211,9 +250,10 @@ export const {
   setCardReceivedAnimationStatus, 
   setSetAnimationStatus,
   setBustAnimationStatus,
-  makeSet, 
-  callBust, 
-  callBustFinal,
+  afterBustSetNextTurn,
+  makeSet,
+  burnCards, 
+  callBust,
   increaseRank, 
   decreaseRank, 
   toggleCardSelected,

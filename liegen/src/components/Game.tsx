@@ -15,7 +15,7 @@ import {
   setCardUrls,
   setPlayersView
 } from "../slices/gameSlice";
-import { AnimationStatus, CardInterface, PlayerInterface, PlayerViewInterface } from '../types/models';
+import { AnimationStatus, PrimaryCardInterface, PlayerInterface, PrimaryPlayerViewInterface, PrimaryPlayerInterface } from '../types/models';
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from '../store';
 import { getImageUrls } from '../utilities/image-store/image-urls';
@@ -23,15 +23,17 @@ import MessageModal from './MessageModal';
 import { current } from '@reduxjs/toolkit';
 import { createPlayersView } from '../utilities/general-helper-functions';
 
-const generatePlayers = (currentPlayerIndex: number) : Array<PlayerInterface> => {
-  const player1Cards : Array<CardInterface> = [
+const generatePlayers = (currentPlayerIndex: number) : Array<PrimaryPlayerInterface> => {
+  const player1Cards : Array<PrimaryCardInterface> = [
     {
       suitIndex: CardSuits.HEARTS,
       rankIndex: CardRanks.ACE,
       faceDown: true,
       selected: false,
-      received: false,
-      originIndex: null,
+      originPoint: {
+        x: 0,
+        y: 0,
+      },
       receiveAnimationStatus: AnimationStatus.IDLE
     },
     {
@@ -39,8 +41,10 @@ const generatePlayers = (currentPlayerIndex: number) : Array<PlayerInterface> =>
       rankIndex: CardRanks.TWO,
       faceDown: true,
       selected: false,
-      received: false,
-      originIndex: null,
+      originPoint: {
+        x: 0,
+        y: 0,
+      },
       receiveAnimationStatus: AnimationStatus.IDLE
     },
     {
@@ -48,8 +52,10 @@ const generatePlayers = (currentPlayerIndex: number) : Array<PlayerInterface> =>
       rankIndex: CardRanks.THREE,
       faceDown: true,
       selected: false,
-      received: false,
-      originIndex: null,
+      originPoint: {
+        x: 0,
+        y: 0,
+      },
       receiveAnimationStatus: AnimationStatus.IDLE
     },
     {
@@ -57,8 +63,10 @@ const generatePlayers = (currentPlayerIndex: number) : Array<PlayerInterface> =>
       rankIndex: CardRanks.THREE,
       faceDown: true,
       selected: false,
-      received: false,
-      originIndex: null,
+      originPoint: {
+        x: 0,
+        y: 0,
+      },
       receiveAnimationStatus: AnimationStatus.IDLE
     },
     {
@@ -66,8 +74,10 @@ const generatePlayers = (currentPlayerIndex: number) : Array<PlayerInterface> =>
       rankIndex: CardRanks.FOUR,
       faceDown: true,
       selected: false,
-      received: false,
-      originIndex: null,
+      originPoint: {
+        x: 0,
+        y: 0,
+      },
       receiveAnimationStatus: AnimationStatus.IDLE
     },
     {
@@ -75,19 +85,23 @@ const generatePlayers = (currentPlayerIndex: number) : Array<PlayerInterface> =>
       rankIndex: CardRanks.FIVE,
       faceDown: true,
       selected: false,
-      received: false,
-      originIndex: null,
+      originPoint: {
+        x: 0,
+        y: 0,
+      },
       receiveAnimationStatus: AnimationStatus.IDLE
     }
   ];
-  const player2Cards = [
+  const player2Cards : Array<PrimaryCardInterface> = [
     {
       suitIndex: CardSuits.DIAMONDS,
       rankIndex: CardRanks.SEVEN,
       faceDown: true,
       selected: false,
-      received: false,
-      originIndex: null,
+      originPoint: {
+        x: 0,
+        y: 0,
+      },
       receiveAnimationStatus: AnimationStatus.IDLE
     },
     {
@@ -95,8 +109,10 @@ const generatePlayers = (currentPlayerIndex: number) : Array<PlayerInterface> =>
       rankIndex: CardRanks.EIGHT,
       faceDown: true,
       selected: false,
-      received: false,
-      originIndex: null,
+      originPoint: {
+        x: 0,
+        y: 0,
+      },
       receiveAnimationStatus: AnimationStatus.IDLE
     },
     {
@@ -104,8 +120,10 @@ const generatePlayers = (currentPlayerIndex: number) : Array<PlayerInterface> =>
       rankIndex: CardRanks.NINE,
       faceDown: true,
       selected: false,
-      received: false,
-      originIndex: null,
+      originPoint: {
+        x: 0,
+        y: 0,
+      },
       receiveAnimationStatus: AnimationStatus.IDLE
     },
     {
@@ -113,8 +131,10 @@ const generatePlayers = (currentPlayerIndex: number) : Array<PlayerInterface> =>
       rankIndex: CardRanks.JACK,
       faceDown: true,
       selected: false,
-      received: false,
-      originIndex: null,
+      originPoint: {
+        x: 0,
+        y: 0,
+      },
       receiveAnimationStatus: AnimationStatus.IDLE
     },
     {
@@ -122,8 +142,10 @@ const generatePlayers = (currentPlayerIndex: number) : Array<PlayerInterface> =>
       rankIndex: CardRanks.KING,
       faceDown: true,
       selected: false,
-      received: false,
-      originIndex: null,
+      originPoint: {
+        x: 0,
+        y: 0,
+      },
       receiveAnimationStatus: AnimationStatus.IDLE
     },
     {
@@ -131,8 +153,10 @@ const generatePlayers = (currentPlayerIndex: number) : Array<PlayerInterface> =>
       rankIndex: CardRanks.ACE,
       faceDown: true,
       selected: false,
-      received: false,
-      originIndex: null,
+      originPoint: {
+        x: 0,
+        y: 0,
+      },
       receiveAnimationStatus: AnimationStatus.IDLE
     },
   ];
@@ -141,15 +165,19 @@ const generatePlayers = (currentPlayerIndex: number) : Array<PlayerInterface> =>
       name: 'manno',
       cards: player1Cards,
       selectedRank: 0,
-      xPoint: 0,
-      yPoint: 0
+      originPoint: {
+        x: 0,
+        y: 0,
+      }
     },
     {
       name: 'manno2',
       cards: player2Cards,
       selectedRank: 0,
-      xPoint: 0,
-      yPoint: 0
+      originPoint: {
+        x: 0,
+        y: 0,
+      }
     }
   ];
 }
@@ -162,11 +190,12 @@ function Game() {
       playerIndicatorCollection.current[index] = element;
     }
   }
-  const players: Array<PlayerViewInterface> = useSelector(
+  const players: Array<PrimaryPlayerViewInterface> = useSelector(
     (state: RootState) => {
       return state.game.playersView;
     }
   );
+  console.log({players})
   const currentPlayerIndex: number = useSelector(
     (state: RootState) => {
       return state.game.currentPlayerIndex;

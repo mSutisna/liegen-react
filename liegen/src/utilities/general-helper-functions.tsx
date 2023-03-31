@@ -1,4 +1,4 @@
-import { MiddleInterface, PlayerInterface, SetInterface, PlayerViewInterface } from "../types/models";
+import { MiddleInterface, PlayerInterface, SetInterface, PrimaryPlayerViewInterface } from "../types/models";
 
 export const determineSetIsALieAndGetIndexes = (middle: MiddleInterface) : {
   playerToWinSetIndex: number,
@@ -29,7 +29,7 @@ export const determineSetIsALieAndGetIndexes = (middle: MiddleInterface) : {
   }
 }
 
-export const createPlayersView = (players: Array<PlayerInterface>, currentPlayerIndex: number) : Array<PlayerViewInterface> => {
+export const createPlayersView = (players: Array<PlayerInterface>, currentPlayerIndex: number) : Array<PrimaryPlayerViewInterface> => {
   if (players.length === 0) {
     return [];
   }
@@ -42,7 +42,7 @@ export const createPlayersView = (players: Array<PlayerInterface>, currentPlayer
   let iterationIndex = currentPlayerIndex;
   let playersArray = [];
   do {
-    const player = JSON.parse(JSON.stringify(players[iterationIndex])) as PlayerViewInterface;
+    const player = JSON.parse(JSON.stringify(players[iterationIndex])) as PrimaryPlayerViewInterface;
     player.index = realIndexes[player.name];
     playersArray.push(player)
     iterationIndex -= 1;

@@ -1,8 +1,18 @@
-import { PlayerInterface, MiddleInterface, CardInterface, MessageModalData, PlayerViewInterface } from '../models';
+import { 
+  PlayerInterface, 
+  MiddleInterface,  
+  MessageModalData, 
+  Point, 
+  BaseCardInterface,
+  RegularPlayerInterface, 
+  PrimaryPlayerInterface,
+  PrimaryPlayerViewInterface,
+  RegularPlayerViewInterface
+} from '../models';
 
 interface InitialState {
-  players: Array<PlayerInterface>;
-  playersView: Array<PlayerViewInterface>;
+  players: Array<PrimaryPlayerInterface>;
+  playersView: Array<PrimaryPlayerViewInterface>;
   middle: MiddleInterface,
   mainPlayerIndex: number,
   currentPlayerIndex: number;
@@ -19,14 +29,19 @@ export interface MessageModalPayload {
 }
 
 export interface ReceiveCardPayload {
-  originPlayerIndex: number,
+  originPoint?: Point | null,
   receivingPlayerIndex: number,
-  card: CardInterface
+  card: BaseCardInterface,
+}
+
+export interface ToggleCardSelectedPayload {
+  cardName: string,
+  playerIndex: number,
 }
 
 export interface MakeSetPayload {
   receivingPlayerIndex: number,
-  cards: Array<CardInterface>,
+  cards: Array<BaseCardInterface>,
   rank: string,
   amount: number,
 }

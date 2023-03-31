@@ -71,17 +71,22 @@ function Hand({name, index, realIndex, amountOfPlayers, gameWidth, gameHeight, c
               containerX = position.left;
               containerY = position.top;
             }
-            const offsetData = determineXandYForCard(cards, cardIndex, DESKTOP_CARD_SCALE);
-            const left = offsetData.x;
-            const top = offsetData.y;
+            // const offsetData = determineXandYForCard(cards, cardIndex, DESKTOP_CARD_SCALE);
+            // const left = offsetData.x;
+            // const top = offsetData.y;
+            let adjustedOriginPoint = null;
+            if (card.originPoint) {
+              adjustedOriginPoint = {...card.originPoint};
+              adjustedOriginPoint.x = -containerX - card.originPoint.x;
+              adjustedOriginPoint.y = -containerY - card.originPoint.y;
+            }
             const delay = 0.02 + (0.06 * cardIndex);
             return <Card
               key={`cardIndex-${cardIndex}`}
               url={cardUrls['Backside']}
               width={DESKTOP_CARD_WIDTH * DESKTOP_CARD_SCALE}
               height={DESKTOP_CARD_HEIGHT * DESKTOP_CARD_SCALE}
-              startLeft={-containerX - left}
-              startTop={-containerY - top}
+              originPoint={adjustedOriginPoint}
               delay={delay}
               receiveAnimationStatus={card.receiveAnimationStatus}
               playerIndex={realIndex}

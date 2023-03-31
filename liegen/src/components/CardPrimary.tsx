@@ -3,14 +3,13 @@ import { createCardName } from '../utilities/card-helper-functions';
 
 import { useDispatch } from 'react-redux';
 import { toggleCardSelected, setCardReceivedAnimationStatus } from '../slices/gameSlice';
-import { AnimationStatus } from '../types/models';
+import { AnimationStatus, Point } from '../types/models';
 
 interface CardProps {
   url: string,
   width: number,
   height: number,
-  startLeft: number,
-  startTop: number,
+  originPoint: Point | null,
   delay: number,
   rank: string,
   suit: string,
@@ -21,22 +20,25 @@ interface CardProps {
   receiveAnimationStatus: AnimationStatus
 }
 
-function CardPrimary({url, width, height, startLeft, startTop, delay, rank, suit, selected, playerIndex, cardIndex, receiveAnimationStatus }: CardProps) {
+function CardPrimary({url, width, height, originPoint, delay, rank, suit, selected, playerIndex, cardIndex, receiveAnimationStatus }: CardProps) {
   const dispatch = useDispatch();
   const cardName = createCardName(suit, rank);
   let className = 'card';
   if (selected) {
     className += ' selected';
   }
-  const initial = receiveAnimationStatus === AnimationStatus.IDLE
-    ? {
-      x: startLeft,
-      y: startTop
-    } : false;
+  let initial : Point | false = false;
+  if (originPoint) {
+    initial = receiveAnimationStatus === AnimationStatus.IDLE
+    ? originPoint : false;
+  }
   return (
     <motion.img 
       src={url} 
-      onClick={() => dispatch(toggleCardSelected(cardName))}
+      onClick={() => {
+        console.log('card clicked')
+        dispatch(toggleCardSelected({cardName, playerIndex}))
+      }}
       className={className}
       style={{
         width,
