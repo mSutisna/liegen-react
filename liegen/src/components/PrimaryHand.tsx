@@ -1,18 +1,25 @@
 import { HandProps } from '../types/props';
-import { AnimationStatus, CardUrls, MiddleInterface, PlayerInterface, PrimaryPlayerInterface } from '../types/models';
+import { AnimationStatus, CardUrls, MiddleInterface, PlayerInterface } from '../types/models';
 import { determinePositionCoordinates } from '../utilities/player-position-determination';
-import { DESKTOP_PRIMARY_HAND_WIDTH, DESKTOP_PRIMARY_HAND_HEIGHT, DESKTOP_CARD_WIDTH, DESKTOP_CARD_HEIGHT, SUITS, RANKS, DESKTOP_CARD_SCALE } from '../constants';
+import { 
+  DESKTOP_PRIMARY_HAND_WIDTH, 
+  DESKTOP_PRIMARY_HAND_HEIGHT, 
+  DESKTOP_CARD_WIDTH, 
+  DESKTOP_CARD_HEIGHT, 
+  SUITS, 
+  RANKS, 
+  DESKTOP_CARD_SCALE 
+} from '../constants';
 import { createCardName } from '../utilities/card-helper-functions';
 import CardPrimary from '../components/CardPrimary';
-import { useEffect, useRef } from 'react';
-import { determineXandYForCard } from '../utilities/card-position-determination';
+import { useRef, useLayoutEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import {
+  setPlayerCenterCoordinates,
   increaseRank,
   decreaseRank,
   makeSet,
   callBust,
-  setPlayerCenterCoordinates,
   displayNewMessage,
 } from "../slices/gameSlice";
 import { RootState } from '../store';
@@ -33,26 +40,25 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
       return state.game.currentPlayerIndex;
     }
   );
-  const players: (Array<PrimaryPlayerInterface> | null) = useSelector(
+  const players: (Array<PlayerInterface> | null) = useSelector(
     (state: RootState) => {
       return state.game.players;
     }
   );
-
-  const mainContainerRef = useRef<HTMLDivElement>(null);
   const cardContainerRef = useRef<HTMLDivElement>(null);
-  const dispatch = useDispatch();
+  const mainWrapperRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    let mainX = 0;
-    let mainY = 0;
-    if (mainContainerRef.current) {
-      const position = mainContainerRef.current.getBoundingClientRect();
-      mainX = position.left + (position.width / 2);
-      mainY = position.top + (position.height / 2);
+  useLayoutEffect(() => {
+    if (!mainWrapperRef.current) {
+      return;
     }
-    dispatch(setPlayerCenterCoordinates({playerIndex: index, x: mainX, y: mainY}))
-  }, []);
+    const position = mainWrapperRef.current.getBoundingClientRect();
+    const mainX = position.left + (position.width / 2);
+    const mainY = position.top + (position.height / 2);
+    dispatch(setPlayerCenterCoordinates({playerIndex: realIndex, x: mainX, y: mainY}))
+  }, [currentPlayerIndex]);
+
+  const dispatch = useDispatch();
   const position = determinePositionCoordinates(
     index,
     amountOfPlayers,
@@ -68,7 +74,11 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
   }
 
   return (
-    <div className={`primary-hand player-${index}`} style={style} ref={mainContainerRef}>
+    <div 
+      className={`primary-hand player-${index}`} 
+      style={style} 
+      ref={mainWrapperRef}
+    >
       <div className="name">
         <div className="name-value">
           {name}

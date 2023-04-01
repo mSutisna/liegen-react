@@ -2,16 +2,11 @@ import { HandProps } from '../types/props';
 import { CardUrls } from '../types/models';
 import { determinePositionCoordinates } from '../utilities/player-position-determination';
 import { DESKTOP_HAND_WIDTH, DESKTOP_HAND_HEIGHT, DESKTOP_CARD_WIDTH, DESKTOP_CARD_HEIGHT, DESKTOP_CARD_SCALE } from '../constants';
-import { useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from "react-redux";
-import { determineXandYForCard } from '../utilities/card-position-determination';
-import {
-  setPlayerCenterCoordinates
-} from "../slices/gameSlice";
-import { createCardName } from '../utilities/card-helper-functions';
+import { useRef, useLayoutEffect } from 'react';
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from '../store';
 import Card from './Card';
-import checkmark from '../assets/icons/checkmark.svg'
+import { setPlayerCenterCoordinates } from "../slices/gameSlice";
 
 function Hand({name, index, realIndex, amountOfPlayers, gameWidth, gameHeight, cards, assignIndicatorRefToCollection}: HandProps) {
   const cardUrls: CardUrls  = useSelector(
@@ -19,19 +14,24 @@ function Hand({name, index, realIndex, amountOfPlayers, gameWidth, gameHeight, c
       return state.game.cardUrls;
     }
   );
-  const mainContainerRef = useRef<HTMLDivElement>(null);
-  const cardContainerRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
-  useEffect(() => {
-    let mainX = 0;
-    let mainY = 0;
-    if (mainContainerRef.current) {
-      const position = mainContainerRef.current.getBoundingClientRect();
-      mainX = position.left + (position.width / 2);
-      mainY = position.top + (position.height / 2);
+  const currentPlayerIndex: (number) = useSelector(
+    (state: RootState) => {
+      return state.game.currentPlayerIndex;
     }
-    dispatch(setPlayerCenterCoordinates({playerIndex: index, x: mainX, y: mainY}))
-  }, []);
+  );
+  const mainWrapperRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    if (!mainWrapperRef.current) {
+      return;
+    }
+    const position = mainWrapperRef.current.getBoundingClientRect();
+    const mainX = position.left + (position.width / 2);
+    const mainY = position.top + (position.height / 2);
+    dispatch(setPlayerCenterCoordinates({playerIndex: realIndex, x: mainX, y: mainY}))
+  }, [currentPlayerIndex]);
+
+  const cardContainerRef = useRef<HTMLDivElement>(null);
   const position = determinePositionCoordinates(
     index,
     amountOfPlayers,
@@ -47,7 +47,11 @@ function Hand({name, index, realIndex, amountOfPlayers, gameWidth, gameHeight, c
   }
 
   return (
-    <div className={`hand player-${index}`} style={style} ref={mainContainerRef}>
+    <div 
+      className={`hand player-${index}`} 
+      style={style} 
+      ref={mainWrapperRef}
+    >
       <div className="name">
         <div className="name-value">
           {name}

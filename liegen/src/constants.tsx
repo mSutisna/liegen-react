@@ -50,6 +50,3 @@ export enum CardRanks {
   QUEEN = 11,
   KING = 12
 }
-
-export const MESSAGE_MODAL_WIN_DISPLAY_ANIMATION = 'one';
-export const MESSAGE_MODAL_REGULAR_DISPLAY_ANIMATION = 'three';

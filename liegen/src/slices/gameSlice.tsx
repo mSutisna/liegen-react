@@ -1,24 +1,19 @@
 import InitialState, { UpdateGameAction, ReceiveCardPayload, ToggleCardSelectedPayload } from "../types/redux/game";
-import { createSlice, PayloadAction, current, Dispatch, AnyAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction, Dispatch, AnyAction, current } from "@reduxjs/toolkit";
 import { 
-  RegularPlayerInterface, 
-  PrimaryPlayerInterface,
-  RegularCardInterface,
-  PrimaryCardInterface,
-  PrimaryPlayerViewInterface,
-  RegularPlayerViewInterface,
-  CardUrls, 
-  Point
+  PlayerInterface,
+  CardUrls,
+  CardForPlayerInterface
 } from "../types/models";
-import { RANKS, SUITS, MESSAGE_MODAL_REGULAR_DISPLAY_ANIMATION, CardRanks, CardSuits, BurnType } from "../constants";
+import { RANKS, SUITS, BurnType } from "../constants";
 import { createCardName } from "../utilities/card-helper-functions";
-import { MessageModalPayload } from "../types/redux/game";
+import { MessageModalPayload, ModalAnimationType } from "../types/redux/game";
 import { AnimationStatus } from "../types/models";
-import { createPlayersView } from "../utilities/general-helper-functions";
+import { createPlayersOrder } from "../utilities/general-helper-functions";
 
 const initialState: InitialState = {
   players: [],
-  playersView: [],
+  playersOrder: [],
   middle: {
     set: null,
     previousSet: null,
@@ -56,7 +51,7 @@ const initialState: InitialState = {
   messageModal: {
     visible: false,
     message: '',
-    modalAnimation: MESSAGE_MODAL_REGULAR_DISPLAY_ANIMATION,
+    modalAnimation: ModalAnimationType.REGULAR,
     disableCloseButton: false
   },
   clockwise: true
@@ -66,18 +61,11 @@ export const gameSlice = createSlice({
   name: UpdateGameAction,
   initialState: initialState,
   reducers: {
-    setPlayers: (state : InitialState, action: PayloadAction<Array<PrimaryPlayerInterface>>) => {
+    setPlayers: (state : InitialState, action: PayloadAction<Array<PlayerInterface>>) => {
       state.players = action.payload;
     },
-    setPlayersView: (state: InitialState, action: PayloadAction<Array<PrimaryPlayerViewInterface>>) => {
-      state.playersView = action.payload;
-    },
-    setPlayerCenterCoordinates: (state: InitialState, action: PayloadAction<{playerIndex: number, x: number, y: number}>) => {
-      const player = state.players[action.payload.playerIndex]
-      player.originPoint = {
-        x: action.payload.x,
-        y: action.payload.y
-      };
+    setPlayersOrder: (state: InitialState, action: PayloadAction<Array<number>>) => {
+      state.playersOrder = action.payload;
     },
     setCardUrls: (state: InitialState, action: PayloadAction<CardUrls>) => {
       state.cardUrls = action.payload;
@@ -96,6 +84,13 @@ export const gameSlice = createSlice({
     setBustAnimationStatus: (state: InitialState, action: PayloadAction<AnimationStatus>) => {
       state.middle.bustAnimationStatus = action.payload;
     },
+    setPlayerCenterCoordinates: (state: InitialState, action: PayloadAction<{playerIndex: number, x: number, y: number}>) => {
+      const player = state.players[action.payload.playerIndex]
+      player.originPoint = {
+        x: action.payload.x,
+        y: action.payload.y
+      }
+    },
     burnCards: (state: InitialState, action: PayloadAction<BurnType>) => {
       const setKey = action.payload === BurnType.CURRENT_SET
         ? 'set'
@@ -111,58 +106,52 @@ export const gameSlice = createSlice({
       state.middle.burnedCards = [...state.middle.burnedCards, ...cardsToBurn];
       state.middle[setKey] = null;
     },
-    afterBustSetNextTurn: (state: InitialState, action: PayloadAction<number>) => {
+    afterBustResetMiddle: (state: InitialState) => {
       state.middle.set = null;
       state.middle.previousSet = null;
       state.middle.burnedCards = [];
       state.middle.playerToCallBust = null;
       state.middle.setAnimationStatus = AnimationStatus.IDLE;
       state.middle.bustAnimationStatus = AnimationStatus.IDLE;
-      state.currentPlayerIndex = action.payload;
-      state.playersView = createPlayersView(state.players, state.currentPlayerIndex);
     },
     increaseRank: (state: InitialState) => {
-      const player = state.players[state.currentPlayerIndex] as PrimaryPlayerInterface;
+      const player = state.players[state.currentPlayerIndex];
       let selectedRank = player.selectedRank += 1;
       if (selectedRank > (RANKS.length - 1)) {
         selectedRank = 0;
       }
       player.selectedRank = selectedRank;
-      state.playersView = createPlayersView(state.players, state.currentPlayerIndex);
     },
     decreaseRank: (state: InitialState) => {
-      const player = state.players[state.currentPlayerIndex] as PrimaryPlayerInterface;
+      const player = state.players[state.currentPlayerIndex];
       let selectedRank = player.selectedRank -= 1;
       if (selectedRank < 0) {
         selectedRank = RANKS.length - 1;
       }
       player.selectedRank = selectedRank;
-      state.playersView = createPlayersView(state.players, state.currentPlayerIndex);
     },
     toggleCardSelected: (state: InitialState, action: PayloadAction<ToggleCardSelectedPayload>) => {
-      const cards = state.players[action.payload.playerIndex].cards as Array<PrimaryCardInterface>;
+      const cards = state.players[action.payload.playerIndex].cards;
       const index = cards.findIndex(card => createCardName(SUITS[card.suitIndex], RANKS[card.rankIndex]) === action.payload.cardName);
       if (index === -1) {
         return;
       }
       cards[index].selected = !cards[index].selected;
-      state.playersView = createPlayersView(state.players, state.currentPlayerIndex);
     },
     receiveCard: (state : InitialState, action: PayloadAction<ReceiveCardPayload>) => {
       const receivingPlayerIndex = action.payload.receivingPlayerIndex;
       const receivingPlayer = state.players[receivingPlayerIndex];
       const payloadCard = action.payload.card;
-      const card : PrimaryCardInterface = {
+      const card : CardForPlayerInterface = {
         ...payloadCard,
         selected: false,
         originPoint: null,
         receiveAnimationStatus: AnimationStatus.IDLE
       }
       receivingPlayer.cards.push(card);
-      state.playersView = createPlayersView(state.players, state.currentPlayerIndex);
     },
     makeSet: (state : InitialState) => {
-      const player = state.players[state.currentPlayerIndex] as PrimaryPlayerInterface;
+      const player = state.players[state.currentPlayerIndex];
       const playerCards = player.cards;
       const selectedCards = playerCards.filter(playerCard => playerCard.selected);
       const leftOverCards = playerCards.filter(playerCard => !playerCard.selected);
@@ -171,7 +160,7 @@ export const gameSlice = createSlice({
       const amount = selectedCards.length;
       const realCards = selectedCards.map(selectedCard => {
         return {
-          rankIndex,
+          rankIndex: selectedCard.rankIndex,
           suitIndex: selectedCard.suitIndex,
           faceDown: true
         }
@@ -184,16 +173,6 @@ export const gameSlice = createSlice({
           faceDown: false,
         })
       }
-      // const previousMiddleSet = state.middle.set;
-      // if (previousMiddleSet) {
-      //   for (const setCard of previousMiddleSet.realCards) {
-      //     state.middle.burnedCards.push({
-      //       rankIndex: setCard.rankIndex,
-      //       suitIndex: setCard.suitIndex,
-      //       faceDown: true
-      //     })
-      //   }
-      // }
       player.cards = leftOverCards;
       player.selectedRank = 0;
       state.middle.previousSet = state.middle.set;
@@ -206,20 +185,25 @@ export const gameSlice = createSlice({
       }
       state.middle.setAnimationStatus = AnimationStatus.IDLE;
       state.middle.bustAnimationStatus = AnimationStatus.IDLE;
+    },
+    switchToNextPlayer: (state: InitialState, action: PayloadAction<number | null>) => {
       const endPlayerIndex = state.players.length - 1;
-
-      if (state.clockwise) {
-        state.currentPlayerIndex -= 1;
-        if (state.currentPlayerIndex < 0) {
-          state.currentPlayerIndex = endPlayerIndex;
-        }
+      if (action.payload !== null) {
+        state.currentPlayerIndex = action.payload;
       } else {
-        state.currentPlayerIndex += 1;
-        if (state.currentPlayerIndex > endPlayerIndex) {
-          state.currentPlayerIndex = 0;
+        if (state.clockwise) {
+          state.currentPlayerIndex -= 1;
+          if (state.currentPlayerIndex < 0) {
+            state.currentPlayerIndex = endPlayerIndex;
+          }
+        } else {
+          state.currentPlayerIndex += 1;
+          if (state.currentPlayerIndex > endPlayerIndex) {
+            state.currentPlayerIndex = 0;
+          }
         }
       }
-      state.playersView = createPlayersView(state.players, state.currentPlayerIndex);
+      state.playersOrder = createPlayersOrder(state.players, state.currentPlayerIndex);
     },
     callBust: (state : InitialState) => {
       state.middle.playerToCallBust = state.currentPlayerIndex;
@@ -232,7 +216,7 @@ export const gameSlice = createSlice({
       state.messageModal.visible = true;
       state.messageModal.message = data.message;
       state.messageModal.disableCloseButton = data.disableCloseButton ?? false;
-      state.messageModal.modalAnimation = data.modalAnimation ?? MESSAGE_MODAL_REGULAR_DISPLAY_ANIMATION;
+      state.messageModal.modalAnimation = data.modalAnimation ?? ModalAnimationType.REGULAR;
     },
     hideMessageModal: (state: InitialState ) => {
       state.messageModal.visible = false;
@@ -243,15 +227,16 @@ export const gameSlice = createSlice({
 // Action creators are generated for each case reducer function
 export const { 
   setPlayers, 
-  setPlayersView,
-  setPlayerCenterCoordinates,
+  setPlayersOrder,
   setCardUrls,
+  setPlayerCenterCoordinates,
   receiveCard,
   setCardReceivedAnimationStatus, 
   setSetAnimationStatus,
   setBustAnimationStatus,
-  afterBustSetNextTurn,
+  afterBustResetMiddle,
   makeSet,
+  switchToNextPlayer,
   burnCards, 
   callBust,
   increaseRank, 
@@ -265,11 +250,15 @@ export const {
 const helpFunctions = {
   displayNewMessage: async (
     dispatch: Dispatch<AnyAction>,
-    message: string
+    message: string,
+    modalAnimation: ModalAnimationType = ModalAnimationType.REGULAR,
+    disableCloseButton: boolean = false
   ) => {
     await dispatch(gameSlice.actions.hideMessageModal());
     dispatch(gameSlice.actions.setMessageModalMessage({
       message,
+      modalAnimation,
+      disableCloseButton
     }))
   }
 };

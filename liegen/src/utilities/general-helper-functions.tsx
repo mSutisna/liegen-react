@@ -1,11 +1,11 @@
-import { MiddleInterface, PlayerInterface, SetInterface, PrimaryPlayerViewInterface } from "../types/models";
+import { MiddleInterface, PlayerInterface } from "../types/models";
 
 export const determineSetIsALieAndGetIndexes = (middle: MiddleInterface) : {
   playerToWinSetIndex: number,
   playerToLoseSetIndex: number,
   setIsALie: boolean,
 } | null => {
-  if (!middle.set || !middle.playerToCallBust) {
+  if (!middle.set || middle.playerToCallBust === null) {
     return null;
   }
   let setIsALie = false;
@@ -29,26 +29,19 @@ export const determineSetIsALieAndGetIndexes = (middle: MiddleInterface) : {
   }
 }
 
-export const createPlayersView = (players: Array<PlayerInterface>, currentPlayerIndex: number) : Array<PrimaryPlayerViewInterface> => {
+export const createPlayersOrder = (players: Array<PlayerInterface>, currentPlayerIndex: number) : Array<number> => {
   if (players.length === 0) {
     return [];
   }
-  let realIndexes : {[k: string]: number} = {};
-  for (let i = 0; i < players.length; i++) {
-    const player = players[i];
-    realIndexes[player.name] = i;
-  }
   const endIndex = players.length - 1;
   let iterationIndex = currentPlayerIndex;
-  let playersArray = [];
+  let playersOrder = [];
   do {
-    const player = JSON.parse(JSON.stringify(players[iterationIndex])) as PrimaryPlayerViewInterface;
-    player.index = realIndexes[player.name];
-    playersArray.push(player)
+    playersOrder.push(iterationIndex)
     iterationIndex -= 1;
     if (iterationIndex < 0) {
       iterationIndex = endIndex;
     }
   } while (iterationIndex !== currentPlayerIndex);
-  return playersArray;
+  return playersOrder;
 }

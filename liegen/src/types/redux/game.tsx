@@ -3,16 +3,12 @@ import {
   MiddleInterface,  
   MessageModalData, 
   Point, 
-  BaseCardInterface,
-  RegularPlayerInterface, 
-  PrimaryPlayerInterface,
-  PrimaryPlayerViewInterface,
-  RegularPlayerViewInterface
+  BaseCardInterface
 } from '../models';
 
 interface InitialState {
-  players: Array<PrimaryPlayerInterface>;
-  playersView: Array<PrimaryPlayerViewInterface>;
+  players: Array<PlayerInterface>;
+  playersOrder: Array<number>,
   middle: MiddleInterface,
   mainPlayerIndex: number,
   currentPlayerIndex: number;
@@ -22,9 +18,14 @@ interface InitialState {
   clockwise: boolean
 }
 
+export enum ModalAnimationType {
+  WIN = 'one',
+  REGULAR = 'three'
+}
+
 export interface MessageModalPayload {
   message: string,
-  modalAnimation?: string,
+  modalAnimation?: ModalAnimationType,
   disableCloseButton?: boolean
 }
 

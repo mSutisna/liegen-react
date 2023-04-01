@@ -1,4 +1,5 @@
 import { CardRanks, CardSuits } from "../constants";
+import { ModalAnimationType } from "./redux/game";
 
 export interface BaseCardInterface {
   rankIndex: CardRanks,
@@ -6,35 +7,18 @@ export interface BaseCardInterface {
   faceDown: boolean,
 }
 
-export interface RegularCardInterface extends BaseCardInterface {
+export interface CardForPlayerInterface extends BaseCardInterface {
+  selected: boolean,
   originPoint: Point | null,
   receiveAnimationStatus: AnimationStatus,
 }
 
-export interface PrimaryCardInterface extends RegularCardInterface {
-  selected: boolean,
-}
-
 export interface PlayerInterface {
   name: string,
-  originPoint: Point | null
-}
-
-export interface RegularPlayerInterface extends PlayerInterface {
-  cards: Array<RegularCardInterface>,
-}
-
-export interface PrimaryPlayerInterface extends PlayerInterface { 
-  cards: Array<PrimaryCardInterface>,
+  originPoint: Point | null,
+  index: number,
+  cards: Array<CardForPlayerInterface>,
   selectedRank: number,
-}
-
-export interface PrimaryPlayerViewInterface extends PrimaryPlayerInterface  {
-  index: number,
-}
-
-export interface RegularPlayerViewInterface extends RegularPlayerInterface {
-  index: number,
 }
 
 export interface SetInterface {
@@ -83,6 +67,6 @@ export interface CardUrls {
 export interface MessageModalData {
   visible: boolean,
   message: string,
-  modalAnimation: string,
+  modalAnimation: ModalAnimationType,
   disableCloseButton: boolean
 }

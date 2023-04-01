@@ -34,7 +34,7 @@ const MessageModalInner = ({message, modalDisplayAnimation, disableCloseButton} 
         <div className="modal-background">
           <div className="modal" ref={modalRef}>
             <p id="modal-message">{message}</p>
-            <span id="modal-close-button" onClick={closeFunction}>&times;</span>
+            {!disableCloseButton && <span id="modal-close-button" onClick={closeFunction}>&times;</span>}
           </div>
         </div>
       </div>
