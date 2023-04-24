@@ -40,11 +40,11 @@ export default class ImageStore {
           img.className = 'card-size';
           img.onload = () => {
             const img = document.createElement('img');
-            img.src = imageUrl;
+            img.src = imageUrl.regular;
             cardImagesObject[key] = img;
             resolve();
           };
-          img.src = imageUrl;
+          img.src = imageUrl.regular;
         })
       );
     }

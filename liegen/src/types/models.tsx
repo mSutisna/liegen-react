@@ -64,9 +64,18 @@ export interface CardUrls {
   [k: string]: string
 }
 
+export interface CardUrlsComplete {
+  [K: string]: {
+    regular: string,
+    mobile: string
+  }
+}
+
 export interface MessageModalData {
   visible: boolean,
   message: string,
   modalAnimation: ModalAnimationType,
   disableCloseButton: boolean
 }
+
+export type CardPosition = {row: number, column: number};

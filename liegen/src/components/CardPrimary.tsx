@@ -33,17 +33,11 @@ function CardPrimary({url, width, height, originPoint, delay, rank, suit, select
     ? originPoint : false;
   }
   return (
-    <motion.img 
-      src={url} 
+    <motion.div
       onClick={() => {
-        console.log('card clicked')
         dispatch(toggleCardSelected({cardName, playerIndex}))
       }}
       className={className}
-      style={{
-        width,
-        height,
-      }}
       initial={initial}
       animate={{
         x: 0,
@@ -59,7 +53,32 @@ function CardPrimary({url, width, height, originPoint, delay, rank, suit, select
       onAnimationComplete={() => {
         dispatch(setCardReceivedAnimationStatus({playerIndex, cardIndex, status: AnimationStatus.FINISHED}))
       }}
-    />
+    >
+      <img src={url}  />
+    </motion.div>
+
+    // <motion.img 
+    //   src={url} 
+    //   onClick={() => {
+    //     dispatch(toggleCardSelected({cardName, playerIndex}))
+    //   }}
+    //   className={className}
+    //   initial={initial}
+    //   animate={{
+    //     x: 0,
+    //     y: 0
+    //   }}
+    //   transition={{
+    //     delay,
+    //     default: { ease: "linear" }
+    //   }}
+    //   onAnimationStart={() => {
+    //     dispatch(setCardReceivedAnimationStatus({playerIndex, cardIndex, status: AnimationStatus.RUNNING}))
+    //   }}
+    //   onAnimationComplete={() => {
+    //     dispatch(setCardReceivedAnimationStatus({playerIndex, cardIndex, status: AnimationStatus.FINISHED}))
+    //   }}
+    // />
   )
 }
 

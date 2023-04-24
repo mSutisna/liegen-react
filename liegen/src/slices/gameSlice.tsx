@@ -3,9 +3,10 @@ import { createSlice, PayloadAction, Dispatch, AnyAction, current } from "@redux
 import { 
   PlayerInterface,
   CardUrls,
-  CardForPlayerInterface
+  CardForPlayerInterface,
+  CardUrlsComplete
 } from "../types/models";
-import { RANKS, SUITS, BurnType } from "../constants";
+import { RANKS, SUITS, BurnType, CardRanks, CardSuits, CardUrlType } from "../constants";
 import { createCardName } from "../utilities/card-helper-functions";
 import { MessageModalPayload, ModalAnimationType } from "../types/redux/game";
 import { AnimationStatus } from "../types/models";
@@ -14,40 +15,42 @@ import { createPlayersOrder } from "../utilities/general-helper-functions";
 const initialState: InitialState = {
   players: [],
   playersOrder: [],
-  middle: {
-    set: null,
-    previousSet: null,
-    burnedCards: [],
-    playerToCallBust: null,
-    setAnimationStatus: AnimationStatus.IDLE,
-    bustAnimationStatus: AnimationStatus.IDLE,
-  },
   // middle: {
-  //   set: {
-  //     playerIndex: 0,
-  //     realCards: [
-  //       {suitIndex: CardSuits.HEARTS, rankIndex: CardRanks.KING, faceDown: true},
-  //       {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: true},
-  //       {suitIndex: CardSuits.SPADES, rankIndex: CardRanks.ACE, faceDown: true},
-  //     ],
-  //     supposedCards: [
-  //       {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: false},
-  //       {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: false},
-  //       {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: false},
-  //     ],
-  //     rank: CardRanks.ACE,
-  //     amount: 3,
-  //   },
+  //   set: null,
   //   previousSet: null,
   //   burnedCards: [],
   //   playerToCallBust: null,
-  //   setAnimationStatus: AnimationStatus.FINISHED,
+  //   setAnimationStatus: AnimationStatus.IDLE,
   //   bustAnimationStatus: AnimationStatus.IDLE,
   // },
+  middle: {
+    set: {
+      playerIndex: 0,
+      realCards: [
+        {suitIndex: CardSuits.HEARTS, rankIndex: CardRanks.KING, faceDown: true},
+        {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: true},
+        {suitIndex: CardSuits.SPADES, rankIndex: CardRanks.ACE, faceDown: true},
+      ],
+      supposedCards: [
+        {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: false},
+        {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: false},
+        {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: false},
+      ],
+      rank: CardRanks.ACE,
+      amount: 3,
+    },
+    previousSet: null,
+    burnedCards: [],
+    playerToCallBust: null,
+    setAnimationStatus: AnimationStatus.FINISHED,
+    bustAnimationStatus: AnimationStatus.IDLE,
+  },
   mainPlayerIndex: 0,
-  currentPlayerIndex: 1,
+  currentPlayerIndex: 0,
   previousPlayerIndex: null,
   cardUrls: {},
+  cardUrlsRegular: {},
+  cardUrlsMobile: {},
   messageModal: {
     visible: false,
     message: '',
@@ -67,8 +70,21 @@ export const gameSlice = createSlice({
     setPlayersOrder: (state: InitialState, action: PayloadAction<Array<number>>) => {
       state.playersOrder = action.payload;
     },
-    setCardUrls: (state: InitialState, action: PayloadAction<CardUrls>) => {
-      state.cardUrls = action.payload;
+    setCardUrls: (state: InitialState, action: PayloadAction<CardUrlsComplete>) => {
+      for (const [cardName, urls] of Object.entries(action.payload)) {
+        state.cardUrlsRegular[cardName] = urls.regular;
+        state.cardUrlsMobile[cardName] = urls.mobile;
+      }
+    },
+    setCardUrlsToUse: (state: InitialState, action: PayloadAction<CardUrlType>) => {
+      let newCardUrls;
+      if (action.payload === CardUrlType.REGULAR) {
+        newCardUrls = state.cardUrlsRegular;
+      } else {
+        newCardUrls = state.cardUrlsMobile;
+      }
+      newCardUrls = JSON.parse(JSON.stringify(newCardUrls)) as CardUrls;
+      state.cardUrls = newCardUrls;
     },
     setCardReceivedAnimationStatus: (state: InitialState, action: PayloadAction<{playerIndex: number, cardIndex: number, status: AnimationStatus}>) => {
       const player = state.players[action.payload.playerIndex];
@@ -229,6 +245,7 @@ export const {
   setPlayers, 
   setPlayersOrder,
   setCardUrls,
+  setCardUrlsToUse,
   setPlayerCenterCoordinates,
   receiveCard,
   setCardReceivedAnimationStatus, 

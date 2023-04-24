@@ -2,7 +2,10 @@ import { useState, useRef, useEffect } from "react"
 import { getImageUrls } from './utilities/image-store/image-urls';
 
 function App3() {
-  const [cardUrls, setCardUrls] = useState<{[k: string]: string}>({});
+  const [cardUrls, setCardUrls] = useState<{[k: string]: {
+    regular: string,
+    mobile: string
+  }}>({});
   useEffect(() => {
     const setImageUrls = async () => {
       const imageUrls = await getImageUrls();
@@ -82,7 +85,7 @@ function App3() {
           }
           return (
             <img 
-              src={cardUrls[item]}
+              src={cardUrls[item].regular}
               className={`item item-top card ${animClass}`}
               onClick={(evt) => moveDown(item, evt)}
               style={style}
@@ -99,7 +102,7 @@ function App3() {
           }
           return (
             <img 
-              src={cardUrls[item]}
+              src={cardUrls[item].regular}
               className={`item item-bottom ${animClass}`}
               onClick={(evt) => moveUp(item, evt)}
               style={style}

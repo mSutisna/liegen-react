@@ -276,9 +276,6 @@ TODO MORGEN
 
 
 
-
-
-
 TODO MORGEN (2023-04-02):
 - RESPONSIVE PLAYER LAYOUT MAKEN!!!
 - ervoor zorgen dat kolommen voor het grid voor kaarten dynamisch bepaald wordt
@@ -286,3 +283,78 @@ TODO MORGEN (2023-04-02):
 
 
 
+LEARN CSS GRID IN 20 minutes
+https://www.youtube.com/watch?v=9zBsdzdE4sM
+
+Responsive CSS Will Never Be The Same (CSS container queries tutorial)
+https://www.youtube.com/watch?v=rrLAg7xNERA&t=638s
+
+Scaled proporitional blocks
+https://css-tricks.com/scaled-proportional-blocks-with-css-and-javascript/
+
+
+Proportional scaling based on font-size:
+https://blog.evanshunt.com/using-proportional-font-scaling-with-responsive-web-design-30e99094fca0
+
+Proportional website scaling (with fonts):
+https://www.wearebraid.com/articles/proportional-website-scaling
+
+Fluid typogrpahy explained (scaling based by font size)
+https://www.youtube.com/watch?v=mGCOsB_gF0M
+
+
+Best screen sizes for responsive web design:
+https://www.hobo-web.co.uk/best-screen-size/
+
+
+Using CSS subgrids with container queries
+https://blog.logrocket.com/using-css-subgrids-container-queries/
+
+Project idee:
+- betere versie van grid generator maken (check deze site: https://grid.layoutit.com/)
+
+
+
+Mobile deck of cards SVG:
+https://www.google.com/search?q=deck+of+cards+mobile+svg&sxsrf=APwXEdegByt2fDouj5AIN0ziqOwmWQPFVg:1681749456858&source=lnms&tbm=isch&sa=X&ved=2ahUKEwi1guj3rLH-AhVLg_0HHeZXDvcQ_AUoAXoECDwQAw&biw=2586&bih=1272&dpr=0.99#imgrc=FZw6ZLwRFvGEGM
+
+
+
+Todo:
+Card images uit .gitignore halen
+
+
+Draw image with delta rotated:
+https://stackoverflow.com/questions/32663547/canvas-rotate-image-which-depicts-an-angled-ellipse
+
+
+
+Todo:
+- Kaarten uitdelen na bust
+- Geen set of bust kunnen doen zodra er een animatie bezig is
+- Game over screen tonen
+- Volledige testronde doen
+
+- Kaarten altijd in het midden uitlijnen (.cards grid columns dynamisch) X
+- Animaties checken met regular en mobile cards (make set, make set and burn, bust)
+- Grid layout voor 2 players
+- Aparte layouts maken voor 3 en 4 players
+- De layouts stylen zoals dat is gedaan in Phaser liegen
+- Responsive maken grid layout
+- Mobile layout stylen
+- Gradient maken voor achtergrond
+
+
+- Lobby verwerken het spel
+- Backend verwerken in het spel
+- Volledige testronde doen in multiplayer
+
+- Overlay maken om te kunnen spelen terwijl de main player een excess aan kaarten heeft
+- Indicator tonen als er een excess aan kaarten is (tonen hoeveel kaarten er in excess zijn)
+- Kaarten kunnen sorteren
+
+- Multiple lobbies
+- Spectator mode
+- Chat systeem
+
+- Locken dat het scherm sideways moet

@@ -1,9 +1,6 @@
 import { HandProps } from '../types/props';
-import { AnimationStatus, CardUrls, MiddleInterface, PlayerInterface } from '../types/models';
-import { determinePositionCoordinates } from '../utilities/player-position-determination';
-import { 
-  DESKTOP_PRIMARY_HAND_WIDTH, 
-  DESKTOP_PRIMARY_HAND_HEIGHT, 
+import { AnimationStatus, BaseCardInterface, CardUrls, MiddleInterface, PlayerInterface } from '../types/models';
+import {
   DESKTOP_CARD_WIDTH, 
   DESKTOP_CARD_HEIGHT, 
   SUITS, 
@@ -12,7 +9,7 @@ import {
 } from '../constants';
 import { createCardName } from '../utilities/card-helper-functions';
 import CardPrimary from '../components/CardPrimary';
-import { useRef, useLayoutEffect } from 'react';
+import { useRef, useLayoutEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import {
   setPlayerCenterCoordinates,
@@ -23,6 +20,7 @@ import {
   displayNewMessage,
 } from "../slices/gameSlice";
 import { RootState } from '../store';
+import questionMark from '../assets/icons/question-mark.svg';
 
 function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHeight, cards, selectedRank, assignIndicatorRefToCollection} : HandProps) {
   const cardUrls: CardUrls  = useSelector(
@@ -45,38 +43,58 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
       return state.game.players;
     }
   );
+  const playerCards: (Array<BaseCardInterface> | null) = useSelector(
+    (state: RootState) => {
+      return state.game.players[realIndex]?.cards ?? null;
+    }
+  );
   const cardContainerRef = useRef<HTMLDivElement>(null);
   const mainWrapperRef = useRef<HTMLDivElement>(null);
+  const cardsGridRef = useRef<HTMLDivElement>(null);
+  const mainWrapperWidthAndHeight = useRef<{
+    width: number | null,
+    height: number | null
+  }>({
+    width: null,
+    height: null
+  });
+  const [screenSize, setScreenSize] = useState<{
+    width: number,
+    height: number,
+  }>({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  })
 
   useLayoutEffect(() => {
-    if (!mainWrapperRef.current) {
+    if (!mainWrapperRef.current || !mainWrapperWidthAndHeight.current || !cardsGridRef.current) {
       return;
     }
+    const columns = playerCards.length <= 5
+      ? playerCards.length
+      : 5;
+    cardsGridRef.current.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+    const handleWindowResize = () => {
+      setScreenSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      })
+    }
+    window.addEventListener('resize', handleWindowResize);
     const position = mainWrapperRef.current.getBoundingClientRect();
     const mainX = position.left + (position.width / 2);
     const mainY = position.top + (position.height / 2);
     dispatch(setPlayerCenterCoordinates({playerIndex: realIndex, x: mainX, y: mainY}))
-  }, [currentPlayerIndex]);
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+    }
+  }, [currentPlayerIndex, screenSize.width, screenSize.height]);
 
   const dispatch = useDispatch();
-  const position = determinePositionCoordinates(
-    index,
-    amountOfPlayers,
-    gameWidth,
-    gameHeight,
-    DESKTOP_PRIMARY_HAND_WIDTH,
-    DESKTOP_PRIMARY_HAND_HEIGHT
-  )
-  const style = {
-    ...position,
-    width: DESKTOP_PRIMARY_HAND_WIDTH,
-    height: DESKTOP_PRIMARY_HAND_HEIGHT
-  }
 
   return (
     <div 
-      className={`primary-hand player-${index}`} 
-      style={style} 
+      className={`primary-hand player-${index}`}
       ref={mainWrapperRef}
     >
       <div className="name">
@@ -84,7 +102,7 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
           {name}
         </div>
         <img 
-          src=""
+          src={questionMark}
           ref={element => assignIndicatorRefToCollection(element, index)}
           className="indicator" 
         />
@@ -115,7 +133,10 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
           ref={cardContainerRef}
           className="cards"
         >
-          <div className="cards-grid">
+          <div 
+            ref={cardsGridRef}
+            className="cards-grid"
+          >
             {cards.map((card, cardIndex) => {
               const cardKey = createCardName(SUITS[card.suitIndex] ?? '', RANKS[card.rankIndex] ?? '')
               if (!cardUrls[cardKey]) {
@@ -128,9 +149,6 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
                 containerX = position.left;
                 containerY = position.top;
               }
-              // const offsetData = determineXandYForCard(cards, cardIndex, DESKTOP_CARD_SCALE);
-              // const left = offsetData.x;
-              // const top = offsetData.y;
               let adjustedOriginPoint = null;
               if (card.originPoint) {
                 adjustedOriginPoint = {...card.originPoint};
@@ -170,7 +188,6 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
             onClick={e => {
               e.stopPropagation();
               if (middle.setAnimationStatus === AnimationStatus.RUNNING || middle.bustAnimationStatus === AnimationStatus.RUNNING) {
-                console.log('BIG FAIL!!!', middle);
                 return;
               }
               const player = players[realIndex];

@@ -1,0 +1,58 @@
+// $container-desktop-font-size: 16px;
+
+
+// // $container-320: percentageOfToPx(320, 80);
+
+// // $container-599: percentageOfToPx(599, 80);
+
+// // $container-600: percentageOfToPx(600, 80);
+
+// // $container-1279: percentageOfToPx(1279, 80);
+
+// $container-1280: percentageOfToPx(1280, 80);
+
+// // $container-1280: 1200px;
+
+// html {
+//   // @container (max-width: #{$container-599}) {
+//   //   font-size: px2cwqGridContainer($container-desktop-font-size, $container-320);
+//   // }
+//   // @container (min-width: #{$container-600}) and (max-width: #{$container-1279}) {
+//   //   font-size: px2cwqGridContainer($container-desktop-font-size, $container-600);
+//   // }
+//   // @container (min-width: #{$container-1280}) {
+//   //   font-size: px2cwqGridContainer($container-desktop-font-size, $container-1280);
+//   // }
+//   // font-size: px2vw($container-desktop-font-size, 600px);
+//   // @media screen and (min-width: 1280px) {
+//   //   font-size: px2vw($container-desktop-font-size, 1280px);
+//   // }
+//   font-size: px2vw($container-desktop-font-size, 1280px);
+// }
+
+// .game {
+//   // // @container (max-width: #{$container-599}) {
+//   // //   font-size: px2cwqGridContainer($container-desktop-font-size, $container-320);
+//   // // }
+//   // // @container (min-width: #{$container-600}) and (max-width: #{$container-1279}) {
+//   // //   font-size: px2cwqGridContainer($container-desktop-font-size, $container-600);
+//   // // }
+//   // // @container (min-width: #{$container-1280}) {
+//   // //   font-size: px2cwqGridContainer($container-desktop-font-size, $container-1280);
+//   // // }
+//   // font-size: px2cwqGridContainer($container-desktop-font-size, $container-1280);
+
+//   // button {
+//   //   // @container (min-width: #{$container-1280}) {
+//   //   //   font-size: px2cwqGridContainer($container-desktop-font-size, $container-1280);
+//   //   // }
+//   //   font-size: px2cwqGridContainer($container-desktop-font-size, $container-1280);
+//   // }
+  
+//   // font-size: px2cwqGridContainer($container-desktop-font-size, $container-1280);
+
+//   // @media screen and (min-width: 1280px) {
+//   //   font-size: px2vw($container-desktop-font-size, 1280px);
+//   // }
+//   font-size: inherit;
+// }

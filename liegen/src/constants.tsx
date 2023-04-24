@@ -23,6 +23,11 @@ export const DESKTOP_CARD_SCALE = 0.35;
 export const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 export const SUITS = ['Hearts', 'Clubs', 'Diamonds', 'Spades'];
 
+export enum CardUrlType {
+  REGULAR = 'regular',
+  MOBILE = 'mobile'
+}
+
 export enum CardSuits {
   HEARTS = 0,
   CLUBS = 1,
@@ -49,4 +54,15 @@ export enum CardRanks {
   JACK = 10,
   QUEEN = 11,
   KING = 12
+}
+
+
+export enum GridOrientation {
+  REGULAR = 'regular',
+  REVERSE = 'reverse'
+}
+
+export enum GridItemType {
+  ROW = 'row',
+  COLUMN = 'column'
 }

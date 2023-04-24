@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from '../store';
-import { MiddleInterface, PlayerInterface, SetInterface } from "../types/models";
+import { CardUrls, MiddleInterface, PlayerInterface, SetInterface } from "../types/models";
 import { createCardName } from "../utilities/card-helper-functions";
 import { useState, useRef, useLayoutEffect } from "react";
 import { getImageUrls } from "../utilities/image-store/image-urls";
@@ -63,7 +63,11 @@ interface refCollectionInterface {
 }
 
 function Middle({width, height, left, top, playerIndicatorCollection} : MiddleProps) {  
-  const [cardUrls, setCardUrls] = useState<{[k: string]: string}>({});
+  const cardUrls: CardUrls  = useSelector(
+    (state: RootState) => {
+      return state.game.cardUrls;
+    }
+  );
   const dispatch = useDispatch();
   const middle: MiddleInterface = useSelector(
     (state: RootState) => {
@@ -106,12 +110,6 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
   const refCardsBurned = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    const setImageUrls = async () => {
-      const imageUrls = await getImageUrls();
-      setCardUrls(imageUrls);
-    }
-    setImageUrls();
-
     if (!middleSet) {
       return;
     }
@@ -222,11 +220,11 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
       }
       const cardStyle = {...style};
       //Comment out if chain below to display middle set initially without problems
-      if (visibilityHideType === 'visibility')  {
-        style.visibility = 'hidden';
-      } else if (visibilityHideType === 'display') {
-        style.display = 'none';
-      }
+      // if (visibilityHideType === 'visibility')  {
+      //   style.visibility = 'hidden';
+      // } else if (visibilityHideType === 'display') {
+      //   style.display = 'none';
+      // }
       const frontSideDisplay = type === 'supposedCard' 
         ? 'do-display'
         : 'dont-display';
@@ -248,7 +246,7 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
           );
         }}
         className="card"
-        style={style}
+        // style={style}
       >
         <div 
           ref={el => {
@@ -268,12 +266,12 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
         >
           <img 
             src={url} 
-            style={cardStyle}
+            // style={cardStyle}
             className={`front-side ${frontSideDisplay}`}
           />
           <img 
             src={cardUrls['Backside']} 
-            style={cardStyle}
+            // style={cardStyle}
             className={`back-side ${backsideDisplay}`}
           />
         </div>
@@ -297,9 +295,6 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
           src="" 
           className="indicator"
           ref={element => {
-            // if (!middleCardIndicatorsCollection.current[i]) {
-            //   middleCardIndicatorsCollection.current[i] = element;
-            // }
             const alreadyAddedElement = middleCardIndicatorsCollection.current[i];
             if (!alreadyAddedElement || alreadyAddedElement !== element) {
               middleCardIndicatorsCollection.current[i] = element;
@@ -341,10 +336,6 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
       key={`card-to-deal-${i}`}
       src={cardUrls['Backside']}
       className="card"
-      style={{
-        width: '59.5px',
-        height: '89.25px'
-      }}
       ref={element => {
         const alreadyAddedCardElement = cardsToDealCollection.current[i];
         if (!alreadyAddedCardElement || alreadyAddedCardElement !== element) {
@@ -359,12 +350,6 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
   return (
     <div 
       className="middle"
-      style={{
-        width,
-        height,
-        left,
-        top
-      }}
     >
       <div className="card-count" ref={refCardsBurned}>
         <div className="count-inner">
@@ -375,10 +360,10 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
         <div className="cards-to-deal">
           <div 
             className="cards-to-deal-inner"
-            style={{
-              width: '59.5px',
-              height: '89.25px'
-            }}
+            // style={{
+            //   width: '59.5px',
+            //   height: '89.25px'
+            // }}
           >
             {cardsToDeal}
           </div>

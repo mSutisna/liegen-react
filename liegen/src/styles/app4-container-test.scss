@@ -1,0 +1,68 @@
+// $mobile-font-size: 20px;
+
+// $tablet-font-size: 14px;
+
+// $desktop-font-size: 16px;
+
+
+// $container-320: percentageOfToPx(320, 80);
+
+// $container-599: percentageOfToPx(599, 80);
+
+// $container-600: percentageOfToPx(600, 80);
+
+// $container-1279: percentageOfToPx(1279, 80);
+
+// $container-1280: percentageOfToPx(1280, 80);
+
+// $layout-tablet-inverse-percentage: inversePercentageOfPx(600px, 80);
+
+// $layout-desktop-inverse-percentage: inversePercentageOfPx(1280px, 80);
+
+html {
+  //Mobile
+  @media screen and (max-width: 599px) {
+    font-size: px2cwqGridContainer($mobile-font-size, 320px);
+  }
+  //Tablet
+  @media screen and (min-width: 600px) and (max-width: 1279px) {
+    font-size: px2vw($tablet-font-size, 600px);
+  }
+  //Desktop
+  // @media screen and (min-width: 1280px) {
+  //   font-size: px2cwqGridContainer($container-desktop-font-size, 1536px);
+  // }
+  @media screen and (min-width: 1280px) and ((max-width: 1439px)) {
+    font-size: px2vw($desktop-font-size, 1280px);
+  }
+  font-size: 18px;
+}
+
+.game {
+  // // @container (max-width: #{$container-599}) {
+  // //   font-size: px2cwqGridContainer($container-desktop-font-size, $container-320);
+  // // }
+  // // @container (min-width: #{$container-600}) and (max-width: #{$container-1279}) {
+  // //   font-size: px2cwqGridContainer($container-desktop-font-size, $container-600);
+  // // }
+  // // @container (min-width: #{$container-1280}) {
+  // //   font-size: px2cwqGridContainer($container-desktop-font-size, $container-1280);
+  // // }
+  // font-size: px2cwqGridContainer($container-desktop-font-size, $container-1280);
+
+  // button {
+  //   // @container (min-width: #{$container-1280}) {
+  //   //   font-size: px2cwqGridContainer($container-desktop-font-size, $container-1280);
+  //   // }
+  //   font-size: px2cwqGridContainer($container-desktop-font-size, $container-1280);
+  // }
+  
+  // font-size: px2cwqGridContainer($container-desktop-font-size, $container-1280);
+
+  // @media screen and (min-width: 1280px) {
+  //   font-size: px2vw($container-desktop-font-size, 1280px);
+  // }
+  button {
+    font-size: inherit;
+  }
+}

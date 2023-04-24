@@ -1,0 +1,33 @@
+$root-font-size: 16px;
+
+@function px2vw($value-px, $layout-px) {
+  @return ($value-px / $layout-px) * 100vw;
+}
+
+@function px2rem($value-px) {
+  @return ($value-px / $root-font-size) * 1rem;
+}
+
+// $container-root-font-size: 16px;
+
+// @function px2cwqGridContainer($value-px, $layout-px) {
+//   @return ($value-px / $layout-px) * 100cqw;
+// }
+
+
+// @function px2vw($value-px, $layout-px) {
+//   @debug $layout-px;
+//   @return ($value-px / $layout-px) * 100vw;
+// }
+
+// @function px2em2($value-px, $font-size) {
+//   @return ($value-px / $font-size) * 1rem;
+// }
+
+// @function px2em($value-px) {
+//   @return ($value-px / $root-font-size) * 1rem;
+// }
+
+// @function inversePercentageOfPx($screenSize, $percentage) {
+//   @return ($screenSize * (((100 - $percentage) + 100) / 100))
+// }

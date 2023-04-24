@@ -14,6 +14,8 @@ interface InitialState {
   currentPlayerIndex: number;
   previousPlayerIndex: number | null,
   cardUrls: {[k: string]: string},
+  cardUrlsRegular: {[k: string]: string},
+  cardUrlsMobile: {[k: string]: string},
   messageModal: MessageModalData,
   clockwise: boolean
 }

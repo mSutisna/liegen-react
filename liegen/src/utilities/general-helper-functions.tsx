@@ -38,9 +38,9 @@ export const createPlayersOrder = (players: Array<PlayerInterface>, currentPlaye
   let playersOrder = [];
   do {
     playersOrder.push(iterationIndex)
-    iterationIndex -= 1;
-    if (iterationIndex < 0) {
-      iterationIndex = endIndex;
+    iterationIndex += 1;
+    if (iterationIndex > endIndex) {
+      iterationIndex = 0;
     }
   } while (iterationIndex !== currentPlayerIndex);
   return playersOrder;
