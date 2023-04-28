@@ -17,7 +17,8 @@ interface InitialState {
   cardUrlsRegular: {[k: string]: string},
   cardUrlsMobile: {[k: string]: string},
   messageModal: MessageModalData,
-  clockwise: boolean
+  clockwise: boolean,
+  allCardsModalVisible: boolean
 }
 
 export enum ModalAnimationType {

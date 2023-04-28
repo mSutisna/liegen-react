@@ -57,7 +57,8 @@ const initialState: InitialState = {
     modalAnimation: ModalAnimationType.REGULAR,
     disableCloseButton: false
   },
-  clockwise: true
+  clockwise: true,
+  allCardsModalVisible: false,
 };
 
 export const gameSlice = createSlice({
@@ -234,9 +235,12 @@ export const gameSlice = createSlice({
       state.messageModal.disableCloseButton = data.disableCloseButton ?? false;
       state.messageModal.modalAnimation = data.modalAnimation ?? ModalAnimationType.REGULAR;
     },
-    hideMessageModal: (state: InitialState ) => {
-      state.messageModal.visible = false;
+    setVisibilityMessageModal: (state: InitialState, action: PayloadAction<boolean>) => {
+      state.messageModal.visible = action.payload;
     },
+    setVisibilityAllCardsModal: (state: InitialState, action: PayloadAction<boolean>) => {
+      state.allCardsModalVisible = action.payload;
+    }
   },
 });
 
@@ -260,9 +264,9 @@ export const {
   decreaseRank, 
   toggleCardSelected,
   setMessageModalMessage,
-  hideMessageModal
+  setVisibilityMessageModal,
+  setVisibilityAllCardsModal
 } = gameSlice.actions;
-
 
 const helpFunctions = {
   displayNewMessage: async (
@@ -271,7 +275,7 @@ const helpFunctions = {
     modalAnimation: ModalAnimationType = ModalAnimationType.REGULAR,
     disableCloseButton: boolean = false
   ) => {
-    await dispatch(gameSlice.actions.hideMessageModal());
+    await dispatch(gameSlice.actions.setVisibilityMessageModal(true));
     dispatch(gameSlice.actions.setMessageModalMessage({
       message,
       modalAnimation,

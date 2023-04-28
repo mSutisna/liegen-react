@@ -1,14 +1,14 @@
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from '../store';
-import { CardUrls, MiddleInterface, PlayerInterface, SetInterface } from "../types/models";
-import { createCardName } from "../utilities/card-helper-functions";
-import { useState, useRef, useLayoutEffect } from "react";
-import { getImageUrls } from "../utilities/image-store/image-urls";
+import { RootState } from '../../store';
+import { CardUrls, MiddleInterface, PlayerInterface, SetInterface } from "../../types/models";
+import { createCardName } from "../../utilities/card-helper-functions";
+import React, { useState, useRef, useLayoutEffect } from "react";
+import { getImageUrls } from "../../utilities/image-store/image-urls";
 import { 
   AnimationChain, 
   AnimationChainMultipleImplelmentations, 
   AnimationStatus 
-} from '../types/models'
+} from '../../types/models'
 import { 
   DESKTOP_CARD_HEIGHT, 
   DESKTOP_CARD_WIDTH, 
@@ -16,8 +16,8 @@ import {
   RANKS,
   SUITS, 
   BurnType
-} from "../constants";
-import { playAnimationChains } from "../utilities/animation/play-animation";
+} from "../../constants";
+import { playAnimationChains } from "../../utilities/animation/play-animation";
 import { 
   setSetAnimationStatus, 
   setBustAnimationStatus, 
@@ -26,16 +26,16 @@ import {
   burnCards,
   switchToNextPlayer,
   displayNewMessage
-} from "../slices/gameSlice";
-import exclamationMark from '../assets/icons/exclamation-mark.svg';
-import questionMark from '../assets/icons/question-mark.svg';
-import crossMark from '../assets/icons/cross-mark.svg';
-import checkMark from '../assets/icons/check-mark.svg';
-import smileyFace from '../assets/icons/smiley-face.svg';
-import frownFace from '../assets/icons/frown-face.svg';
-import { determineSetIsALieAndGetIndexes } from "../utilities/general-helper-functions";
+} from "../../slices/gameSlice";
+import exclamationMark from '../../assets/icons/exclamation-mark.svg';
+import questionMark from '../../assets/icons/question-mark.svg';
+import crossMark from '../../assets/icons/cross-mark.svg';
+import checkMark from '../../assets/icons/check-mark.svg';
+import smileyFace from '../../assets/icons/smiley-face.svg';
+import frownFace from '../../assets/icons/frown-face.svg';
+import { determineSetIsALieAndGetIndexes } from "../../utilities/general-helper-functions";
 import { Dispatch, AnyAction } from "@reduxjs/toolkit";
-import { ModalAnimationType } from "../types/redux/game";
+import { ModalAnimationType } from "../../types/redux/game";
 
 interface MiddleProps {
   width: number,

@@ -45,7 +45,7 @@ export function determineXandYForCard(
 export function determineGridPositionsForCards(
   rows: number,
   columns: number,
-  rowOrientation:  GridOrientation = GridOrientation.REGULAR,
+  rowOrientation: GridOrientation = GridOrientation.REGULAR,
   columnOrientation: GridOrientation = GridOrientation.REGULAR,
   gridFillOrder: GridItemType = GridItemType.ROW,
 ) : Array<CardPosition> {

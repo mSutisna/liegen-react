@@ -1,12 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles/all-styles.scss';
-import Game from './components/Game';
+import Game from './components/game/Game';
+import Entry from './components/lobby/Entry';
 import reportWebVitals from './reportWebVitals';
 
 // This is the extra redux functionality
 import store from "./store";
 import { Provider } from "react-redux";
+import { BrowserRouter } from 'react-router-dom';
 
 
 const root = ReactDOM.createRoot(
@@ -15,7 +17,9 @@ const root = ReactDOM.createRoot(
 root.render(
   // <React.StrictMode>
     <Provider store={store}>
-      <Game />
+      <BrowserRouter>
+        <Entry />
+      </BrowserRouter>
     </Provider>
   // </React.StrictMode>
 );

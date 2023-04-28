@@ -1,0 +1,110 @@
+#app {
+  height: 100vh;
+  width: 100vw;
+}
+
+.enter-username {
+  height: 100%;
+  font-family: 'Helvetica', 'Arial', sans-serif;
+  background-color: #4488AA;
+  
+  .title {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .sub-title {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+  }
+  
+  .submit-button {
+    margin-top: 20px;
+    cursor: pointer;
+  }
+  
+  .container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .submit-button .disabled {
+    background-color: dimgrey;
+  }
+  
+  .username-input .disabled {
+    background-color: dimgrey;
+  }
+}
+
+.lobby-body {
+  width: 90vw;
+  height: 80vh;
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  font-family: 'Helvetica', 'Arial', sans-serif;
+
+  .lobby-info {
+    border: solid black 1px;
+    position: relative;
+    background: rgba(0, 0, 0, .5)
+  }
+  
+  
+  .lobby-title {
+    margin: 10px;
+    color: white;
+  }
+  
+  .lobby-container {
+    width: 90%;
+    height: 500px;
+    background: purple;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .lobby-players {
+    flex: 1;
+    background: rgba(0, 0, 0, .5);
+  }
+  
+  .player-row {
+    margin-top: 20px;
+    background: rgba(0, 0, 0, .7);
+    border-radius: 13px;
+    height: 50px;
+    margin: 5px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .player-row h2 {
+    flex: 1;
+    margin-left: 10px;
+  }
+  
+  .player-self {
+    color: #0096FF;
+  }
+  
+  .player-row .status {
+    flex: 2;
+  }
+  
+  .start-button {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .ready-button {
+    margin-left: 10px;
+    padding: 10px;
+    cursor: pointer;
+  }
+}

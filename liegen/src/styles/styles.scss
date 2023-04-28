@@ -41,6 +41,29 @@ body {
     height: px2rem(75px);
   }
 
+  div {
+    &.primary {
+      background: #145DA0;
+      color: #ECECEC;
+      cursor: pointer;
+      &:hover {
+        background: #ECECEC;
+        color: #145DA0;
+      }
+    }
+    background: #750000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: px2vw(24px, 1440px);
+    @media screen and (max-width: 1023px) {
+      width: px2rem(46.66px);
+      height: px2rem(70px);
+    }
+    width: px2rem(50px);
+    height: px2rem(75px);
+  }
+
   //USE THIS TO DISPLAY PLAYER 1 AND PLAYER 3 CARDS WHEN 4 PLAYERS ARE PLAYING
   &.rotated-card {
     // width: px2rem(50px);
@@ -67,8 +90,6 @@ body {
     }
   }
 }
-
-
 
 .game-wrapper {
   background: #477148;
@@ -190,7 +211,10 @@ body {
         column-gap: px2rem(15px);
         // grid-template-columns: repeat(5, 1fr);
         div:nth-child(n+6) {
-          margin-top: -#{px2rem(80px)};
+          @media screen and (max-width: 1023px) {
+            margin-top: -#{px2rem(40px)};
+          }
+          margin-top: -#{px2rem(58px)};
         }
       }
     }
@@ -214,11 +238,62 @@ body {
     grid-column: 9 / 17;
     grid-row: 2 / 8;
     .name {
-      bottom: px2rem(10px);
-      right: px2rem(10px);
+      bottom: px2rem(5px);
+      right: px2rem(3px);
       position: absolute;
       display: flex;
       align-items: center;
+    }
+    .cards {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding-bottom: px2rem(18px);
+      .cards-grid {
+        display: grid;
+        column-gap: px2rem(15px);
+        align-items: end;
+        &.one-extra-row {
+          @media screen and (max-width: 1023px) {
+            margin-top: -#{px2rem(93.33px)};
+          }
+          margin-top: -#{px2rem(100px)};
+        }
+        &.two-extra-rows {
+          @media screen and (max-width: 1023px) {
+            margin-top: -#{px2rem(186.67px)};
+          }
+          margin-top: -#{px2rem(200px)};
+        }
+        &.three-extra-rows {
+          @media screen and (max-width: 1023px) {
+            margin-top: -#{px2rem(280px)};
+          }
+          margin-top: -#{px2rem(300px)};
+        }
+        &.four-extra-rows {
+          @media screen and (max-width: 1023px) {
+            margin-top: -#{px2rem(365.33px)};
+          }
+          margin-top: -#{px2rem(390px)};
+        }
+        div:nth-child(n+6) {
+          position: relative;
+          bottom: -#{px2rem(85px)};;
+        }
+        div:nth-child(n+11) {
+          position: relative;
+          bottom: -#{px2rem(170px)};;
+        }
+        div:nth-child(n+16) {
+          position: relative;
+          bottom: -#{px2rem(235px)};;
+        }
+        div:nth-child(n+21) {
+          position: relative;
+          bottom: -#{px2rem(360px)};;
+        }
+      }
     }
   }
   &.three-players {
@@ -230,11 +305,62 @@ body {
     grid-column: 2 / 10;
     grid-row: 2 / 8;
     .name {
-      bottom: px2rem(10px);
-      right: px2rem(10px);
+      bottom: px2rem(5px);
+      right: px2rem(3px);
       position: absolute;
       display: flex;
       align-items: center;
+    }
+    .cards {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding-bottom: px2rem(18px);
+      .cards-grid {
+        display: grid;
+        column-gap: px2rem(15px);
+        align-items: end;
+        &.one-extra-row {
+          @media screen and (max-width: 1023px) {
+            margin-top: -#{px2rem(93.33px)};
+          }
+          margin-top: -#{px2rem(100px)};
+        }
+        &.two-extra-rows {
+          @media screen and (max-width: 1023px) {
+            margin-top: -#{px2rem(186.67px)};
+          }
+          margin-top: -#{px2rem(200px)};
+        }
+        &.three-extra-rows {
+          @media screen and (max-width: 1023px) {
+            margin-top: -#{px2rem(280px)};
+          }
+          margin-top: -#{px2rem(300px)};
+        }
+        &.four-extra-rows {
+          @media screen and (max-width: 1023px) {
+            margin-top: -#{px2rem(365.33px)};
+          }
+          margin-top: -#{px2rem(390px)};
+        }
+        div:nth-child(n+6) {
+          position: relative;
+          bottom: -#{px2rem(90px)};;
+        }
+        div:nth-child(n+11) {
+          position: relative;
+          bottom: -#{px2rem(180px)};;
+        }
+        div:nth-child(n+16) {
+          position: relative;
+          bottom: -#{px2rem(270px)};;
+        }
+        div:nth-child(n+21) {
+          position: relative;
+          bottom: -#{px2rem(360px)};;
+        }
+      }
     }
   }
   &.four-players {
@@ -246,7 +372,7 @@ body {
     grid-row: 5 / 21;
     grid-column: 2 / 6;
     .name {
-      bottom: px2rem(10px);
+      top: px2rem(10px);
       right: px2rem(10px);
       position: absolute;
       display: flex;
@@ -262,13 +388,43 @@ body {
         display: grid;
         grid-auto-flow: column dense;
         row-gap: px2rem(15px);
-        align-items: end;
+        // align-items: end;
         width: 100%;
         position: relative;
+        justify-items: end;
+        &.one-extra-row {
+          @media screen and (max-width: 1023px) {
+            margin-left: -#{px2rem(70px)};
+          }
+          margin-left: -#{px2rem(75px)};
+        }
+        &.two-extra-rows {
+          @media screen and (max-width: 1023px) {
+            margin-left: -#{px2rem(140px)};
+          }
+          margin-left: -#{px2rem(150px)};
+        }
+        &.three-extra-rows {
+          @media screen and (max-width: 1023px) {
+            margin-left: -#{px2rem(210px)};
+          }
+          margin-left: -#{px2rem(225px)};
+        }
         div:nth-child(n+6) {
           position: relative;
-          left: px2rem(60px)
-          // margin-left: -#{px2rem(60px)};
+          right: -#{px2rem(60px)};;
+        }
+        div:nth-child(n+11) {
+          position: relative;
+          right: -#{px2rem(120px)};;
+        }
+        div:nth-child(n+16) {
+          position: relative;
+          right: -#{px2rem(180px)};;
+        }
+        div:nth-child(n+21) {
+          position: relative;
+          right: -#{px2rem(240px)};;
         }
       }
     }
@@ -280,7 +436,7 @@ body {
     justify-content: center;
     .cards-grid {
       display: grid;
-      column-gap: px2rem(15px);
+      // column-gap: px2rem(15px);
       // grid-template-columns: repeat(5, 1fr);
       img:nth-child(n+6) {
         margin-top: -#{px2rem(80px)};
@@ -298,14 +454,6 @@ body {
     background: palevioletred;
     grid-column: 16 / 24;
     grid-row: 2 / 8;
-    
-    .name {
-      bottom: px2rem(10px);
-      right: px2rem(10px);
-      position: absolute;
-      display: flex;
-      align-items: center;
-    }
   }
   &.four-players {
     @media screen and (max-width: 1023px) {
@@ -316,15 +464,61 @@ body {
     grid-column: 8 / 18;
     grid-row: 2 / 8;
   }
+  .name {
+    bottom: px2rem(5px);
+    right: px2rem(3px);
+    position: absolute;
+    display: flex;
+    align-items: center;
+  }
   .cards {
     flex: 1;
     display: flex;
     justify-content: center;
+    padding-bottom: px2rem(18px);
     .cards-grid {
       display: grid;
       column-gap: px2rem(15px);
+      align-items: end;
+      &.one-extra-row {
+        @media screen and (max-width: 1023px) {
+          margin-top: -#{px2rem(93.33px)};
+        }
+        margin-top: -#{px2rem(100px)};
+      }
+      &.two-extra-rows {
+        @media screen and (max-width: 1023px) {
+          margin-top: -#{px2rem(186.67px)};
+        }
+        margin-top: -#{px2rem(200px)};
+      }
+      &.three-extra-rows {
+        @media screen and (max-width: 1023px) {
+          margin-top: -#{px2rem(280px)};
+        }
+        margin-top: -#{px2rem(300px)};
+      }
+      &.four-extra-rows {
+        @media screen and (max-width: 1023px) {
+          margin-top: -#{px2rem(365.33px)};
+        }
+        margin-top: -#{px2rem(390px)};
+      }
       div:nth-child(n+6) {
-        margin-top: -#{px2rem(80px)};
+        position: relative;
+        bottom: -#{px2rem(90px)};;
+      }
+      div:nth-child(n+11) {
+        position: relative;
+        bottom: -#{px2rem(180px)};;
+      }
+      div:nth-child(n+16) {
+        position: relative;
+        bottom: -#{px2rem(270px)};;
+      }
+      div:nth-child(n+21) {
+        position: relative;
+        bottom: -#{px2rem(360px)};;
       }
     }
   }
@@ -342,7 +536,7 @@ body {
     grid-column: 20 / 24;
   }
   .name {
-    top: px2rem(10px);
+    bottom: px2rem(10px);
     left: px2rem(10px);
     position: absolute;
     display: flex;
@@ -358,8 +552,41 @@ body {
       grid-auto-flow: column dense;
       row-gap: px2rem(15px);
       width: 100%;
+      position: relative;
+      justify-items: start;
+      &.one-extra-row {
+        @media screen and (max-width: 1023px) {
+          margin-right: -#{px2rem(70px)};
+        }
+        margin-right: -#{px2rem(75px)};
+      }
+      &.two-extra-rows {
+        @media screen and (max-width: 1023px) {
+          margin-right: -#{px2rem(140px)};
+        }
+        margin-right: -#{px2rem(150px)};
+      }
+      &.three-extra-rows {
+        @media screen and (max-width: 1023px) {
+          margin-right: -#{px2rem(210px)};
+        }
+        margin-right: -#{px2rem(225px)};
+      }
       div:nth-child(n+6) {
-        margin-left: -#{px2rem(60px)};
+        position: relative;
+        left: -#{px2rem(60px)};;
+      }
+      div:nth-child(n+11) {
+        position: relative;
+        left: -#{px2rem(120px)};;
+      }
+      div:nth-child(n+16) {
+        position: relative;
+        left: -#{px2rem(180px)};;
+      }
+      div:nth-child(n+21) {
+        position: relative;
+        left: -#{px2rem(240px)};;
       }
     }
   }
@@ -407,6 +634,11 @@ body {
   border: solid transparent px2rem(1px);
   &.selected {
     border: solid green px2rem(1px);
+  }
+  .indicate-amount {
+    .amount {
+      margin-left: px2rem(3px)
+    }
   }
 }
 
@@ -566,15 +798,60 @@ body {
   transform: translateY(0) !important;
 }
 
-
-
-
-@media screen and (max-width: 599px) {
-
+.modal-container {
+  &.all-cards-modal {
+    z-index: 1;
+    .modal-background {
+      .modal {
+        width: 50%;
+        height: 70%;
+        background: #808080;
+      }
+    }
+  }
 }
-@media screen and (min-width: 600px) and (max-width: 1279px) {
 
+.all-cards-body {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  .bottom {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 80%;
+    .cards-section {
+      flex: 5;
+      background: black;
+    }
+    .controls-section {
+      flex: 1;
+      background: brown;
+      display: flex;
+      .control-section-inner {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        column-gap: px2rem(15px);
+      }
+    }
+  }
 }
-@media screen and (min-width: 1280px) {
-  
+
+.cards-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .cards-grid {
+    display: grid;
+    column-gap: px2rem(15px);
+    div:nth-child(n+6) {
+      @media screen and (max-width: 1023px) {
+        margin-top: -#{px2rem(35px)};
+      }
+      margin-top: -#{px2rem(50.75px)};
+    }
+  }
 }

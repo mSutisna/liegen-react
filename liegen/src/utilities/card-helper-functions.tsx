@@ -1,4 +1,6 @@
+import { ReactNode } from "react";
 import { RANKS, SUITS } from "../constants";
+import { CardForPlayerInterface } from "../types/models";
 const cardsInDeckAmount = 52;
 
 function createCardNames() {
@@ -29,7 +31,29 @@ function createCardName(suit : string, rank: string) {
   return `${suit}-${rank}`;
 }
 
+
+const createCardCollectionToRender = (
+  cards: Array<CardForPlayerInterface>, 
+  renderCard: (card: CardForPlayerInterface, index: number, indicateAmount: number | null) => ReactNode,
+) : Array<ReactNode> => {
+  const cardsToDisplay : Array<ReactNode> = [];
+  const displayMoreCardsIndicator = cards.length > 15;
+  const leftOverCards = cards.length - 14;
+  for (let i = 0; i < cards.length; i++) {
+    let indicateAmount = displayMoreCardsIndicator && i === 14
+      ? leftOverCards
+      : null;
+    const cardToDisplay = renderCard(cards[i], i, indicateAmount);
+    cardsToDisplay.push(cardToDisplay);
+    if (displayMoreCardsIndicator && i === 14) {
+      break;
+    }
+  }
+  return cardsToDisplay;
+}
+
 export {
   createCardName,
-  createCardNames
+  createCardNames,
+  createCardCollectionToRender
 }

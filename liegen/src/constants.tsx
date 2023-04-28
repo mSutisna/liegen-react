@@ -56,7 +56,6 @@ export enum CardRanks {
   KING = 12
 }
 
-
 export enum GridOrientation {
   REGULAR = 'regular',
   REVERSE = 'reverse'
@@ -65,4 +64,15 @@ export enum GridOrientation {
 export enum GridItemType {
   ROW = 'row',
   COLUMN = 'column'
+}
+
+export enum PlayerOrientations {
+  TOP = 'top',
+  LEFT = 'left',
+  RIGHT = 'right'
+}
+
+export enum ModalAnimationStyles {
+  WIN = 'one',
+  REGULAR = 'three'
 }

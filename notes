@@ -357,4 +357,64 @@ Todo:
 - Spectator mode
 - Chat systeem
 
-- Locken dat het scherm sideways moet
+- Locken dat het scherm sideways moet op mobile
+- Spel inladen via micro front end
+
+
+
+
+
+Search term:
+css display flex determine overflow direction
+
+
+Overflow to the left:
+https://stackoverflow.com/questions/68924749/how-to-make-a-flex-containers-elements-overflow-to-the-left
+
+
+Todo morgen:
+
+4 playeres layout labels goed paatsen voor player 2 en player 4
+
+2 players layout checken + fixes doen
+3 players layout checken + fixes doen
+
+
+Voor later:
+- 4 players layout de breedte dunner maken voor player 2 en player 4
+
+meer kaarten indicator maken
+meer kaarten indicator ook op kunnen klikken als niet het maximum aantal kaarten wordt getoond 
+niet meer dan 15 kaarten tonen overal
+overlay maken voor meer kaarten (check oude liegen spel)
+
+styling van andere liegen game verwerken
+
+
+
+
+
+Multi card indicator
+Overlay gameplay maken
+
+Multiplayer maken
+Multiplayer test rondes doen
+Styling implementeren waar dingen nog missen en styling optimaliseren
+- Originele liegen spel styling toevoegen
+- Gradient toevoegen
+
+
+
+
+- Overlay maken
+- Overlay speelbaar maken
+- Overlay reponsive maken
+- 3 player view en 4 player view checken
+
+- als een set van de main speler wordt gebust de overlay sluiten
+- t/m 15 kaarten doorgeven in non overlay mode
+
+
+- Single lobby maken
+- Multiplayer mode
+

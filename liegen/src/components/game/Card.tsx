@@ -3,8 +3,8 @@ import { motion } from 'framer-motion';
 import { useDispatch } from "react-redux";
 import {
   setCardReceivedAnimationStatus
-} from "../slices/gameSlice";
-import { AnimationStatus, Point } from '../types/models';
+} from "../../slices/gameSlice";
+import { AnimationStatus, Point } from '../../types/models';
 
 interface CardProps {
   url: string,
@@ -17,9 +17,10 @@ interface CardProps {
   playerIndex: number,
   cardIndex: number,
   fourPlayers: boolean,
+  indicateAmount?: number | null
 }
 
-function Card({url, width, height, cardPositions, originPoint, delay, receiveAnimationStatus, playerIndex, cardIndex, fourPlayers }: CardProps) {
+function Card({url, width, height, cardPositions, originPoint, delay, receiveAnimationStatus, playerIndex, cardIndex, fourPlayers, indicateAmount }: CardProps) {
   const dispatch = useDispatch();
   let initial : Point | false = false;
   if (originPoint) {
@@ -44,7 +45,12 @@ function Card({url, width, height, cardPositions, originPoint, delay, receiveAni
     style.gridRow = `${position.row} / ${position.row}`;
     style.gridColumn = `${position.column} / ${position.column}`;
   }
-  // console.log({initial})
+
+  const inner = indicateAmount
+    ? <div className="indicate-amount">
+      <span className="plus">+</span><span className="amount">{indicateAmount}</span>
+    </div>
+    : <img src={url} />
   return (
     <motion.div 
       className={className}
@@ -65,7 +71,7 @@ function Card({url, width, height, cardPositions, originPoint, delay, receiveAni
         dispatch(setCardReceivedAnimationStatus({playerIndex, cardIndex, status: AnimationStatus.FINISHED}))
       }}
       >
-        <img src={url} />
+        {inner}
       </motion.div>
   )
 }

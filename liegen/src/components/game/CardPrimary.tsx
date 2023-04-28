@@ -1,14 +1,12 @@
 import { motion } from 'framer-motion';
-import { createCardName } from '../utilities/card-helper-functions';
+import { createCardName } from '../../utilities/card-helper-functions';
 
 import { useDispatch } from 'react-redux';
-import { toggleCardSelected, setCardReceivedAnimationStatus } from '../slices/gameSlice';
-import { AnimationStatus, Point } from '../types/models';
+import { toggleCardSelected, setCardReceivedAnimationStatus } from '../../slices/gameSlice';
+import { AnimationStatus, Point } from '../../types/models';
 
 interface CardProps {
   url: string,
-  width: number,
-  height: number,
   originPoint: Point | null,
   delay: number,
   rank: string,
@@ -17,10 +15,12 @@ interface CardProps {
   faceDown: boolean,
   playerIndex: number,
   cardIndex: number,
-  receiveAnimationStatus: AnimationStatus
+  receiveAnimationStatus: AnimationStatus,
+  indicateAmount: number | null,
+  onClick: (() => void) | null
 }
 
-function CardPrimary({url, width, height, originPoint, delay, rank, suit, selected, playerIndex, cardIndex, receiveAnimationStatus }: CardProps) {
+function CardPrimary({url, originPoint, delay, rank, suit, selected, playerIndex, cardIndex, receiveAnimationStatus, indicateAmount, onClick }: CardProps) {
   const dispatch = useDispatch();
   const cardName = createCardName(suit, rank);
   let className = 'card';
@@ -32,10 +32,25 @@ function CardPrimary({url, width, height, originPoint, delay, rank, suit, select
     initial = receiveAnimationStatus === AnimationStatus.IDLE
     ? originPoint : false;
   }
+
+  const inner = indicateAmount
+    ? <div className="indicate-amount primary">
+      <span className="plus">+</span><span className="amount">{indicateAmount}</span>
+    </div>
+    : <img src={url} />
+
+  let cardOnClick = () => {
+    dispatch(toggleCardSelected({cardName, playerIndex}))
+  }
+  if (onClick) {
+    cardOnClick = onClick;
+  }
+
   return (
     <motion.div
-      onClick={() => {
-        dispatch(toggleCardSelected({cardName, playerIndex}))
+      onClick={e => {
+        e.stopPropagation();
+        cardOnClick();
       }}
       className={className}
       initial={initial}
@@ -54,7 +69,7 @@ function CardPrimary({url, width, height, originPoint, delay, rank, suit, select
         dispatch(setCardReceivedAnimationStatus({playerIndex, cardIndex, status: AnimationStatus.FINISHED}))
       }}
     >
-      <img src={url}  />
+      {inner}
     </motion.div>
 
     // <motion.img 

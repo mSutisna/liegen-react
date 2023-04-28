@@ -1,3 +1,4 @@
+import { type Socket } from "socket.io-client";
 import { CardRanks, CardSuits } from "../constants";
 import { ModalAnimationType } from "./redux/game";
 
@@ -79,3 +80,9 @@ export interface MessageModalData {
 }
 
 export type CardPosition = {row: number, column: number};
+
+
+export interface SocketExtraData extends Socket {
+  sessionID?: string
+  userID?: string
+}

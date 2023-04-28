@@ -1,15 +1,15 @@
-import { HandProps } from '../types/props';
-import { AnimationStatus, BaseCardInterface, CardUrls, MiddleInterface, PlayerInterface } from '../types/models';
+import { HandProps } from '../../types/props';
+import { AnimationStatus, BaseCardInterface, CardForPlayerInterface, CardUrls, MiddleInterface, PlayerInterface } from '../../types/models';
 import {
   DESKTOP_CARD_WIDTH, 
   DESKTOP_CARD_HEIGHT, 
   SUITS, 
   RANKS, 
   DESKTOP_CARD_SCALE 
-} from '../constants';
-import { createCardName } from '../utilities/card-helper-functions';
-import CardPrimary from '../components/CardPrimary';
-import { useRef, useLayoutEffect, useState } from 'react';
+} from '../../constants';
+import { createCardCollectionToRender, createCardName } from '../../utilities/card-helper-functions';
+import CardPrimary from './CardPrimary';
+import { useRef, useLayoutEffect, useState, ReactNode } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import {
   setPlayerCenterCoordinates,
@@ -18,14 +18,21 @@ import {
   makeSet,
   callBust,
   displayNewMessage,
-} from "../slices/gameSlice";
-import { RootState } from '../store';
-import questionMark from '../assets/icons/question-mark.svg';
+} from "../../slices/gameSlice";
+import { RootState } from '../../store';
+import questionMark from '../../assets/icons/question-mark.svg';
+import { setVisibilityAllCardsModal } from '../../slices/gameSlice';
+import { Dispatch, AnyAction } from "@reduxjs/toolkit";
 
 function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHeight, cards, selectedRank, assignIndicatorRefToCollection} : HandProps) {
   const cardUrls: CardUrls  = useSelector(
     (state: RootState) => {
       return state.game.cardUrls;
+    }
+  );
+  const visible: boolean  = useSelector(
+    (state: RootState) => {
+      return state.game.allCardsModalVisible;
     }
   );
   const middle: MiddleInterface = useSelector(
@@ -92,6 +99,53 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
 
   const dispatch = useDispatch();
 
+  const renderCard = (card: CardForPlayerInterface, index: number, indicateAmount: number | null) : ReactNode => {
+    const cardKey = createCardName(SUITS[card.suitIndex] ?? '', RANKS[card.rankIndex] ?? '')
+    if (!cardUrls[cardKey]) {
+      return null;
+    }
+    let containerX = 0;
+    let containerY = 0;
+    if (cardContainerRef.current) {
+      const position = cardContainerRef.current.getBoundingClientRect();
+      containerX = position.left;
+      containerY = position.top;
+    }
+    let adjustedOriginPoint = null;
+    if (card.originPoint) {
+      adjustedOriginPoint = {...card.originPoint};
+      adjustedOriginPoint.x = -containerX - card.originPoint.x;
+      adjustedOriginPoint.y = -containerY - card.originPoint.y;
+    }
+    let onClick = null
+    if (indicateAmount !== null) {
+      onClick = () => {
+        dispatch(setVisibilityAllCardsModal(true));
+      }
+    }
+    const delay = 0.02 + (0.06 * index);
+    return <CardPrimary
+      key={`cardIndex-${index}`}
+      url={cardUrls[cardKey]}
+      onClick={onClick}
+      originPoint={adjustedOriginPoint}
+      delay={delay}
+      rank={RANKS[card.rankIndex]}
+      suit={SUITS[card.suitIndex]}
+      selected={card.selected}
+      faceDown={card.faceDown}
+      playerIndex={realIndex}
+      cardIndex={index}
+      receiveAnimationStatus={card.receiveAnimationStatus}
+      indicateAmount={indicateAmount}
+    />
+  }
+
+  const cardsToRender = createCardCollectionToRender(
+    cards, 
+    renderCard,
+  );
+
   return (
     <div 
       className={`primary-hand player-${index}`}
@@ -137,41 +191,7 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
             ref={cardsGridRef}
             className="cards-grid"
           >
-            {cards.map((card, cardIndex) => {
-              const cardKey = createCardName(SUITS[card.suitIndex] ?? '', RANKS[card.rankIndex] ?? '')
-              if (!cardUrls[cardKey]) {
-                return null;
-              }
-              let containerX = 0;
-              let containerY = 0;
-              if (cardContainerRef.current) {
-                const position = cardContainerRef.current.getBoundingClientRect();
-                containerX = position.left;
-                containerY = position.top;
-              }
-              let adjustedOriginPoint = null;
-              if (card.originPoint) {
-                adjustedOriginPoint = {...card.originPoint};
-                adjustedOriginPoint.x = -containerX - card.originPoint.x;
-                adjustedOriginPoint.y = -containerY - card.originPoint.y;
-              }
-              const delay = 0.02 + (0.06 * cardIndex);
-              return <CardPrimary
-                key={`cardIndex-${cardIndex}`}
-                url={cardUrls[cardKey]}
-                width={DESKTOP_CARD_WIDTH * DESKTOP_CARD_SCALE}
-                height={DESKTOP_CARD_HEIGHT * DESKTOP_CARD_SCALE}
-                originPoint={adjustedOriginPoint}
-                delay={delay}
-                rank={RANKS[card.rankIndex]}
-                suit={SUITS[card.suitIndex]}
-                selected={card.selected}
-                faceDown={card.faceDown}
-                playerIndex={realIndex}
-                cardIndex={cardIndex}
-                receiveAnimationStatus={card.receiveAnimationStatus}
-              />
-            })}
+            {cardsToRender}
           </div>
         </div>
         <div className="make-set">
@@ -187,48 +207,7 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
           <button
             onClick={e => {
               e.stopPropagation();
-              if (middle.setAnimationStatus === AnimationStatus.RUNNING || middle.bustAnimationStatus === AnimationStatus.RUNNING) {
-                return;
-              }
-              const player = players[realIndex];
-              if (currentPlayerIndex !== realIndex) {
-                displayNewMessage(dispatch, 'You can\'t make a set because it is not your turn.');
-                return;
-              }
-              for (const player of players) {
-                if (player.cards.length === 0) {
-                  displayNewMessage(dispatch, `Player '${player.name}' has no more cards left. Someone must call bust on ${player.name}'s set!`);
-                  return;
-                }
-              }
-              if (!player || player.cards.filter(card => card.selected).length === 0) {
-                displayNewMessage(dispatch, 'You must select at least one card to make a set.');
-                return;
-              }
-              if (middle.set) {
-                const belowRank = (middle.set.rank - 1) >= 0 
-                  ? middle.set.rank - 1
-                  : RANKS.length - 1;
-                const aboveRank = (middle.set.rank + 1) <= (RANKS.length - 1)
-                  ? middle.set.rank + 1
-                  : 0;
-  
-                const validRankIndexes = [
-                  belowRank,
-                  middle.set.rank,
-                  aboveRank
-                ];
-
-                const rankLabels = validRankIndexes.map(index => {
-                  return RANKS[index];
-                })
-
-                if (!validRankIndexes.includes(player.selectedRank)) {
-                  displayNewMessage(dispatch, `You can only select one of the following ranks '${rankLabels.join(', ')}' because the rank of the current set is '${RANKS[middle.set.rank]}'.`);
-                  return;
-                }
-              }
-              dispatch(makeSet())
+              makeSetLogic(middle, players, realIndex, currentPlayerIndex, dispatch);
             }}
           >
             Make set
@@ -237,6 +216,57 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
       </div>
     </div>
   )
+}
+
+export const makeSetLogic = (
+  middle: MiddleInterface, 
+  players: Array<PlayerInterface>,
+  mainPlayerIndex: number,
+  currentPlayerIndex: number,
+  dispatch: Dispatch<AnyAction>
+) => {
+  if (middle.setAnimationStatus === AnimationStatus.RUNNING || middle.bustAnimationStatus === AnimationStatus.RUNNING) {
+    return;
+  }
+  const player = players[mainPlayerIndex];
+  if (currentPlayerIndex !== mainPlayerIndex) {
+    displayNewMessage(dispatch, 'You can\'t make a set because it is not your turn.');
+    return;
+  }
+  for (const player of players) {
+    if (player.cards.length === 0) {
+      displayNewMessage(dispatch, `Player '${player.name}' has no more cards left. Someone must call bust on ${player.name}'s set!`);
+      return;
+    }
+  }
+  if (!player || player.cards.filter(card => card.selected).length === 0) {
+    displayNewMessage(dispatch, 'You must select at least one card to make a set.');
+    return;
+  }
+  if (middle.set) {
+    const belowRank = (middle.set.rank - 1) >= 0 
+      ? middle.set.rank - 1
+      : RANKS.length - 1;
+    const aboveRank = (middle.set.rank + 1) <= (RANKS.length - 1)
+      ? middle.set.rank + 1
+      : 0;
+
+    const validRankIndexes = [
+      belowRank,
+      middle.set.rank,
+      aboveRank
+    ];
+
+    const rankLabels = validRankIndexes.map(index => {
+      return RANKS[index];
+    })
+
+    if (!validRankIndexes.includes(player.selectedRank)) {
+      displayNewMessage(dispatch, `You can only select one of the following ranks '${rankLabels.join(', ')}' because the rank of the current set is '${RANKS[middle.set.rank]}'.`);
+      return;
+    }
+  }
+  dispatch(makeSet())
 }
 
 export default PrimaryHand;
