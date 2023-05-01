@@ -18,7 +18,20 @@ interface InitialState {
   cardUrlsMobile: {[k: string]: string},
   messageModal: MessageModalData,
   clockwise: boolean,
-  allCardsModalVisible: boolean
+  allCardsModalVisible: boolean,
+  userID: string,
+  gameContinued: boolean,
+  playerIndexWhoWon: number | null,
+  gameOver: boolean,
+  userData: {
+    sessionID?: string,
+    userID?: string,
+  },
+  gameData: {
+    players: Array<PlayerInterface>,
+    playingGame?: boolean
+  },
+  connectedWithServer: boolean | null
 }
 
 export enum ModalAnimationType {

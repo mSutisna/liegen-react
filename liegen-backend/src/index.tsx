@@ -42,10 +42,6 @@ io.on('connection', (socket: SocketExtraData) => {
   socket.username = sessionData.username;
   session.connected = true;
   sessionStore.saveSession(socket.sessionID, session);
-  console.log({
-    sessionID: socket.sessionID,
-    session
-  })
   socket.on('enterUsernameLoaded', () => {
     if (game.getState() === GameStates.PLAYING) {
       const startGameEvent: EventStartGame = {
@@ -103,7 +99,7 @@ const registerListeners = (socket: SocketExtraData) => {
   })
 }
 
-const sendPlayerChanges = (socket) => {
+const sendPlayerChanges = (socket: SocketExtraData) => {
   const playersPayload = createPlayersInLobbyPayload(sessionStore);
   io.emit('playersChange', {
     players: playersPayload
@@ -111,7 +107,9 @@ const sendPlayerChanges = (socket) => {
   io.emit('playersUpdate', {
     players: playersPayload
   })
-  socket.emit('registerCallback', {
+
+
+  const payload = {
     code: 'continue',
     userData: {
       username: socket.username,
@@ -119,9 +117,13 @@ const sendPlayerChanges = (socket) => {
       sessionID: socket.sessionID,
     },
     gameData: {
-      players: playersPayload
+      players: playersPayload,
     }
-  });
+  };
+
+  console.log('payload', payload)
+
+  socket.emit('registerCallback', payload);
 }
 
 server.listen(3002, () => {

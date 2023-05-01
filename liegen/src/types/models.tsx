@@ -1,10 +1,22 @@
 import { type Socket } from "socket.io-client";
 import { CardRanks, CardSuits } from "../constants";
 import { ModalAnimationType } from "./redux/game";
+import { Player } from "./props";
+
+export interface InitGameData {
+  players: Array<Player>,
+  middleData: MiddleData,
+  selectedPlayerIndex: number,
+  playerIndex: number,
+  userID: string,
+  gameContinued: boolean,
+  gameOver: boolean,
+  playerIndexWhoWon: number | null,
+}
 
 export interface BaseCardInterface {
-  rankIndex: CardRanks,
-  suitIndex: CardSuits,
+  rankIndex: CardRanks | null,
+  suitIndex: CardSuits | null,
   faceDown: boolean,
 }
 
@@ -15,6 +27,10 @@ export interface CardForPlayerInterface extends BaseCardInterface {
 }
 
 export interface PlayerInterface {
+  userID: string,
+  username: string,
+  connected: boolean,
+  ready: boolean,
   name: string,
   originPoint: Point | null,
   index: number,
@@ -43,6 +59,11 @@ export interface MiddleInterface {
   playerToCallBust: number | null,
   setAnimationStatus: AnimationStatus,
   bustAnimationStatus: AnimationStatus,
+}
+
+export interface MiddleData {
+  cards: Array<BaseCardInterface>,
+  set: SetInterface
 }
 
 export interface Point {

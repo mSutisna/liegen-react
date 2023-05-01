@@ -61,3 +61,4 @@ export enum StartGameTypes {
   START_GAME = 'startGame',
   CONTINUE_GAME = 'continueGame'
 }
+

@@ -95,7 +95,7 @@ export default class Game {
     return this.state;
   }
 
-  async setGameLoadedForPlayer(socket) {
+  async setGameLoadedForPlayer(socket: SocketExtraData) {
     const playerSession = sessionStore.findSession(socket.sessionID);
     playerSession.gameLoaded = true;
     sessionStore.saveSession(socket.sessionID, playerSession);
@@ -126,7 +126,6 @@ export default class Game {
     }
 
     if (sessionStore.findSession(socket.sessionID)) {
-      console.log('sessionAlreadyFound')
       return true;
     }
 

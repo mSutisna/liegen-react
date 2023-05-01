@@ -2,6 +2,7 @@ import Card from './Card.js';
 import { SUITS, RANKS } from '../constants.js';
 
 import { Card as CardType } from '../types/general.js';
+import type Player from './Player.js';
 
 export default class Deck {
   cards: Array<Card>;
@@ -50,7 +51,7 @@ export default class Deck {
     }
   }
 
-  dealCards(players) {
+  dealCards(players: Array<Player>) {
     let playerIndex = 0;
     const cardsToDeal = this.cards.length;
     for (let i = 0; i < cardsToDeal; i++) {

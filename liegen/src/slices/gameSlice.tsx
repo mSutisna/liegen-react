@@ -4,47 +4,51 @@ import {
   PlayerInterface,
   CardUrls,
   CardForPlayerInterface,
-  CardUrlsComplete
+  CardUrlsComplete,
+  InitGameData,
+  MiddleInterface
 } from "../types/models";
 import { RANKS, SUITS, BurnType, CardRanks, CardSuits, CardUrlType } from "../constants";
 import { createCardName } from "../utilities/card-helper-functions";
 import { MessageModalPayload, ModalAnimationType } from "../types/redux/game";
 import { AnimationStatus } from "../types/models";
 import { createPlayersOrder } from "../utilities/general-helper-functions";
+import { Player } from "../types/props";
+import { LobbyPlayerData } from "../types/pages/lobby";
 
 const initialState: InitialState = {
   players: [],
   playersOrder: [],
-  // middle: {
-  //   set: null,
-  //   previousSet: null,
-  //   burnedCards: [],
-  //   playerToCallBust: null,
-  //   setAnimationStatus: AnimationStatus.IDLE,
-  //   bustAnimationStatus: AnimationStatus.IDLE,
-  // },
   middle: {
-    set: {
-      playerIndex: 0,
-      realCards: [
-        {suitIndex: CardSuits.HEARTS, rankIndex: CardRanks.KING, faceDown: true},
-        {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: true},
-        {suitIndex: CardSuits.SPADES, rankIndex: CardRanks.ACE, faceDown: true},
-      ],
-      supposedCards: [
-        {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: false},
-        {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: false},
-        {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: false},
-      ],
-      rank: CardRanks.ACE,
-      amount: 3,
-    },
+    set: null,
     previousSet: null,
     burnedCards: [],
     playerToCallBust: null,
-    setAnimationStatus: AnimationStatus.FINISHED,
+    setAnimationStatus: AnimationStatus.IDLE,
     bustAnimationStatus: AnimationStatus.IDLE,
   },
+  // middle: {
+  //   set: {
+  //     playerIndex: 0,
+  //     realCards: [
+  //       {suitIndex: CardSuits.HEARTS, rankIndex: CardRanks.KING, faceDown: true},
+  //       {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: true},
+  //       {suitIndex: CardSuits.SPADES, rankIndex: CardRanks.ACE, faceDown: true},
+  //     ],
+  //     supposedCards: [
+  //       {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: false},
+  //       {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: false},
+  //       {suitIndex: CardSuits.DIAMONDS, rankIndex: CardRanks.ACE, faceDown: false},
+  //     ],
+  //     rank: CardRanks.ACE,
+  //     amount: 3,
+  //   },
+  //   previousSet: null,
+  //   burnedCards: [],
+  //   playerToCallBust: null,
+  //   setAnimationStatus: AnimationStatus.FINISHED,
+  //   bustAnimationStatus: AnimationStatus.IDLE,
+  // },
   mainPlayerIndex: 0,
   currentPlayerIndex: 0,
   previousPlayerIndex: null,
@@ -59,14 +63,86 @@ const initialState: InitialState = {
   },
   clockwise: true,
   allCardsModalVisible: false,
+  userID: '',
+  gameContinued: false,
+  playerIndexWhoWon: null,
+  gameOver: false,
+  connectedWithServer: false,
+  userData: {},
+  gameData: {
+    players: [],
+    playingGame: false,
+  }
 };
 
 export const gameSlice = createSlice({
   name: UpdateGameAction,
   initialState: initialState,
   reducers: {
-    setPlayers: (state : InitialState, action: PayloadAction<Array<PlayerInterface>>) => {
-      state.players = action.payload;
+    setPlayers: (state: InitialState, action: PayloadAction<Array<LobbyPlayerData>>) => {
+      const players = action.payload;
+      for (let i = 0; i < players.length; i++) {
+        const player = players[i] as PlayerInterface
+        player.name = player.username;
+        player.originPoint = {
+          x: 0,
+          y: 0
+        };
+        player.index = i;
+        player.cards = [];
+        player.selectedRank = 0;
+      }
+      state.players = players as Array<PlayerInterface>;
+    },
+    setMainPlayerIndex: (state: InitialState, action: PayloadAction<Array<LobbyPlayerData>>) => {
+      let mainPlayerIndex = 0;
+      const players = action.payload;
+      for (let i = 0; i < players.length; i++) {
+        const player = players[i];
+        if (player.userID === state.userID) {
+          mainPlayerIndex = i;
+          break;
+        }
+      }
+      state.mainPlayerIndex = mainPlayerIndex
+    },
+    initGame: (state: InitialState, action: PayloadAction<InitGameData>) => {
+      const players = action.payload.players;
+      const adjustedPlayers: Array<PlayerInterface> = []
+      for (let i = 0; i < players.length; i++) {
+        const player = players[i] as PlayerInterface
+
+        const adjustedPlayer = {
+          ...player,
+          name: player.username,
+          originPoint: {
+            x: 0,
+            y: 0
+          },
+          index: i,
+          cards: [],
+          selectedRank: 0
+        }
+        adjustedPlayers.push(adjustedPlayer);
+      }
+      const middle = action.payload.middleData;
+      const adjustedMiddle: MiddleInterface = {
+        set: middle.set,
+        previousSet: null,
+        burnedCards: middle.cards,
+        playerToCallBust: null,
+        setAnimationStatus: AnimationStatus.IDLE,
+        bustAnimationStatus: AnimationStatus.IDLE
+      }
+      const data = action.payload;
+      state.players = adjustedPlayers;
+      state.middle = adjustedMiddle;
+      state.currentPlayerIndex = data.selectedPlayerIndex;
+      state.mainPlayerIndex = data.playerIndex;
+      state.userID = data.userID;
+      state.gameContinued = data.gameContinued;
+      state.gameOver = data.gameOver;
+      state.playerIndexWhoWon = data.playerIndexWhoWon;
     },
     setPlayersOrder: (state: InitialState, action: PayloadAction<Array<number>>) => {
       state.playersOrder = action.payload;
@@ -149,7 +225,7 @@ export const gameSlice = createSlice({
     },
     toggleCardSelected: (state: InitialState, action: PayloadAction<ToggleCardSelectedPayload>) => {
       const cards = state.players[action.payload.playerIndex].cards;
-      const index = cards.findIndex(card => createCardName(SUITS[card.suitIndex], RANKS[card.rankIndex]) === action.payload.cardName);
+      const index = cards.findIndex(card => createCardName(SUITS[card.suitIndex ?? -1], RANKS[card.rankIndex ?? -1]) === action.payload.cardName);
       if (index === -1) {
         return;
       }
@@ -245,8 +321,10 @@ export const gameSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { 
-  setPlayers, 
+export const {
+  setPlayers,
+  setMainPlayerIndex,
+  initGame,
   setPlayersOrder,
   setCardUrls,
   setCardUrlsToUse,

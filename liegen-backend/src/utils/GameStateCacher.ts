@@ -23,11 +23,11 @@ export default class GameStateCacher {
   }
 
   getCacheGameStateGame() {
-    return this.getCachedGameState().game ?? null;
+    return this.getCachedGameState()?.game ?? null;
   }
 
   getCachedGameStateSessions() {
-    return this.getCachedGameState().sessions ?? null;
+    return this.getCachedGameState()?.sessions ?? null;
   }
 
   getCachedGameState() : CachedGameState | null {
@@ -67,7 +67,7 @@ export default class GameStateCacher {
     this.writingToCache = true;
     const json = this.queue.shift();
     if (json) {
-      fs.writeFileSync(GAME_STATE_FILE_PATH, json);
+      fs.writeFileSync(this.filePath, json);
     }
     this.writingToCache = false;
   }

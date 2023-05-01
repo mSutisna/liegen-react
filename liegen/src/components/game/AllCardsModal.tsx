@@ -77,7 +77,7 @@ const AllCardsModal = ({
       <div className="cards-section">
         <div ref={cardsGridRef} className="cards-grid"> 
           {playerData?.cards?.map?.((card, index) => {
-            const cardKey = createCardName(SUITS[card.suitIndex] ?? '', RANKS[card.rankIndex] ?? '')
+            const cardKey = createCardName(SUITS[card.suitIndex ?? -1] ?? '', RANKS[card.rankIndex ?? -1] ?? '')
             if (!cardUrls[cardKey]) {
               return null;
             }
@@ -101,8 +101,8 @@ const AllCardsModal = ({
               onClick={null}
               originPoint={adjustedOriginPoint}
               delay={delay}
-              rank={RANKS[card.rankIndex]}
-              suit={SUITS[card.suitIndex]}
+              rank={RANKS[card.rankIndex ?? -1]}
+              suit={SUITS[card.suitIndex ?? -1]}
               selected={card.selected}
               faceDown={card.faceDown}
               playerIndex={mainPlayerIndex}

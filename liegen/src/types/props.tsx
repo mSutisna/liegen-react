@@ -1,4 +1,4 @@
-import { CardForPlayerInterface } from "./models";
+import { CardForPlayerInterface, InitGameData, PlayerInterface } from "./models";
 
 export interface HandProps {
   name: string,
@@ -44,6 +44,7 @@ export interface Player {
 export type toggleModal = () => void
 export type setSaving = (status: boolean) => void
 export type setModalMessage = (message: string) => void
-export type setUserDataDispatch = (data: {}) => void
-export type setPlayersDataDispatch = (players: Array<Player>) => void
-export type setGameDataDispatch = (data: {}) => void
+export type setUserDataDispatch = (data: {}, startGame?: boolean) => void
+export type setPlayersDataDispatch = (players: Array<Player>, startGame?: boolean) => void
+export type setGameDataDispatch = (data: InitGameData, startGame?: boolean) => void
+export type setPlayingGameDispatch = (data: boolean, startGame?: boolean) => void

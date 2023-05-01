@@ -1,3 +1,5 @@
+nodemon --ignore 'cache/game_state.json' dist/index.js
+
 Wat is het dat ik wil doen?
 
 
@@ -418,3 +420,95 @@ Styling implementeren waar dingen nog missen en styling optimaliseren
 - Single lobby maken
 - Multiplayer mode
 
+
+
+- game werkend krijgen
+- game stylen
+- multi lobbies
+- spectator mode
+- live zetten
+
+- portfolio site maken
+- project op de site zetten
+
+
+- spel inladen via micro frontend architecture
+- nieuw spel maken
+- chat maken
+
+
+- nieuwe baan zoeken
+- content maken
+- paulo helpen om het spel af te maken
+
+
+
+
+
+- zodra iedereen klaar is in de front end in de backend de kaarten verdelen over alle spelers
+- de data naar de spelers sturen
+- alle kaarten van de spelers uitdelen
+- alle spelers in de front end aan de back end teruggeven aangeven dat zij de data hebben ontvangen
+
+
+- make set vanuit de front end naar de back end sturen.
+- als de back end een response geeft dan pas de animatie doen (call back in de store zetten)
+
+- call bust vanuit de front end naar de back end sturen.
+- als de back end een response geeft dan pas de animatie doen.
+
+- spel pauzeren
+
+
+- als het spel herlaadt dan alles weer tonen zoals het is (store.getState() in socket functies gebruiken)
+- ervoor zorgen dat er niet twee verschillende animaties afgespeeld kunnen worden
+
+Socket IO with React and Typescript [2022]
+https://www.youtube.com/watch?v=-aTWWl4klYE
+
+
+
+Flow:
+
+- elke speler komt op de GAME pagina terecht
+- elke speler stuurt een 'gameLoaded' event terug naar de server
+- als alle spelers hun spel is geladen worden de kaarten uitgedeeld en een voor een naar elke speler toegestuurd
+
+
+
+
+
+
+
+Flow vanaf het begin:
+- Naam invoeren 
+- Naam verifieren
+- Zeggen dat je ready bent
+- Eerste speler op ready kunnen laten drukken
+- Als eerste speler op ready drukt dan het spel starten
+- Als de pagina herladen wordt dan de data opnieuw inladen
+
+
+Een speler aanmaken in game en een speler aanmaken in sessiondata
+In beide gevallen kunnen ze elkaar vinden door te zoeken op het sessie ID
+
+
+
+https://stackoverflow.com/questions/49707703/open-the-same-directory-twice
+
+
+
+
+TODO 2023-05-01
+- lobby pagina data tonen
+- lobby pagina herladen dan nog steeds op de lobby pagina terecht komen
+- listeners registreren voor lobby pagina (frontend / backend)
+- listener voor enter use name pagina unregisteren (backend)
+
+
+Todo zometeen:
+Spel starten
+Code opschonen
+
+Aangeven in de frontend dat we in de 'Game' fase zitten zodat de 'GameStateRoutes' component er altijd naartoe verwijst
+Een bericht sturen naar de backend dat alle spelers geladen zijn zodat de kaarten uitgedeeld kunnen worden

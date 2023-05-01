@@ -25,7 +25,6 @@ const MessageModal = ({messageModalData, closeExecution, messageModalRef}: {
     if (messageModalData.disableCloseButton) {
       return;
     }
-    console.log('BEFORE EXECUTION MESSAGE')
     closeExecution('messageModal');
   }
   useEffect(() => {

@@ -281,8 +281,8 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
     for (let i = 0; i < supposedCards.length; i++) {
       const supposedCard = supposedCards[i];
       const realCard = realCards[i];
-      const supposedCardKey = createCardName(SUITS[supposedCard.suitIndex] ?? '', RANKS[supposedCard.rankIndex] ?? '');
-      const realCardKey = createCardName(SUITS[realCard.suitIndex] ?? '', RANKS[realCard.rankIndex] ?? '');
+      const supposedCardKey = createCardName(SUITS[supposedCard.suitIndex ?? -1] ?? '', RANKS[supposedCard.rankIndex ?? -1] ?? '');
+      const realCardKey = createCardName(SUITS[realCard.suitIndex ?? -1] ?? '', RANKS[realCard.rankIndex ?? -1] ?? '');
       currentSetCardsToDisplay.push(<div 
         key={`middle-cards-container-new-${i}-${middleSet.playerIndex}`} 
         className="middle-cards-container" 
@@ -309,8 +309,8 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
       for (let i = 0; i < previousSupposedCards.length; i++) {
         const supposedCard = previousSupposedCards[i];
         const realCard = previousMiddleCards[i];
-        const supposedCardKey = !supposedCard.faceDown ? createCardName(SUITS[supposedCard.suitIndex] ?? '', RANKS[supposedCard.rankIndex] ?? '') : 'Backside';
-        const realCardKey = !realCard.faceDown ? createCardName(SUITS[realCard.suitIndex] ?? '', RANKS[realCard.rankIndex] ?? '') : 'Backside';
+        const supposedCardKey = !supposedCard.faceDown ? createCardName(SUITS[supposedCard.suitIndex ?? -1] ?? '', RANKS[supposedCard.rankIndex ?? -1] ?? '') : 'Backside';
+        const realCardKey = !realCard.faceDown ? createCardName(SUITS[realCard.suitIndex ?? -1] ?? '', RANKS[realCard.rankIndex ?? -1] ?? '') : 'Backside';
         previousSetCardsToDisplay.push(<div 
           key={`middle-cards-container-previous-${i}-${middleSet.playerIndex}`} 
           className="middle-cards-container previous"

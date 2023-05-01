@@ -54,7 +54,6 @@ export default class Player {
     const indexesToRemove = [];
     for (const card of cardsToRemove) {
       const cardKey = this.createCardKey(card);
-      console.log({cardKey})
       if (cardIndexes[cardKey] === undefined) {
         continue;
       }
@@ -62,7 +61,6 @@ export default class Player {
     }
     indexesToRemove.sort();
     indexesToRemove.reverse();
-    console.log(indexesToRemove);
     for (const indexToRemove of indexesToRemove) {
       this.cards.splice(indexToRemove, 1)
     }

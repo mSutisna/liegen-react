@@ -100,7 +100,7 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
   const dispatch = useDispatch();
 
   const renderCard = (card: CardForPlayerInterface, index: number, indicateAmount: number | null) : ReactNode => {
-    const cardKey = createCardName(SUITS[card.suitIndex] ?? '', RANKS[card.rankIndex] ?? '')
+    const cardKey = createCardName(SUITS[card.suitIndex ?? -1] ?? '', RANKS[card.rankIndex ?? -1] ?? '')
     if (!cardUrls[cardKey]) {
       return null;
     }
@@ -130,8 +130,8 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
       onClick={onClick}
       originPoint={adjustedOriginPoint}
       delay={delay}
-      rank={RANKS[card.rankIndex]}
-      suit={SUITS[card.suitIndex]}
+      rank={RANKS[card.rankIndex ?? -1]}
+      suit={SUITS[card.suitIndex ?? -1]}
       selected={card.selected}
       faceDown={card.faceDown}
       playerIndex={realIndex}

@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles/all-styles.scss';
 import Game from './components/game/Game';
-import Entry from './components/lobby/Entry';
+import Entry from './components/lobby-2/Entry';
 import reportWebVitals from './reportWebVitals';
 
 // This is the extra redux functionality
