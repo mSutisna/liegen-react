@@ -3,6 +3,7 @@ import ErrorPage from "./ErrorPage";
 import EnterUsername from "./EnterUsername";
 import GameStateRoutes from "./GameStateRoutes";
 import Lobby from "./Lobby";
+// import Game from "./Game";
 import Game from "../game/Game";
 
 function Entry() {

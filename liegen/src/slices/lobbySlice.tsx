@@ -4,10 +4,11 @@ import { LobbyPlayerData } from '../types/pages/lobby';
 
 const initialState: LobbyState = {
   userID: '',
-  players: []
+  players: [],
+  gameStarted: false,
 }
 
-export const gameStateSlice = createSlice({
+export const lobbySlice = createSlice({
   name: 'lobbyState',
   initialState,
   reducers: {
@@ -16,6 +17,9 @@ export const gameStateSlice = createSlice({
     },
     setPlayers: (state: LobbyState, action: PayloadAction<Array<LobbyPlayerData>>) => {
       state.players = action.payload
+    },
+    setGameStarted: (state: LobbyState, action: PayloadAction<boolean>) => {
+      state.gameStarted = action.payload;
     }
   }
 })
@@ -23,6 +27,7 @@ export const gameStateSlice = createSlice({
 export const {
   setUserID, 
   setPlayers, 
-} = gameStateSlice.actions;
+  setGameStarted,
+} = lobbySlice.actions;
 
-export default gameStateSlice.reducer;
+export default lobbySlice.reducer;

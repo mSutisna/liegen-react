@@ -14,4 +14,4 @@ export interface LobbyPlayerData {
 
 export type HandlePlayersChangeCallback = (data: {players: Array<LobbyPlayerData>}) => void;
 export type HandleStartResponseCallback = (data: {error: string}) => void;
-export type HandleDefinitiveStartCallback = (data: {players: Array<LobbyPlayerData>}) => void;
+export type HandleDefinitiveStartCallback = (data: {players: Array<LobbyPlayerData>, userID: string}) => void;

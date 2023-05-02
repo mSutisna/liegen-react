@@ -1,10 +1,11 @@
 import { type Server } from "socket.io"
-import { SocketWithExtraData } from "../types/socket-types/general.js"
+import { HANDLERS_STATE, SocketWithExtraData } from "../types/socket-types/general.js"
 import { sessionStore } from "../utils/SessionStore.js";
 import { createPlayersLobbyDataPayload } from "./general.js";
 import { READY_CHANGE, START, START_RESPONSE, PLAYERS_CHANGE, DEFINITIVE_START } from "../types/socket-types/lobby.js";
 import { game } from "../models/Game.js";
 import { createIndexedSocketCollection } from "../utils/helper-function.js";
+import { setHandlers } from "./set-handlers.js";
 
 export const registerLobbyHandlers = (io: Server, socket: SocketWithExtraData) => {
   socket.on(READY_CHANGE, () => {
@@ -23,13 +24,14 @@ export const unregisterLobbyHandlers = (socket: SocketWithExtraData) => {
 const readyListener = (io: Server, socket: SocketWithExtraData) => {
   const session = sessionStore.findSession(socket.data.sessionID);
   if (!session) {
-    console.log({session, sessionID: socket.data.sessionID})
     return;
   }
   session.ready = !session.ready;
   sessionStore.saveSession(socket.data.sessionID, session);
   const playersPayload = createPlayersLobbyDataPayload();
-  io.emit(PLAYERS_CHANGE, playersPayload)
+  io.emit(PLAYERS_CHANGE, {
+    players: playersPayload
+  })
 }
 
 const startListener = (io: Server, socket: SocketWithExtraData) => {
@@ -55,15 +57,18 @@ const startListener = (io: Server, socket: SocketWithExtraData) => {
     }
   }
 
+  const indexedSocketCollection = createIndexedSocketCollection(io);
+  for (const socket of Object.values(indexedSocketCollection)) {
+    setHandlers(io, socket, HANDLERS_STATE.GAME);
+  }
+  sessions = sessionStore.findAllSessions();
+  game.startGame(sessions, indexedSocketCollection);
+  const playersPayload = createPlayersLobbyDataPayload();
 
-  const startGame = async () => {
-    sessions = sessionStore.findAllSessions();
-    const indexedSocketCollection = createIndexedSocketCollection(io);
-    game.startGame(sessions, indexedSocketCollection);
-    const playersPayload = createPlayersLobbyDataPayload();
-    io.emit(DEFINITIVE_START, {
+  for (const playerSocket of Object.values(indexedSocketCollection)) {
+    playerSocket.emit(DEFINITIVE_START, {
+      userID: playerSocket.data.userID,
       players: playersPayload,
     });
   }
-  startGame();
 }

@@ -26,8 +26,6 @@ fs.readFile(cardMapPath, (err, cardMap) => {
   );
 });
 
-// console.log({cardMapData})
-
 // return;
 
 function convertToIndividualCardImages(image) {

@@ -15,8 +15,8 @@ import {
   registerLobbyHandlers, 
   unregisterLobbyHandlers,
 } from "../../register-socket-handlers/lobby";
-import { setPlayers as setPlayersLobby } from "../../slices/lobbySlice";
-import { setPlayers, setMainPlayerIndex } from "../../slices/gameSlice";
+import { setPlayers as setPlayersLobby, setGameStarted } from "../../slices/lobbySlice";
+import { setPlayers, setMainPlayerIndex, setUserID } from "../../slices/gameSlice";
 import Modal from "./Modal";
 
 export default function Lobby() {
@@ -40,8 +40,14 @@ export default function Lobby() {
       if (!data.players) {
         return;
       }
-      dispatch(setPlayers(data.players));
-      dispatch(setMainPlayerIndex(data.players));
+      const setData = async () => {
+        console.log({data});
+        await dispatch(setUserID(data.userID))
+        await dispatch(setPlayers(data.players));
+        await dispatch(setMainPlayerIndex(data.players));
+        dispatch(setGameStarted(true));
+      }
+      setData();
     }
     registerLobbyHandlers(
       playersChangeCallback,
@@ -59,7 +65,6 @@ export default function Lobby() {
       return state.lobby;
     }
   );
-  console.log({lobby});
   const playerRows = [];
   let firstPlayerUserID = null;
   let playerSelf = null;

@@ -121,8 +121,6 @@ const sendPlayerChanges = (socket: SocketExtraData) => {
     }
   };
 
-  console.log('payload', payload)
-
   socket.emit('registerCallback', payload);
 }
 

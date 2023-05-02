@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import useModal from '../../custom-hooks/useModal';
 import { REGISTER } from "../../types/pages/enter-username";
 import { registerEnterUsernameHandlers, unregisterEnterUsernameHandlers } from "../../register-socket-handlers/enter-username";
-import { setUserID, setPlayers } from "../../slices/lobbySlice";
+import { setUserID, setPlayers, setGameStarted } from "../../slices/lobbySlice";
+import { initGame } from '../../slices/gameSlice';
 import Modal from "./Modal";
 import { useDispatch } from "react-redux";
 import { 
@@ -26,12 +27,16 @@ export default function EnterUsername() {
       setSaving(false);
     }
     const handleContinueToLobby: HandleContinueToLobby = (data) => {
-      console.log({data});
       dispatch(setUserID(data.userID));
       dispatch(setPlayers(data.players));
     }
-    const handleContinueToGame: HandleContinueToGame = () => {
-
+    const handleContinueToGame: HandleContinueToGame = (data) => {
+      const setData = async () => {
+        await dispatch(setUserID(data.userID));
+        await dispatch(setGameStarted(true));
+        dispatch(initGame(data));
+      }
+      setData();
     }
   
     registerEnterUsernameHandlers(

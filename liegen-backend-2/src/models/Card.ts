@@ -1,4 +1,5 @@
 import { PlayerCard } from "../types/data.js";
+import { RANKS_INDEXES, SUITS_INDEXES } from "../constants.js";
 
 export default class Card {
   suit: string;

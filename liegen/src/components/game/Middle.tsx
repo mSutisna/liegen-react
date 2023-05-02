@@ -565,8 +565,8 @@ const playBustAnimationInner = async (
           await dispatch(receiveCard({
             receivingPlayerIndex,
             card: {
-              rankIndex,
-              suitIndex,
+              rank: RANKS[rankIndex],
+              suit: SUITS[suitIndex],
               faceDown: false
             }
           }))

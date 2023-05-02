@@ -8,7 +8,7 @@ import {
   InitGameData,
   MiddleInterface
 } from "../types/models";
-import { RANKS, SUITS, BurnType, CardRanks, CardSuits, CardUrlType } from "../constants";
+import { RANKS, SUITS, BurnType, CardRanks, CardSuits, CardUrlType, RANKS_INDEXES, SUITS_INDEXES } from "../constants";
 import { createCardName } from "../utilities/card-helper-functions";
 import { MessageModalPayload, ModalAnimationType } from "../types/redux/game";
 import { AnimationStatus } from "../types/models";
@@ -19,6 +19,7 @@ import { LobbyPlayerData } from "../types/pages/lobby";
 const initialState: InitialState = {
   players: [],
   playersOrder: [],
+  userID: '',
   middle: {
     set: null,
     previousSet: null,
@@ -63,22 +64,18 @@ const initialState: InitialState = {
   },
   clockwise: true,
   allCardsModalVisible: false,
-  userID: '',
-  gameContinued: false,
   playerIndexWhoWon: null,
   gameOver: false,
-  connectedWithServer: false,
-  userData: {},
-  gameData: {
-    players: [],
-    playingGame: false,
-  }
 };
 
 export const gameSlice = createSlice({
   name: UpdateGameAction,
   initialState: initialState,
   reducers: {
+    setUserID: (state: InitialState, action: PayloadAction<string>) => {
+      console.log('what the kanker aids', action.payload)
+      state.userID = action.payload;
+    },
     setPlayers: (state: InitialState, action: PayloadAction<Array<LobbyPlayerData>>) => {
       const players = action.payload;
       for (let i = 0; i < players.length; i++) {
@@ -92,7 +89,8 @@ export const gameSlice = createSlice({
         player.cards = [];
         player.selectedRank = 0;
       }
-      state.players = players as Array<PlayerInterface>;
+      const newPlayers = players as Array<PlayerInterface>;
+      state.players = newPlayers;
     },
     setMainPlayerIndex: (state: InitialState, action: PayloadAction<Array<LobbyPlayerData>>) => {
       let mainPlayerIndex = 0;
@@ -104,25 +102,44 @@ export const gameSlice = createSlice({
           break;
         }
       }
-      state.mainPlayerIndex = mainPlayerIndex
+      state.mainPlayerIndex = mainPlayerIndex;
+      const playersOrder = createPlayersOrder(state.players, state.mainPlayerIndex);
+      console.log({playersOrder, players});
+      state.playersOrder = playersOrder;
     },
     initGame: (state: InitialState, action: PayloadAction<InitGameData>) => {
       const players = action.payload.players;
       const adjustedPlayers: Array<PlayerInterface> = []
       for (let i = 0; i < players.length; i++) {
-        const player = players[i] as PlayerInterface
-
+        const player = players[i];
+        const convertedCards: Array<CardForPlayerInterface> = [];
+        for (const card of player.cards) {
+          const convertedCard: CardForPlayerInterface = {
+            selected: false,
+            originPoint: {
+              x: 0,
+              y: 0
+            },
+            receiveAnimationStatus: AnimationStatus.IDLE,
+            rankIndex: RANKS_INDEXES[card.rank],
+            suitIndex: SUITS_INDEXES[card.suit],
+            faceDown: player.sessionData.userID !== action.payload.userID
+          }
+          convertedCards.push(convertedCard);
+        }
         const adjustedPlayer = {
-          ...player,
-          name: player.username,
+          name: player.sessionData.username,
+          userID: player.sessionData.userID,
+          connected: player.sessionData.connected,
+          ready: player.sessionData.ready,
           originPoint: {
             x: 0,
             y: 0
           },
           index: i,
-          cards: [],
+          cards: convertedCards,
           selectedRank: 0
-        }
+        } as PlayerInterface;
         adjustedPlayers.push(adjustedPlayer);
       }
       const middle = action.payload.middleData;
@@ -140,9 +157,9 @@ export const gameSlice = createSlice({
       state.currentPlayerIndex = data.selectedPlayerIndex;
       state.mainPlayerIndex = data.playerIndex;
       state.userID = data.userID;
-      state.gameContinued = data.gameContinued;
       state.gameOver = data.gameOver;
       state.playerIndexWhoWon = data.playerIndexWhoWon;
+      state.playersOrder = createPlayersOrder(state.players, state.mainPlayerIndex);
     },
     setPlayersOrder: (state: InitialState, action: PayloadAction<Array<number>>) => {
       state.playersOrder = action.payload;
@@ -236,11 +253,14 @@ export const gameSlice = createSlice({
       const receivingPlayer = state.players[receivingPlayerIndex];
       const payloadCard = action.payload.card;
       const card : CardForPlayerInterface = {
-        ...payloadCard,
+        rankIndex: RANKS_INDEXES[payloadCard.rank],
+        suitIndex: SUITS_INDEXES[payloadCard.suit],
+        faceDown: payloadCard.faceDown ?? receivingPlayer.userID !== state.userID,
         selected: false,
-        originPoint: null,
+        originPoint: {x: 0, y: 0},
         receiveAnimationStatus: AnimationStatus.IDLE
       }
+      // console.log('KANKER CARD', card)
       receivingPlayer.cards.push(card);
     },
     makeSet: (state : InitialState) => {
@@ -322,6 +342,7 @@ export const gameSlice = createSlice({
 
 // Action creators are generated for each case reducer function
 export const {
+  setUserID,
   setPlayers,
   setMainPlayerIndex,
   initGame,

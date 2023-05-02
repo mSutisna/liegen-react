@@ -17,10 +17,6 @@ function Game() {
   //     return state.gameState;
   //   }
   // )
-
-  console.log({game});
-
-  // console.log({gameState})
   
   return (
     <>

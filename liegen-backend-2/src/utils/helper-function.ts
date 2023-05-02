@@ -14,3 +14,14 @@ export const createIndexedSocketCollection = (io: Server): {[k: string]: SocketW
   }
   return indexedSocketCollection
 }
+
+export const arrayFlip = (trans) => {
+  var key, tmp_ar = {};
+
+  for (key in trans) {
+    if (!trans.hasOwnProperty(key)) {continue;}
+    tmp_ar[trans[key]] = key;
+  }
+
+  return tmp_ar;
+}

@@ -45,3 +45,18 @@ export const createPlayersOrder = (players: Array<PlayerInterface>, currentPlaye
   } while (iterationIndex !== currentPlayerIndex);
   return playersOrder;
 }
+
+export const arrayFlip = (trans: Array<string>) => {
+  let key;
+  const tmp_ar: {[k: string]: number} = {};
+
+  for (key in trans) {
+    if (!trans.hasOwnProperty(key)) {
+      continue
+    }
+    const index = parseInt(key);
+    tmp_ar[trans[key]] = index;
+  }
+
+  return tmp_ar;
+}

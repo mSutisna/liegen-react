@@ -512,3 +512,44 @@ Code opschonen
 
 Aangeven in de frontend dat we in de 'Game' fase zitten zodat de 'GameStateRoutes' component er altijd naartoe verwijst
 Een bericht sturen naar de backend dat alle spelers geladen zijn zodat de kaarten uitgedeeld kunnen worden
+
+
+
+
+Kaarten in eerste instantie uitdelen
+Alle game data opnieuw inladen 
+
+
+
+
+
+
+Spel kunnen spelen via multiplayer
+Stylen
+Multiple lobbies
+Specatator mode
+Checken of de kaarten die ik gebruik gratis gebruikt mogen worden. Anders andere opzoeken.
+
+Portfolio website maken
+Profiel maken
+Game showcasen
+
+Linked In updaten
+Github profile updaten
+
+Werk zoeken
+Youtube channel maken
+Content maken
+
+
+TODO NOW:
+- continueToGame functie afmaken
+- ervoor zorgen dat de kaarten van de primary player gelijk goed worden getoond (grid view)
+- ervoor zorgen dat de kaarten uitgedeeld worden (dat de animaties werken)
+
+- set kunnen maken
+- bust kunnen callen
+- game over scherm tonen 
+- pauze scherm tonen
+
+- als ik gaandeweg synchronisatie problemen heb kijke of het implementeren van een Queue dat kan oplossen

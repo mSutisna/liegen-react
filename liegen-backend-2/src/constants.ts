@@ -1,7 +1,10 @@
+import { arrayFlip } from "./utils/helper-function.js";
+
 export const MAX_AMOUNT_OF_PLAYERS = 4;
 
 export enum GameStates {
   IDLE = 'idle',
+  STARTED = 'started',
   PLAYING = 'playing'
 }
 
@@ -35,6 +38,8 @@ export const SUITS = [
   CardSuits.SPADES
 ];
 
+export const SUITS_INDEXES = arrayFlip(SUITS);
+
 export const RANKS = [
   CardRanks.ACE, 
   CardRanks.TWO, 
@@ -50,3 +55,5 @@ export const RANKS = [
   CardRanks.QUEEN, 
   CardRanks.KING
 ];
+
+export const RANKS_INDEXES = arrayFlip(RANKS);

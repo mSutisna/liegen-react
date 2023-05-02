@@ -75,7 +75,6 @@ gameEventEmitter.on(EVENT_RECEIVE_CARD, function (receiveCardEvent: EventReceive
   for (let i = 0; i < players.length; i++) {
     const gamePlayer = players[i];
     const socket = realPlayer.getSocket();
-    console.log('JE KANKER AIDS TERING TYFUS KANKER MOEDER', player.sessionData.userID, gamePlayer.getUserID(), player.sessionData.userID === gamePlayer.getUserID())
     const cardData = player.sessionData.userID === gamePlayer.getUserID() ? card : {rank: null, suit: null};
     const payload = {
       cardData,

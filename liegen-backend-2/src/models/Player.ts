@@ -1,10 +1,11 @@
 import { PlayerCard, SessionData } from "../types/data.js";
 import Card from "./Card.js";
-import { EVENT_RECEIVE_CARD, SocketWithExtraData } from "../types/socket-types/general.js";
+import { SocketWithExtraData } from "../types/socket-types/general.js";
 import { SerializedPlayer } from "../types/data.js";
 import { EventReceiveCard } from "../types/events.js";
 import { gameEventEmitter } from "../utils/GameEventEmitter.js";
 import { createCardKey } from "../utils/helper-function.js";
+import { EVENT_RECEIVE_CARD } from "../types/socket-types/game.js";
 
 export default class Player {
   sessionData: SessionData;
@@ -17,10 +18,15 @@ export default class Player {
     this.cards = [];
   }
 
-  serialize() {
-    const serializedCards: Array<PlayerCard> = [];
+  serialize(emptyCards: boolean = false) : SerializedPlayer {
+    const serializedCards = [];
     for (const card of this.cards) {
-      serializedCards.push(card.serialize());
+      const serializedCard = card.serialize();
+      if (emptyCards) {
+        serializedCard.rank = null;
+        serializedCard.suit = null;
+      }
+      serializedCards.push(serializedCard);
     }
     const serializedPlayer: SerializedPlayer = {
       sessionData: {...this.sessionData},

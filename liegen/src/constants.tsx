@@ -1,3 +1,5 @@
+import { arrayFlip } from "./utilities/general-helper-functions";
+
 export const DESKTOP_GAME_WIDTH = 1200;
 export const DESKTOP_GAME_HEIGHT = 800;
 
@@ -21,7 +23,9 @@ export const DESKTOP_CARD_SCALE = 0.35;
 
 
 export const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+export const RANKS_INDEXES = arrayFlip(RANKS);
 export const SUITS = ['Hearts', 'Clubs', 'Diamonds', 'Spades'];
+export const SUITS_INDEXES = arrayFlip(SUITS);
 
 export enum CardUrlType {
   REGULAR = 'regular',

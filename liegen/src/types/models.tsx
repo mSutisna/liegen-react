@@ -3,13 +3,27 @@ import { CardRanks, CardSuits } from "../constants";
 import { ModalAnimationType } from "./redux/game";
 import { Player } from "./props";
 
+
+export interface SessionData {
+  sessionID: string,
+  userID: string,
+  username: string,
+  connected: boolean,
+  ready: boolean,
+  gameLoaded: boolean
+}
+
+export interface InitGamePlayer {
+  sessionData: SessionData,
+  cards: Array<CardInterface>
+}
+
 export interface InitGameData {
-  players: Array<Player>,
+  players: Array<InitGamePlayer>,
   middleData: MiddleData,
   selectedPlayerIndex: number,
   playerIndex: number,
   userID: string,
-  gameContinued: boolean,
   gameOver: boolean,
   playerIndexWhoWon: number | null,
 }
@@ -18,6 +32,12 @@ export interface BaseCardInterface {
   rankIndex: CardRanks | null,
   suitIndex: CardSuits | null,
   faceDown: boolean,
+}
+
+export interface CardInterface {
+  rank: string,
+  suit: string,
+  faceDown?: boolean,
 }
 
 export interface CardForPlayerInterface extends BaseCardInterface {

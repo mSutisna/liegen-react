@@ -59,7 +59,7 @@ const registerCallback = (io: Server, socket: SocketWithExtraData, { username })
     const playersLobbyPayload = createPlayersLobbyDataPayload();
     socket.emit(REGISTER_RESPONSE, {
       userID: socket.data.userID,
-      ...playersLobbyPayload
+      players: playersLobbyPayload
     });
     sendPlayerChangesLobby(io);
     setHandlers(io, socket, HANDLERS_STATE.LOBBY);

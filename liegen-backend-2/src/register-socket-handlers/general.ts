@@ -6,7 +6,9 @@ import { LobbyPlayerData } from "../types/socket-types/general.js";
 
 export const sendPlayerChangesLobby = (io: Server) => {
   const playersPayload = createPlayersLobbyDataPayload();
-  io.emit(PLAYERS_CHANGE, playersPayload)
+  io.emit(PLAYERS_CHANGE, {
+    players: playersPayload
+  })
 }
 
 export const createPlayersLobbyDataPayload = () => {
@@ -20,7 +22,5 @@ export const createPlayersLobbyDataPayload = () => {
     }
     return playerPayload;
   });
-  return {
-    players
-  }
+  return players;
 }

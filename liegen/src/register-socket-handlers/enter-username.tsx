@@ -8,11 +8,12 @@ import {
   CONTINUE_TO_GAME_DATA 
 } from "../types/pages/enter-username";
 import { establishSocketConnection } from "../utilities/Socket";
+import { InitGameData } from "../types/models";
 
 export type HandleRegisterCallbackSuccessType = (data: REGISTER_RESPONSE_DATA) => void;
 export type HandleErrorType = (message: string) => void;
 export type HandleContinueToLobby = (data: CONTINUE_TO_LOBBY_DATA) => void;
-export type HandleContinueToGame = (data: CONTINUE_TO_GAME_DATA) => void;
+export type HandleContinueToGame = (data: InitGameData) => void;
 
 export const registerEnterUsernameHandlers = (
   handleRegisterCallbackSuccess: HandleRegisterCallbackSuccessType,

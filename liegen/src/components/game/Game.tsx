@@ -42,53 +42,21 @@ import { getImageUrls } from '../../utilities/image-store/image-urls';
 import MessageModal from './MessageModal'; 
 import AllCardsModal from './AllCardsModal';
 import { createPlayersOrder } from '../../utilities/general-helper-functions';
+import InitialState, { ModalAnimationType, ReceiveCardPayload } from '../../types/redux/game';
+import { registerGameHandlers, unregisterGameHandlers } from '../../register-socket-handlers/game';
+import {
+  GAME_LOADED,
+  MAKE_SET,
+  CALL_BUST,
+  GAME_OVER, 
+  HandleGameLoadedResponse,
+  HandleMakeSetResponse,
+  HandleCallBustResponse,
+  HandleGameOverResponse,
+  HandleReceiveCardResponse
+} from '../../types/pages/game';
 import socket from "../../utilities/Socket";
-import { Dispatch, AnyAction } from "@reduxjs/toolkit";
-import queueInstance from '../../utilities/Queue';
-import { ReceiveCardDataResponseInterface, SetResponseInterface } from '../../types/socket';
-import InitialState, { ModalAnimationType } from '../../types/redux/game';
-import store from "../../store";
 
-
-const registerSocketListeners = (
-  dispatch: Dispatch<AnyAction>,
-  // players: Array<PlayerInterface>,
-  // displayNewMessage: (
-  //   dispatch: Dispatch<AnyAction>,
-  //   message: string,
-  //   modalAnimation?: ModalAnimationType,
-  //   disableCloseButton?: boolean
-  // ) => void
-) => {
-  // socket.on('playersUpdate', data => {
-  // })
-
-  const storeState = store.getState();
-
-  socket.on(EVENT_RECEIVE_CARD, (data: ReceiveCardDataResponseInterface) => {
-    let rankIndex = data.cardData.rank !== null
-      ? RANKS.findIndex(rank => data.cardData.rank === rank)
-      : null;
-    let suitIndex = data.cardData.suit !== null
-      ? SUITS.findIndex(suit => data.cardData.suit === suit)
-      : null;
-    dispatch(receiveCard({
-      receivingPlayerIndex: data.playerIndex,
-      card: {
-        rankIndex,
-        suitIndex,
-        faceDown: storeState.game.mainPlayerIndex === data.playerIndex
-      }
-    }))
-  })
-
-  socket.on(EVENT_MAKE_SET_RESPONSE, (setResponse) => {
-  })
-
-  socket.on(EVENT_CALL_BUST_RESPONSE, (bustResponse) => {
-  });
-  socket.emit('gameLoaded');
-}
 
 function Game() {
   const dispatch = useDispatch();
@@ -99,19 +67,20 @@ function Game() {
     }
   }
 
-  const gameSlice: InitialState = useSelector(
+  const game: InitialState = useSelector(
     (state: RootState) => {
       return state.game;
-    }
+    } 
   )
-
-  console.log('KANKER AIDS GAME SLICE', gameSlice)
+  
+  console.log({game});
 
   const players: Array<PlayerInterface> = useSelector(
     (state: RootState) => {
       return state.game.players;
     }
   );
+
   const playersOrder: Array<number> = useSelector(
     (state: RootState) => {
       return state.game.playersOrder;
@@ -172,22 +141,40 @@ function Game() {
   
   const amountOfPlayers = players.length;
   useEffect(() => {
-
-    registerSocketListeners(
-      dispatch,
-    )
-    const fetchPlayers = async () => {
-      // const players = generatePlayers();
-      const playersOrder = createPlayersOrder(players, currentPlayerIndex);
-      dispatch(setPlayers(players));
-      dispatch(setPlayersOrder(playersOrder))
-    }
-    fetchPlayers();
+    // const fetchPlayers = async () => {
+    //   // const players = generatePlayers();
+    //   const playersOrder = createPlayersOrder(players, currentPlayerIndex);
+    //   dispatch(setPlayers(players));
+    //   dispatch(setPlayersOrder(playersOrder))
+    // }
+    // fetchPlayers();
     const setImageUrls = async () => {
       const imageUrls = await getImageUrls();
       dispatch(setCardUrls(imageUrls));
     }
     setImageUrls();
+
+    const receiveCardCallback: HandleReceiveCardResponse = (data: ReceiveCardPayload) => {
+      dispatch(receiveCard(data))
+    }
+    const makeSetCallback: HandleMakeSetResponse = () => {
+
+    }
+    const callBustCallback: HandleCallBustResponse = () => {
+
+    }
+    const gameOverCallback: HandleGameOverResponse = () => {
+
+    }
+
+    registerGameHandlers(
+      receiveCardCallback,
+      makeSetCallback,
+      callBustCallback,
+      gameOverCallback
+    );
+    socket.emit(GAME_LOADED)
+    return unregisterGameHandlers;
   }, []);
 
   const gameWidth = DESKTOP_GAME_WIDTH;
@@ -231,8 +218,6 @@ function Game() {
       dispatch(setVisibilityMessageModal(false))
     }
   }
-
-  const mainPlayerData = players[currentPlayerIndex];
 
   const modals = <>
     <AllCardsModal 

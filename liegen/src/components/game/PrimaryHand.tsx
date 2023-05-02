@@ -52,7 +52,7 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
   );
   const playerCards: (Array<BaseCardInterface> | null) = useSelector(
     (state: RootState) => {
-      return state.game.players[realIndex]?.cards ?? null;
+      return state.game.players[realIndex]?.cards ?? [];
     }
   );
   const cardContainerRef = useRef<HTMLDivElement>(null);
@@ -95,7 +95,7 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
     return () => {
       window.removeEventListener('resize', handleWindowResize);
     }
-  }, [currentPlayerIndex, screenSize.width, screenSize.height]);
+  }, [currentPlayerIndex, screenSize.width, screenSize.height, playerCards]);
 
   const dispatch = useDispatch();
 

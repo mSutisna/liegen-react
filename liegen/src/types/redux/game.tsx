@@ -3,7 +3,8 @@ import {
   MiddleInterface,  
   MessageModalData, 
   Point, 
-  BaseCardInterface
+  BaseCardInterface,
+  CardInterface
 } from '../models';
 
 interface InitialState {
@@ -20,18 +21,8 @@ interface InitialState {
   clockwise: boolean,
   allCardsModalVisible: boolean,
   userID: string,
-  gameContinued: boolean,
   playerIndexWhoWon: number | null,
   gameOver: boolean,
-  userData: {
-    sessionID?: string,
-    userID?: string,
-  },
-  gameData: {
-    players: Array<PlayerInterface>,
-    playingGame?: boolean
-  },
-  connectedWithServer: boolean | null
 }
 
 export enum ModalAnimationType {
@@ -48,7 +39,7 @@ export interface MessageModalPayload {
 export interface ReceiveCardPayload {
   originPoint?: Point | null,
   receivingPlayerIndex: number,
-  card: BaseCardInterface,
+  card: CardInterface,
 }
 
 export interface ToggleCardSelectedPayload {

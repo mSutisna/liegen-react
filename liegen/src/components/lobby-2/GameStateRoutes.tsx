@@ -11,16 +11,12 @@ const GameStateRoutes = () => {
   );
   const location = useLocation();
   let navigateTo = '/';
-  // if (gameState.gameData?.playingGame && gameState.connectedWithServer && gameState.userData?.sessionID) {
-  //   navigateTo = '/game';
-  if (lobbyState.userID) {
+  if (lobbyState.userID && lobbyState.gameStarted) {
+    navigateTo = '/game';
+  } else if (lobbyState.userID) {
     navigateTo = '/lobby';
-  } else if (!lobbyState.userID) {
-    navigateTo = '/';
   }
-  return (
-      navigateTo === location.pathname ? <Outlet/> : <Navigate to={navigateTo}/>
-  )
+  return (navigateTo === location.pathname ? <Outlet/> : <Navigate to={navigateTo}/>)
 }
 
 export default GameStateRoutes;
