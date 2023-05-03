@@ -14,6 +14,10 @@ io.on('connection', (socket: SocketWithExtraData) => {
   if (session && game.getState() !== GameStates.IDLE) {
     socket.data.sessionID = session.sessionID;
     socket.data.userID = session.userID;
+    if (!game.renewSocketForLinkedPlayer(socket)) {
+      console.error(`Could not attach new socket to player with session ID: ${socket.data.sessionID}`);
+      return;
+    }
     const payload: SerializedGame = game.serialize(socket);
     socket.emit(CONTINUE_TO_GAME, payload);
     setHandlers(io, socket, HANDLERS_STATE.GAME);

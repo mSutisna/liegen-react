@@ -191,10 +191,13 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
     playReceiveSetAnimation();
   }, [middle])
 
-
   if (middleSet) {
-    const supposedCards = middleSet.supposedCards;
-    const realCards = middleSet.realCards;
+    const supposedCards = middleSet.supposedCards ?? [];
+    const realCards = middleSet.realCards ?? [];
+    console.log({
+      supposedCards,
+      realCards
+    })
     const createRefObjectAndSetElement = (
       refCollectionData: cardsRefInterface[],
       index: number,
@@ -215,22 +218,25 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
 
     const createCardElement = (refCardCollection: Array<cardsRefInterface>, type: string, url: string, index: number, visibilityHideType = 'visibility')  => {
       const style : {[k: string]: string | number} = {
-        width: cardWidth,
-        height: cardHeight,
+        // width: cardWidth,
+        // height: cardHeight,
       }
       const cardStyle = {...style};
       //Comment out if chain below to display middle set initially without problems
-      // if (visibilityHideType === 'visibility')  {
-      //   style.visibility = 'hidden';
-      // } else if (visibilityHideType === 'display') {
-      //   style.display = 'none';
-      // }
+      if (middle.setAnimationStatus !== AnimationStatus.FINISHED) {
+        if (visibilityHideType === 'visibility')  {
+          style.visibility = 'hidden';
+        } else if (visibilityHideType === 'display') {
+          style.display = 'none';
+        }
+      }
       const frontSideDisplay = type === 'supposedCard' 
         ? 'do-display'
         : 'dont-display';
       const backsideDisplay = type === 'supposedCard' 
         ? 'dont-display'
         : 'do-display';
+
       return <div
         ref={el => {
           createRefObjectAndSetElement(
@@ -246,7 +252,7 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
           );
         }}
         className="card"
-        // style={style}
+        style={style}
       >
         <div 
           ref={el => {

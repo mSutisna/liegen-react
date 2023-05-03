@@ -1,5 +1,5 @@
 import { HandProps } from '../../types/props';
-import { AnimationStatus, BaseCardInterface, CardForPlayerInterface, CardUrls, MiddleInterface, PlayerInterface } from '../../types/models';
+import { AnimationStatus, BaseCardInterface, CardForPlayerInterface, CardInterface, CardUrls, MiddleInterface, PlayerInterface } from '../../types/models';
 import {
   DESKTOP_CARD_WIDTH, 
   DESKTOP_CARD_HEIGHT, 
@@ -23,6 +23,8 @@ import { RootState } from '../../store';
 import questionMark from '../../assets/icons/question-mark.svg';
 import { setVisibilityAllCardsModal } from '../../slices/gameSlice';
 import { Dispatch, AnyAction } from "@reduxjs/toolkit";
+import socket from '../../utilities/Socket';
+import { MAKE_SET, MakeSetData } from '../../types/pages/game';
 
 function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHeight, cards, selectedRank, assignIndicatorRefToCollection} : HandProps) {
   const cardUrls: CardUrls  = useSelector(
@@ -228,45 +230,71 @@ export const makeSetLogic = (
   if (middle.setAnimationStatus === AnimationStatus.RUNNING || middle.bustAnimationStatus === AnimationStatus.RUNNING) {
     return;
   }
+  // const player = players[mainPlayerIndex];
+  // if (currentPlayerIndex !== mainPlayerIndex) {
+  //   displayNewMessage(dispatch, 'You can\'t make a set because it is not your turn.');
+  //   return;
+  // }
+  // for (const player of players) {
+  //   if (player.cards.length === 0) {
+  //     displayNewMessage(dispatch, `Player '${player.name}' has no more cards left. Someone must call bust on ${player.name}'s set!`);
+  //     return;
+  //   }
+  // }
+  // if (!player || player.cards.filter(card => card.selected).length === 0) {
+  //   displayNewMessage(dispatch, 'You must select at least one card to make a set.');
+  //   return;
+  // }
+  // if (middle.set) {
+  //   const belowRank = (middle.set.rank - 1) >= 0 
+  //     ? middle.set.rank - 1
+  //     : RANKS.length - 1;
+  //   const aboveRank = (middle.set.rank + 1) <= (RANKS.length - 1)
+  //     ? middle.set.rank + 1
+  //     : 0;
+
+  //   const validRankIndexes = [
+  //     belowRank,
+  //     middle.set.rank,
+  //     aboveRank
+  //   ];
+
+  //   const rankLabels = validRankIndexes.map(index => {
+  //     return RANKS[index];
+  //   })
+
+  //   if (!validRankIndexes.includes(player.selectedRank)) {
+  //     displayNewMessage(dispatch, `You can only select one of the following ranks '${rankLabels.join(', ')}' because the rank of the current set is '${RANKS[middle.set.rank]}'.`);
+  //     return;
+  //   }
+  // }
+
+
   const player = players[mainPlayerIndex];
-  if (currentPlayerIndex !== mainPlayerIndex) {
-    displayNewMessage(dispatch, 'You can\'t make a set because it is not your turn.');
-    return;
-  }
-  for (const player of players) {
-    if (player.cards.length === 0) {
-      displayNewMessage(dispatch, `Player '${player.name}' has no more cards left. Someone must call bust on ${player.name}'s set!`);
-      return;
+  const cards = [];
+  for (const playerCard of player.cards) {
+    if (!playerCard.selected) {
+      continue;
     }
-  }
-  if (!player || player.cards.filter(card => card.selected).length === 0) {
-    displayNewMessage(dispatch, 'You must select at least one card to make a set.');
-    return;
-  }
-  if (middle.set) {
-    const belowRank = (middle.set.rank - 1) >= 0 
-      ? middle.set.rank - 1
-      : RANKS.length - 1;
-    const aboveRank = (middle.set.rank + 1) <= (RANKS.length - 1)
-      ? middle.set.rank + 1
-      : 0;
-
-    const validRankIndexes = [
-      belowRank,
-      middle.set.rank,
-      aboveRank
-    ];
-
-    const rankLabels = validRankIndexes.map(index => {
-      return RANKS[index];
-    })
-
-    if (!validRankIndexes.includes(player.selectedRank)) {
-      displayNewMessage(dispatch, `You can only select one of the following ranks '${rankLabels.join(', ')}' because the rank of the current set is '${RANKS[middle.set.rank]}'.`);
-      return;
+    const rank = RANKS[playerCard.rankIndex ?? -1] ?? null;
+    const suit = SUITS[playerCard.suitIndex ?? -1] ?? null;
+    if (!rank || !suit) {
+      continue;
     }
+    const card: CardInterface = {
+      rank,
+      suit
+    }
+    cards.push(card)
   }
-  dispatch(makeSet())
+  const payload: MakeSetData = {
+    playerIndex: mainPlayerIndex,
+    cards,
+    rank: player.selectedRank,
+    amount: cards.length
+  }
+  console.log('EMIT!!')
+  socket.emit(MAKE_SET, payload)
 }
 
 export default PrimaryHand;

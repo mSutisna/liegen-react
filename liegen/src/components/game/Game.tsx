@@ -27,6 +27,7 @@ import {
   setVisibilityAllCardsModal,
   setVisibilityMessageModal,
   receiveCard,
+  makeSet,
   displayNewMessage
 } from "../../slices/gameSlice";
 import { 
@@ -42,7 +43,7 @@ import { getImageUrls } from '../../utilities/image-store/image-urls';
 import MessageModal from './MessageModal'; 
 import AllCardsModal from './AllCardsModal';
 import { createPlayersOrder } from '../../utilities/general-helper-functions';
-import InitialState, { ModalAnimationType, ReceiveCardPayload } from '../../types/redux/game';
+import InitialState, { MakeSetPayload, ModalAnimationType, ReceiveCardPayload } from '../../types/redux/game';
 import { registerGameHandlers, unregisterGameHandlers } from '../../register-socket-handlers/game';
 import {
   GAME_LOADED,
@@ -53,7 +54,8 @@ import {
   HandleMakeSetResponse,
   HandleCallBustResponse,
   HandleGameOverResponse,
-  HandleReceiveCardResponse
+  HandleReceiveCardResponse,
+  MakeSetDataResponse
 } from '../../types/pages/game';
 import socket from "../../utilities/Socket";
 
@@ -72,8 +74,6 @@ function Game() {
       return state.game;
     } 
   )
-  
-  console.log({game});
 
   const players: Array<PlayerInterface> = useSelector(
     (state: RootState) => {
@@ -157,8 +157,13 @@ function Game() {
     const receiveCardCallback: HandleReceiveCardResponse = (data: ReceiveCardPayload) => {
       dispatch(receiveCard(data))
     }
-    const makeSetCallback: HandleMakeSetResponse = () => {
-
+    const makeSetCallback: HandleMakeSetResponse = (data: MakeSetDataResponse) => {
+      if (data.error) {
+        displayNewMessage(dispatch, data.error);
+        return;
+      }
+      console.log('MAKET SET!!!')
+      dispatch(makeSet(data));
     }
     const callBustCallback: HandleCallBustResponse = () => {
 
@@ -234,7 +239,6 @@ function Game() {
       messageModalRef={messageModalRef} 
     />
   </>;
-
   return (
     <div className="game-wrapper">
       {modals}

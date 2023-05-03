@@ -23,12 +23,6 @@ export interface SerializedPlayercard extends PlayerCard {
   suit: string | null
 }
 
-export interface PlayerCardFrontend {
-  rankIndex: number,
-  suitIndex: number,
-  selected: boolean
-}
-
 export interface SerializedPlayer {
   sessionData: SessionData,
   cards: Array<SerializedPlayercard>,

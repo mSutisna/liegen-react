@@ -4,6 +4,11 @@ import Player from "./Player.js";
 import { SocketWithExtraData } from "../types/socket-types/general.js";
 import Deck from "./Deck.js";
 import Middle from "./Middle.js";
+import MiddleSet from './Set.js'; 
+import { EVENT_MAKE_SET, MAKE_SET_RESPONSE, MakeSetData } from "../types/socket-types/game.js";
+import { buildCardsFromJsonData } from "../utils/helper-function.js";
+import { gameEventEmitter } from "../utils/GameEventEmitter.js";
+import { EventMakeSet } from "../types/events.js";
 
 export default class Game {
   sessions: Array<SessionData>;
@@ -61,6 +66,86 @@ export default class Game {
   dealCards() {
     this.state = GameStates.PLAYING;
     this.deck.dealCards(this.getPlayers())
+  }
+
+  receiveSet(setData: MakeSetData) {
+    const player = game.getPlayerByIndex(setData.playerIndex); 
+    const socket = player.getSocket();
+    if (this.makeSetInProgress) {
+      socket.emit(MAKE_SET_RESPONSE, {
+        error: 'Somebody else is already making a set, you have to wait till the set of that person is placed.'
+      })
+      return;
+    }
+    if (
+      setData.cards === null
+      || setData.rank === null
+      || setData.amount === null
+    ) {
+      socket.emit(MAKE_SET_RESPONSE, {
+        error: ''
+      })
+      return;
+    }
+    if (setData.playerIndex !== this.selectedPlayerIndex) {
+      socket.emit(MAKE_SET_RESPONSE, {
+        error: 'You can\'t make a set, it\'s not your turn.'
+      })
+      return;
+    }
+    const lastSet = this.middle.getSet();
+    if (lastSet && lastSet.getPlayer().getCards().length === 0) {
+      socket.emit(MAKE_SET_RESPONSE, {
+        error: 'The player of the last set has no cards left. Someone must call bust!'
+      })
+      return;
+    }
+    this.makeSetInProgress = true;
+    const set = new MiddleSet(
+      player,
+      setData.rank,
+      setData.amount,
+      buildCardsFromJsonData(setData.cards)
+    );
+    player.removeCards(set.getActualCards());
+    const players = this.getPlayers();
+    let prevPlayerIndex = null;
+    for (let i = 0; i < players.length; i++) {
+      const player = players[i];
+      if (player === set.getPlayer()) {
+        prevPlayerIndex = i;
+        break;
+      }
+    }
+    this.middle.setSet(set);
+    let selectedPlayerIndex = this.selectedPlayerIndex - 1;
+    if (selectedPlayerIndex < 0) {
+      selectedPlayerIndex = players.length - 1;
+    }
+    this.selectedPlayerIndex = selectedPlayerIndex;
+    const eventMakeSet: EventMakeSet = {
+      prevPlayerIndex,
+      currentPlayerIndex: selectedPlayerIndex,
+      rank: set.getRank(),
+      amount: set.getAmount(),
+      cardsData: set.getActualCards()
+    }
+    gameEventEmitter.emit(EVENT_MAKE_SET, eventMakeSet);
+    this.makeSetInProgress = false;
+  }
+
+  getPlayerByIndex(index: number) {
+    return this.players[index] ?? null;
+  }
+
+  renewSocketForLinkedPlayer(socket: SocketWithExtraData): boolean {
+    for (const player of this.players) {
+      if (socket.data.sessionID === player.sessionData.sessionID) {
+        player.setSocket(socket);
+        return true;
+      }
+    }
+    return false;
   }
 
   serialize(socket: SocketWithExtraData): SerializedGame {

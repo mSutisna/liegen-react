@@ -553,3 +553,28 @@ TODO NOW:
 - pauze scherm tonen
 
 - als ik gaandeweg synchronisatie problemen heb kijke of het implementeren van een Queue dat kan oplossen
+
+
+
+TODO VANDAAG:
+- set kunnen maken
+- bust kunnen callen
+
+ambitieus
+- game over scherm tonen
+
+
+
+bugs:
+- niet meer frame motion gebruiken voor uitdelen van kaarten maar gewoon vanilla js voor animaties
+- bij 4 spelers worden bij speler 2 en speler 4 de kaarten verkeerd getoond
+- als een speler opnieuw verbind dan de juiste socket aan hem toekennen (mogelijk een bug)
+
+
+
+bugs:
+- na reloaden kan er geen set gedaan worden - X
+- bij de eerste set die gemaakt wordt worden de kaarten niet goed getoond - X
+- kaarten zijn niet even veel na maken van sets bij verschillende players
+- middle moet groter gemaakt worden
+- maximaal maar 4 kaarten op middle leggen (in backend checken)

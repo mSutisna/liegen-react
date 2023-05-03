@@ -1,3 +1,4 @@
+import { CardRanks } from '../../constants';
 import { 
   PlayerInterface, 
   MiddleInterface,  
@@ -42,16 +43,16 @@ export interface ReceiveCardPayload {
   card: CardInterface,
 }
 
+export interface MakeSetPayload {
+  playerIndex: number,
+  cards: Array<CardInterface>,
+  rank: CardRanks,
+  amount: number,
+}
+
 export interface ToggleCardSelectedPayload {
   cardName: string,
   playerIndex: number,
-}
-
-export interface MakeSetPayload {
-  receivingPlayerIndex: number,
-  cards: Array<BaseCardInterface>,
-  rank: string,
-  amount: number,
 }
 
 export interface CallBustPayload {

@@ -20,12 +20,36 @@ export interface InitGamePlayer {
 
 export interface InitGameData {
   players: Array<InitGamePlayer>,
-  middleData: MiddleData,
+  middleData: SerializedMiddle,
   selectedPlayerIndex: number,
   playerIndex: number,
   userID: string,
   gameOver: boolean,
   playerIndexWhoWon: number | null,
+}
+
+export interface SerializedSet {
+  player: SerializedPlayer,
+  rank: CardRanks,
+  amount: number,
+  actualCards: Array<CardInterface>;
+}
+
+export interface SerializedPlayer {
+  sessionData: SessionData,
+  cards: Array<CardInterface>,
+}
+
+export interface SerializedMiddle {
+  cards: Array<CardInterface>,
+  set: SerializedSet
+}
+
+export interface SerializedSet {
+  player: SerializedPlayer,
+  rank: CardRanks,
+  amount: number,
+  actualCards: Array<CardInterface>;
 }
 
 export interface BaseCardInterface {

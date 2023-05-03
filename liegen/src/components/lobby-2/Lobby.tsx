@@ -41,7 +41,6 @@ export default function Lobby() {
         return;
       }
       const setData = async () => {
-        console.log({data});
         await dispatch(setUserID(data.userID))
         await dispatch(setPlayers(data.players));
         await dispatch(setMainPlayerIndex(data.players));

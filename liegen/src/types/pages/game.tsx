@@ -1,3 +1,5 @@
+import { CardRanks } from "../../constants";
+import { CardInterface } from "../models";
 import { ReceiveCardPayload } from "../redux/game";
 
 export const GAME_LOADED = 'gameLoaded';
@@ -13,6 +15,24 @@ export const GAME_OVER_RESPONSE = 'gameOverResponse';
 
 export type HandleGameLoadedResponse = () => void;
 export type HandleReceiveCardResponse = (data: ReceiveCardPayload) => void;
-export type HandleMakeSetResponse = () => void;
+export type HandleMakeSetResponse = (data: MakeSetDataResponse) => void;
 export type HandleCallBustResponse = () => void;
 export type HandleGameOverResponse = () => void;
+
+
+export interface MakeSetData {
+  playerIndex: number,
+  cards: Array<CardInterface>,
+  rank: CardRanks,
+  amount: number,
+}
+
+export interface MakeSetDataResponse {
+  error?: string,
+  prevPlayerIndex: number,
+  currentPlayerIndex: number,
+  rank: CardRanks,
+  amount: number,
+  cardsData: Array<CardInterface>,
+  userID: string
+}

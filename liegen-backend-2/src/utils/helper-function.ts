@@ -1,6 +1,7 @@
 import { type Server } from "socket.io"
-import type Card from "../models/Card.js"
+import Card from "../models/Card.js"
 import { SocketWithExtraData } from "../types/socket-types/general.js"
+import { BaseCard } from "../types/data.js"
 
 export const createCardKey = (card: Card) => {
   return `${card.getSuit()}-${card.getRank()}`
@@ -24,4 +25,16 @@ export const arrayFlip = (trans) => {
   }
 
   return tmp_ar;
+}
+
+export const buildCardsFromJsonData = (cards: Array<BaseCard>) : Array<Card> => {
+  let builtCards = [];
+  for (const card of cards) {
+    builtCards.push(buildCardFromJsonData(card));
+  } 
+  return builtCards;
+}
+
+export const buildCardFromJsonData = (card: BaseCard) => {
+  return new Card(card.suit, card.rank)
 }

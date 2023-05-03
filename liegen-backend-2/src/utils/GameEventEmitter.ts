@@ -1,14 +1,15 @@
 import EventEmitter from 'node:events';
 
 import {
+  EVENT_MAKE_SET,
   EVENT_RECEIVE_CARD,
+  MAKE_SET_RESPONSE,
 } from '../types/socket-types/game.js'
 
 import type Game from '../models/Game.js';
 import type SessionStore from './SessionStore.js';
-import { EventReceiveCard } from '../types/events.js';
+import { EventMakeSet, EventReceiveCard } from '../types/events.js';
 import { RECEIVE_CARD_RESPONSE } from '../types/socket-types/game.js';
-import { SUITS_INDEXES, RANKS_INDEXES } from '../constants.js';
 
 class GameEventEmitter extends EventEmitter {
   game: Game;
@@ -42,6 +43,14 @@ gameEventEmitter.on(EVENT_RECEIVE_CARD, function (receiveCardEvent: EventReceive
       receivingPlayerIndex: playerIndex
     }
     socket.emit(RECEIVE_CARD_RESPONSE, payload);
+  }
+});
+
+gameEventEmitter.on(EVENT_MAKE_SET, function (makeSetEvent: EventMakeSet) {
+  const self = this as GameEventEmitter;
+  for (const player of this.game.getPlayers()) {
+    const socket = player.getSocket();
+    socket.emit(MAKE_SET_RESPONSE, makeSetEvent);
   }
 });
 

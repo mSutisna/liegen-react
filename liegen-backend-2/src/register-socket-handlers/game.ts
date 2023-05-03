@@ -3,7 +3,7 @@ import { SocketWithExtraData } from "../types/socket-types/general.js"
 import { gameEventEmitter } from "../utils/GameEventEmitter.js";
 import { sessionStore } from "../utils/SessionStore.js";
 import { game } from "../models/Game.js"
-import { GAME_LOADED, MAKE_SET, CALL_BUST, GAME_OVER } from "../types/socket-types/game.js";
+import { GAME_LOADED, MAKE_SET, CALL_BUST, GAME_OVER, MakeSetData } from "../types/socket-types/game.js";
 
 export const registerGameHandlers = (io: Server, socket: SocketWithExtraData) => {
   gameEventEmitter.setGame(game);
@@ -34,8 +34,8 @@ const gameLoadedCallback = (io: Server, socket: SocketWithExtraData) => {
   game.dealCards();
 }
 
-const makeSetCallBack = () => {
-
+const makeSetCallBack = (data: MakeSetData) => {
+  game.receiveSet(data)
 }
 
 const callBustCallback = () => {
