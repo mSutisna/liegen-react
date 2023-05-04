@@ -5,7 +5,8 @@ import {
   DESKTOP_CARD_HEIGHT, 
   SUITS, 
   RANKS, 
-  DESKTOP_CARD_SCALE 
+  DESKTOP_CARD_SCALE, 
+  RANKS_INDEXES
 } from '../../constants';
 import { createCardCollectionToRender, createCardName } from '../../utilities/card-helper-functions';
 import CardPrimary from './CardPrimary';
@@ -24,7 +25,7 @@ import questionMark from '../../assets/icons/question-mark.svg';
 import { setVisibilityAllCardsModal } from '../../slices/gameSlice';
 import { Dispatch, AnyAction } from "@reduxjs/toolkit";
 import socket from '../../utilities/Socket';
-import { MAKE_SET, MakeSetData } from '../../types/pages/game';
+import { CALL_BUST, MAKE_SET, MakeSetData } from '../../types/pages/game';
 
 function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHeight, cards, selectedRank, assignIndicatorRefToCollection} : HandProps) {
   const cardUrls: CardUrls  = useSelector(
@@ -171,15 +172,7 @@ function PrimaryHand({name, index, realIndex, amountOfPlayers, gameWidth, gameHe
               if (middle.bustAnimationStatus !== AnimationStatus.IDLE || middle.setAnimationStatus == AnimationStatus.RUNNING) {
                 return;
               }
-              if (!middle.set) {
-                displayNewMessage(dispatch, 'You can\'t call bust because there is no set in the middle.');
-                return;
-              }
-              if (middle.set.playerIndex === realIndex) {
-                displayNewMessage(dispatch, 'You can\'t call bust on your own set.');
-                return;
-              }
-              dispatch(callBust())
+              socket.emit(CALL_BUST, {playerIndex: realIndex})
             }}
           >
             Bust
@@ -290,7 +283,7 @@ export const makeSetLogic = (
   const payload: MakeSetData = {
     playerIndex: mainPlayerIndex,
     cards,
-    rank: player.selectedRank,
+    rank: RANKS[player.selectedRank],
     amount: cards.length
   }
   console.log('EMIT!!')

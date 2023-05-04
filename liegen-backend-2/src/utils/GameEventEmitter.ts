@@ -1,6 +1,8 @@
 import EventEmitter from 'node:events';
 
 import {
+  CALL_BUST_RESPONSE,
+  EVENT_CALL_BUST,
   EVENT_MAKE_SET,
   EVENT_RECEIVE_CARD,
   MAKE_SET_RESPONSE,
@@ -8,7 +10,7 @@ import {
 
 import type Game from '../models/Game.js';
 import type SessionStore from './SessionStore.js';
-import { EventMakeSet, EventReceiveCard } from '../types/events.js';
+import { EventCallBust, EventMakeSet, EventReceiveCard } from '../types/events.js';
 import { RECEIVE_CARD_RESPONSE } from '../types/socket-types/game.js';
 
 class GameEventEmitter extends EventEmitter {
@@ -53,5 +55,22 @@ gameEventEmitter.on(EVENT_MAKE_SET, function (makeSetEvent: EventMakeSet) {
     socket.emit(MAKE_SET_RESPONSE, makeSetEvent);
   }
 });
+
+gameEventEmitter.on(EVENT_CALL_BUST, function (makeBustEvent: EventCallBust) {
+  const self = this as GameEventEmitter;
+  const playerToGiveCardsTo = self.game.getPlayerByIndex(makeBustEvent.playerToGiveCardsToIndex);
+  for (const player of this.game.getPlayers()) {
+    const socket = player.getSocket();
+    // let middleCards = makeBustEvent.cards;
+    // if (playerToGiveCardsTo.getUserID() !== player.getUserID()) {
+    //   const newMiddleCards = [];
+    //   for (const card of middleCards) {
+    //     newMiddleCards.push({});
+    //   }
+    //   middleCards = newMiddleCards;
+    // }
+    socket.emit(CALL_BUST_RESPONSE, makeBustEvent);
+  }
+})
 
 export { gameEventEmitter };

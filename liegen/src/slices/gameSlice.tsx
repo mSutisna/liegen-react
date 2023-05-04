@@ -1,4 +1,4 @@
-import InitialState, { UpdateGameAction, ReceiveCardPayload, ToggleCardSelectedPayload, MakeSetPayload } from "../types/redux/game";
+import InitialState, { UpdateGameAction, ReceiveCardPayload, ToggleCardSelectedPayload, MakeSetPayload, CallBustPayload } from "../types/redux/game";
 import { createSlice, PayloadAction, Dispatch, AnyAction, current } from "@reduxjs/toolkit";
 import { 
   PlayerInterface,
@@ -18,7 +18,7 @@ import { AnimationStatus } from "../types/models";
 import { createPlayersOrder } from "../utilities/general-helper-functions";
 import { Player } from "../types/props";
 import { LobbyPlayerData } from "../types/pages/lobby";
-import { MakeSetDataResponse } from "../types/pages/game";
+import { CallBustResponse, MakeSetDataResponse } from "../types/pages/game";
 
 const initialState: InitialState = {
   players: [],
@@ -31,6 +31,7 @@ const initialState: InitialState = {
     playerToCallBust: null,
     setAnimationStatus: AnimationStatus.IDLE,
     bustAnimationStatus: AnimationStatus.IDLE,
+    callBustResponse: null,
   },
   // middle: {
   //   set: {
@@ -69,7 +70,7 @@ const initialState: InitialState = {
   clockwise: true,
   allCardsModalVisible: false,
   playerIndexWhoWon: null,
-  gameOver: false,
+  gameOver: false
 };
 
 export const gameSlice = createSlice({
@@ -190,7 +191,8 @@ export const gameSlice = createSlice({
           burnedCards: adjustedCards,
           playerToCallBust: null,
           setAnimationStatus: AnimationStatus.FINISHED,
-          bustAnimationStatus: AnimationStatus.IDLE
+          bustAnimationStatus: AnimationStatus.IDLE,
+          callBustResponse: null
         };
       }
   
@@ -265,6 +267,7 @@ export const gameSlice = createSlice({
       state.middle.previousSet = null;
       state.middle.burnedCards = [];
       state.middle.playerToCallBust = null;
+      state.middle.callBustResponse = null;
       state.middle.setAnimationStatus = AnimationStatus.IDLE;
       state.middle.bustAnimationStatus = AnimationStatus.IDLE;
     },
@@ -310,7 +313,6 @@ export const gameSlice = createSlice({
       const payload = action.payload;
       const player = state.players[payload.prevPlayerIndex];
       const payloadSelectedCards = payload.cardsData;
-
       const selectedCards: Array<BaseCardInterface> = [];
       const createCardKey = (card: BaseCardInterface) => {
         return `${card.suitIndex}-${card.rankIndex}`;
@@ -326,6 +328,8 @@ export const gameSlice = createSlice({
         selectedCards.push(selectedCard);
       }
 
+      console.log({keysSelectedCards, selectedCards})
+
       let leftOverCards: Array<CardForPlayerInterface> = [];
       if (payload.prevPlayerIndex === state.mainPlayerIndex) {
         leftOverCards = player.cards.filter(playerCard => !keysSelectedCards.includes(createCardKey(playerCard)));
@@ -335,8 +339,8 @@ export const gameSlice = createSlice({
           leftOverCards.pop();
         }
       }
-      
-      const rankIndex = payload.rank;
+      const rankIndex = RANKS_INDEXES[payload.rank];
+      console.log({rankIndex})
       const amount = payload.amount;
       const realCards = selectedCards.map(selectedCard => {
         return {
@@ -366,6 +370,10 @@ export const gameSlice = createSlice({
       state.middle.setAnimationStatus = AnimationStatus.IDLE;
       state.middle.bustAnimationStatus = AnimationStatus.IDLE;
     },
+    callBust: (state : InitialState, action: PayloadAction<CallBustResponse>) => {
+      state.middle.callBustResponse = action.payload;
+      // state.middle.playerToCallBust = state.callBustResponse.playerToCallBustIndex;
+    },
     switchToNextPlayer: (state: InitialState, action: PayloadAction<number | null>) => {
       const endPlayerIndex = state.players.length - 1;
       if (action.payload !== null) {
@@ -383,9 +391,6 @@ export const gameSlice = createSlice({
           }
         }
       }
-    },
-    callBust: (state : InitialState) => {
-      state.middle.playerToCallBust = state.currentPlayerIndex;
     },
     callBustFinished: (state: InitialState) => {
       state.middle.playerToCallBust = null;

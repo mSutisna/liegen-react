@@ -25,10 +25,29 @@ export default class Deck {
     this.cards = [];
     this.generateDeckOfCards();
     this.shuffleDeck();
+    this.checkCards();
+  }
+
+  checkCards() {
+    const indexes: {[k: string]: number} = {};
+    for (const card of this.cards) {
+      const key = `${card.getSuit()}-${card.getRank()}`
+      if (!indexes[key]) {
+        indexes[key] = 0;
+      }
+      indexes[key] += 1;
+    }
+    const duplicateKeys = {};
+    for (const [key, value] of Object.entries(indexes)) {
+      if (value > 1) {
+        duplicateKeys[key] = value;
+      }
+    }
+    console.log({duplicateKeys});
   }
 
   generateDeckOfCards() {
-    this.constructSuit(CardSuits.HEARTS);
+    this.constructSuit(CardSuits.CLUBS);
     this.constructSuit(CardSuits.DIAMONDS);
     this.constructSuit(CardSuits.HEARTS);
     this.constructSuit(CardSuits.SPADES);

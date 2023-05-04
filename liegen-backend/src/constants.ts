@@ -40,7 +40,12 @@ export const RANKS = [
   CardRanks.KING
 ];
 
-export const SUITS = [CardSuits.HEARTS, CardSuits.CLUBS, CardSuits.DIAMONDS, CardSuits.SPADES];
+export const SUITS = [
+  CardSuits.HEARTS, 
+  CardSuits.CLUBS, 
+  CardSuits.DIAMONDS, 
+  CardSuits.SPADES
+];
 
 export const EVENT_START_GAME = 'start_game';
 export const EVENT_RECEIVE_CARD = 'receive_card';

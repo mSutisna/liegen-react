@@ -578,3 +578,10 @@ bugs:
 - kaarten zijn niet even veel na maken van sets bij verschillende players
 - middle moet groter gemaakt worden
 - maximaal maar 4 kaarten op middle leggen (in backend checken)
+
+
+bugs:
+- scherm correct klaarzetten
+- scherm sluiten bij allCardsOverlay als er een set gemaakt wordt
+- ervoor zorgen dat front-end en back-end alleen maar string gebruiker voor rank en suit!
+- een gedeelde type directory hebben, niet types twee keer aanmaken in front-end en back-end

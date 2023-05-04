@@ -14,3 +14,13 @@ export interface EventMakeSet {
   amount: number,
   cardsData: Array<Card>,
 }
+
+export interface EventCallBust {
+  playerToCallBustIndex: number,
+  setPlayerIndex: number,
+  playerToGiveCardsToIndex: number,
+  playerToSwitchToIndex: number,
+  cards: Array<Card>,
+  setActualCards: Array<Card>, 
+  gameOver: boolean
+}

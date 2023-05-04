@@ -28,7 +28,8 @@ import {
   setVisibilityMessageModal,
   receiveCard,
   makeSet,
-  displayNewMessage
+  displayNewMessage,
+  callBust
 } from "../../slices/gameSlice";
 import { 
   AnimationStatus, 
@@ -55,7 +56,8 @@ import {
   HandleCallBustResponse,
   HandleGameOverResponse,
   HandleReceiveCardResponse,
-  MakeSetDataResponse
+  MakeSetDataResponse,
+  CallBustResponse
 } from '../../types/pages/game';
 import socket from "../../utilities/Socket";
 
@@ -162,12 +164,15 @@ function Game() {
         displayNewMessage(dispatch, data.error);
         return;
       }
-      console.log('MAKET SET!!!')
       dispatch(makeSet(data));
     }
-    const callBustCallback: HandleCallBustResponse = () => {
-
-    }
+    const callBustCallback: HandleCallBustResponse = (data: CallBustResponse) => {
+      if (data.error) {
+        displayNewMessage(dispatch, data.error);
+        return;
+      }
+      dispatch(callBust(data));
+    } 
     const gameOverCallback: HandleGameOverResponse = () => {
 
     }

@@ -1,5 +1,5 @@
 import Card from './Card.js';
-import { SUITS, RANKS } from '../constants.js';
+import { SUITS, RANKS, CardSuits } from '../constants.js';
 
 import { Card as CardType } from '../types/general.js';
 import type Player from './Player.js';
@@ -29,10 +29,10 @@ export default class Deck {
   }
 
   generateDeckOfCards() {
-    this.constructSuit('Clubs');
-    this.constructSuit('Diamonds');
-    this.constructSuit('Hearts');
-    this.constructSuit('Spades');
+    this.constructSuit(CardSuits.CLUBS);
+    this.constructSuit(CardSuits.DIAMONDS);
+    this.constructSuit(CardSuits.HEARTS);
+    this.constructSuit(CardSuits.SPADES);
   }
 
   constructSuit(suit: string) {

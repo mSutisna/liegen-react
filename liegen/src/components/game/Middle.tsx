@@ -36,6 +36,7 @@ import frownFace from '../../assets/icons/frown-face.svg';
 import { determineSetIsALieAndGetIndexes } from "../../utilities/general-helper-functions";
 import { Dispatch, AnyAction } from "@reduxjs/toolkit";
 import { ModalAnimationType } from "../../types/redux/game";
+import { CallBustResponse } from "../../types/pages/game";
 
 interface MiddleProps {
   width: number,
@@ -116,16 +117,24 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
 
     const newSetRefs = refCollection.current.newSet;
     const previousSetRefs = refCollection.current.previousSet;
-    if (middle.playerToCallBust !== null) {
+    const callBustResponse = middle.callBustResponse;
+    if (callBustResponse !== null) {
       const playBustAnimation = async () => {
+        console.log('play bust animation', {callBustResponse})
         if (
           (middle.bustAnimationStatus === AnimationStatus.RUNNING || middle.setAnimationStatus === AnimationStatus.RUNNING)
           || middle.bustAnimationStatus === AnimationStatus.FINISHED
         ) {
+          console.log('ALREADY BUSY!', {
+            bust: middle.bustAnimationStatus,
+            set: middle.setAnimationStatus
+          })
           return;
         }
         dispatch(setBustAnimationStatus(AnimationStatus.RUNNING));
+        console.log('set animation status running bust')
         await playBustAnimationInner(
+          callBustResponse,
           players, 
           playersOrder,
           middle, 
@@ -138,13 +147,10 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
         );
         await dispatch(afterBustResetMiddle());
         await dispatch(setBustAnimationStatus(AnimationStatus.FINISHED));
-        const setIsALieData = determineSetIsALieAndGetIndexes(middle);
-        if (!setIsALieData) {
-          return
-        }
-        const winingPlayer = players[setIsALieData.playerToWinSetIndex];
+        const winingPlayer = players[callBustResponse.playerToSwitchToIndex];
         if (winingPlayer.cards.length > 0) {
-          dispatch(switchToNextPlayer(setIsALieData.playerToWinSetIndex));
+          console.log('SWITCH TO NEXT PLAYER', callBustResponse.playerToSwitchToIndex)
+          dispatch(switchToNextPlayer(callBustResponse.playerToSwitchToIndex));
           return;
         }
         displayNewMessage(dispatch, `Player '${winingPlayer.name}' has won!`, ModalAnimationType.WIN, true);
@@ -160,6 +166,7 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
       ) {
         return;
       }
+      console.log('play receive set animation')
       dispatch(setSetAnimationStatus(AnimationStatus.RUNNING));
       if (previousSetRefs.length === 0) {
         await playAnimationOnlyNewSet(
@@ -194,10 +201,6 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
   if (middleSet) {
     const supposedCards = middleSet.supposedCards ?? [];
     const realCards = middleSet.realCards ?? [];
-    console.log({
-      supposedCards,
-      realCards
-    })
     const createRefObjectAndSetElement = (
       refCollectionData: cardsRefInterface[],
       index: number,
@@ -398,6 +401,7 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
 }
 
 const playBustAnimationInner = async (
+  callBustResponse: CallBustResponse,
   players: Array<PlayerInterface>,
   playersOrder: Array<number>,
   middle: MiddleInterface,
@@ -408,38 +412,43 @@ const playBustAnimationInner = async (
   cardsToDeal: Array<HTMLImageElement | null> | null,
   dispatch: Dispatch<AnyAction>,
 ) : Promise<void> => {
+  console.log('PLAY BUST ANIMATION INNER!!!!')
   if (
     !middleCardIndicatorsCollection
     || !playerIndicatorCollection
-    || (middle.playerToCallBust === null)
+    || (callBustResponse.playerToCallBustIndex === null)
     || !middle.set
     || (middle.set.playerIndex === null)
     || !cardsToDeal
     || !cardsBurnedRef
   ) {
+    console.log('dont play animation!!!')
     return
   }
-  const calledBustPlayerIndex = playersOrder.findIndex(index => index === middle.playerToCallBust);
+
+  console.log('SIMPLY PLAY THE ANIMATION')
+  const calledBustPlayerIndex = playersOrder.findIndex(index => index === callBustResponse.playerToCallBustIndex);
   const indicatorCalledBust = playerIndicatorCollection[calledBustPlayerIndex];
   const beingCheckedPlayerIndex = playersOrder.findIndex(index => index === middle.set?.playerIndex);
   const indicatorBeingChecked = playerIndicatorCollection[beingCheckedPlayerIndex];
 
-  const setIsALieData = determineSetIsALieAndGetIndexes(middle);
+  // const setIsALieData = determineSetIsALieAndGetIndexes(middle);
   
-  if (!setIsALieData) {
-    return;
-  }
+  // if (!setIsALieData) {
+  //   return;
+  // }
 
-  const {
-    playerToWinSetIndex,
-    playerToLoseSetIndex,
-  } = setIsALieData;
-  const playerToWinSetPlayerIndex = playersOrder.findIndex(index => index === playerToWinSetIndex)
+  // const {
+  //   playerToWinSetIndex,
+  //   playerToLoseSetIndex,
+  // } = setIsALieData;
+  const playerToWinSetPlayerIndex = playersOrder.findIndex(index => index === callBustResponse.playerToSwitchToIndex)
   const playerToWinSet = playerIndicatorCollection[playerToWinSetPlayerIndex];
-  const playerToLoseSetPlayerIndex = playersOrder.findIndex(index => index === playerToLoseSetIndex);
+  const playerToLoseSetPlayerIndex = playersOrder.findIndex(index => index === callBustResponse.playerToGiveCardsToIndex);
   const playerToLoseSet = playerIndicatorCollection[playerToLoseSetPlayerIndex];
 
   if (!indicatorCalledBust || !indicatorBeingChecked || !playerToWinSet || !playerToLoseSet) {
+    console.log('NO INDICATORS!!!')
     return;
   }
   const flipCardsAndShowAwaitSymbols = () => {
@@ -538,7 +547,7 @@ const playBustAnimationInner = async (
   await (new Promise<void>(resolve => setTimeout(() => resolve(), 500)))
   const dealCards = () => {
     const animationChains : Array<AnimationChainMultipleImplelmentations[]> = [];
-    const receivingPlayer = players[playerToLoseSetIndex];
+    const receivingPlayer = players[callBustResponse.playerToGiveCardsToIndex];
     if (!receivingPlayer.originPoint) {
       return animationChains;
     }
@@ -552,7 +561,7 @@ const playBustAnimationInner = async (
       const endY = (receivingPlayer.originPoint.y - (cardRect.height / 2)) - (cardRect?.top ?? 0);
       const animationChain = [];
 
-      let receivingPlayerIndex = players[playerToLoseSetIndex].index;
+      let receivingPlayerIndex = players[callBustResponse.playerToGiveCardsToIndex].index;
       animationChain.push({
         element: cardToDeal,
         animationInstructions: [

@@ -2,6 +2,7 @@ import { type Socket } from "socket.io-client";
 import { CardRanks, CardSuits } from "../constants";
 import { ModalAnimationType } from "./redux/game";
 import { Player } from "./props";
+import { CallBustResponse } from "./pages/game";
 
 
 export interface SessionData {
@@ -103,6 +104,7 @@ export interface MiddleInterface {
   playerToCallBust: number | null,
   setAnimationStatus: AnimationStatus,
   bustAnimationStatus: AnimationStatus,
+  callBustResponse: CallBustResponse | null,
 }
 
 export interface MiddleData {
