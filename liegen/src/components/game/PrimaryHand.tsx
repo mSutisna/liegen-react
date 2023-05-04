@@ -286,7 +286,6 @@ export const makeSetLogic = (
     rank: RANKS[player.selectedRank],
     amount: cards.length
   }
-  console.log('EMIT!!')
   socket.emit(MAKE_SET, payload)
 }
 

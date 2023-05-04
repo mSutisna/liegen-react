@@ -120,7 +120,6 @@ export default class Game {
 
     if (lastSet) {
       const rankIndex = parseInt(RANKS_INDEXES[lastSet.rank]);
-      console.log({lastSet, rankIndex})
       const belowRank = (rankIndex - 1) >= 0 
         ? rankIndex - 1
         : RANKS.length - 1;
@@ -134,15 +133,11 @@ export default class Game {
         aboveRank
       ];
 
-      console.log(validRankIndexes)
-
       const rankLabels = validRankIndexes.map(index => {
         return RANKS[index];
       })
 
       const selectedRankIndex = RANKS_INDEXES[setData.rank];
-
-      console.log({selectedRankIndex, validRankIndexes})
 
       if (!validRankIndexes.includes(parseInt(selectedRankIndex))) {
         socket.emit(MAKE_SET_RESPONSE, {

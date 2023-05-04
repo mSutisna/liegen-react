@@ -43,7 +43,6 @@ export default class Deck {
         duplicateKeys[key] = value;
       }
     }
-    console.log({duplicateKeys});
   }
 
   generateDeckOfCards() {

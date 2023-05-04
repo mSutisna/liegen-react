@@ -120,19 +120,13 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
     const callBustResponse = middle.callBustResponse;
     if (callBustResponse !== null) {
       const playBustAnimation = async () => {
-        console.log('play bust animation', {callBustResponse})
         if (
           (middle.bustAnimationStatus === AnimationStatus.RUNNING || middle.setAnimationStatus === AnimationStatus.RUNNING)
           || middle.bustAnimationStatus === AnimationStatus.FINISHED
         ) {
-          console.log('ALREADY BUSY!', {
-            bust: middle.bustAnimationStatus,
-            set: middle.setAnimationStatus
-          })
           return;
         }
         dispatch(setBustAnimationStatus(AnimationStatus.RUNNING));
-        console.log('set animation status running bust')
         await playBustAnimationInner(
           callBustResponse,
           players, 
@@ -149,7 +143,6 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
         await dispatch(setBustAnimationStatus(AnimationStatus.FINISHED));
         const winingPlayer = players[callBustResponse.playerToSwitchToIndex];
         if (winingPlayer.cards.length > 0) {
-          console.log('SWITCH TO NEXT PLAYER', callBustResponse.playerToSwitchToIndex)
           dispatch(switchToNextPlayer(callBustResponse.playerToSwitchToIndex));
           return;
         }
@@ -166,7 +159,6 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
       ) {
         return;
       }
-      console.log('play receive set animation')
       dispatch(setSetAnimationStatus(AnimationStatus.RUNNING));
       if (previousSetRefs.length === 0) {
         await playAnimationOnlyNewSet(
@@ -412,7 +404,6 @@ const playBustAnimationInner = async (
   cardsToDeal: Array<HTMLImageElement | null> | null,
   dispatch: Dispatch<AnyAction>,
 ) : Promise<void> => {
-  console.log('PLAY BUST ANIMATION INNER!!!!')
   if (
     !middleCardIndicatorsCollection
     || !playerIndicatorCollection
@@ -422,11 +413,9 @@ const playBustAnimationInner = async (
     || !cardsToDeal
     || !cardsBurnedRef
   ) {
-    console.log('dont play animation!!!')
     return
   }
 
-  console.log('SIMPLY PLAY THE ANIMATION')
   const calledBustPlayerIndex = playersOrder.findIndex(index => index === callBustResponse.playerToCallBustIndex);
   const indicatorCalledBust = playerIndicatorCollection[calledBustPlayerIndex];
   const beingCheckedPlayerIndex = playersOrder.findIndex(index => index === middle.set?.playerIndex);
@@ -448,7 +437,6 @@ const playBustAnimationInner = async (
   const playerToLoseSet = playerIndicatorCollection[playerToLoseSetPlayerIndex];
 
   if (!indicatorCalledBust || !indicatorBeingChecked || !playerToWinSet || !playerToLoseSet) {
-    console.log('NO INDICATORS!!!')
     return;
   }
   const flipCardsAndShowAwaitSymbols = () => {

@@ -328,8 +328,6 @@ export const gameSlice = createSlice({
         selectedCards.push(selectedCard);
       }
 
-      console.log({keysSelectedCards, selectedCards})
-
       let leftOverCards: Array<CardForPlayerInterface> = [];
       if (payload.prevPlayerIndex === state.mainPlayerIndex) {
         leftOverCards = player.cards.filter(playerCard => !keysSelectedCards.includes(createCardKey(playerCard)));
@@ -340,7 +338,6 @@ export const gameSlice = createSlice({
         }
       }
       const rankIndex = RANKS_INDEXES[payload.rank];
-      console.log({rankIndex})
       const amount = payload.amount;
       const realCards = selectedCards.map(selectedCard => {
         return {
