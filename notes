@@ -585,3 +585,9 @@ bugs:
 - scherm sluiten bij allCardsOverlay als er een set gemaakt wordt
 - ervoor zorgen dat front-end en back-end alleen maar string gebruiker voor rank en suit!
 - een gedeelde type directory hebben, niet types twee keer aanmaken in front-end en back-end
+
+TODO morgen:
+- game over scherm
+- pauze scherm
+- liegen-backend folder weggooien
+- liegen/src/components/lobby weggooien
