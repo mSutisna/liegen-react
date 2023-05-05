@@ -112,6 +112,7 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
 
   useLayoutEffect(() => {
     if (!middleSet) {
+      console.log('weird1');
       return;
     }
 
@@ -124,6 +125,7 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
           (middle.bustAnimationStatus === AnimationStatus.RUNNING || middle.setAnimationStatus === AnimationStatus.RUNNING)
           || middle.bustAnimationStatus === AnimationStatus.FINISHED
         ) {
+          console.log('weird2???')
           return;
         }
         dispatch(setBustAnimationStatus(AnimationStatus.RUNNING));
@@ -161,6 +163,7 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
       }
       dispatch(setSetAnimationStatus(AnimationStatus.RUNNING));
       if (previousSetRefs.length === 0) {
+        console.log('ok1');
         await playAnimationOnlyNewSet(
           newSetRefs, 
           players, 
@@ -169,6 +172,7 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
           cardHeight
         )
       } else {
+        console.log('ok2');
         const newSetData = {
           newSetCardRefs: newSetRefs, 
           players, 
@@ -320,7 +324,7 @@ function Middle({width, height, left, top, playerIndicatorCollection} : MiddlePr
             {createCardElement(refCollectionData.previousSet, 'supposedCard', cardUrls[supposedCardKey], i, 'noHide')}
             {createCardElement(refCollectionData.previousSet, 'realCard', cardUrls[realCardKey], i, 'noHide')}
           </div>
-          <img src="" className="indicator"/>
+          <img src="" className="indicator" />
         </div>)
       }
     }
@@ -413,6 +417,7 @@ const playBustAnimationInner = async (
     || !cardsToDeal
     || !cardsBurnedRef
   ) {
+    console.log('weird3???')
     return
   }
 
@@ -437,6 +442,7 @@ const playBustAnimationInner = async (
   const playerToLoseSet = playerIndicatorCollection[playerToLoseSetPlayerIndex];
 
   if (!indicatorCalledBust || !indicatorBeingChecked || !playerToWinSet || !playerToLoseSet) {
+    console.log('weird4???')
     return;
   }
   const flipCardsAndShowAwaitSymbols = () => {

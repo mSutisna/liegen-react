@@ -61,14 +61,14 @@ gameEventEmitter.on(EVENT_CALL_BUST, function (makeBustEvent: EventCallBust) {
   const playerToGiveCardsTo = self.game.getPlayerByIndex(makeBustEvent.playerToGiveCardsToIndex);
   for (const player of this.game.getPlayers()) {
     const socket = player.getSocket();
-    // let middleCards = makeBustEvent.cards;
-    // if (playerToGiveCardsTo.getUserID() !== player.getUserID()) {
-    //   const newMiddleCards = [];
-    //   for (const card of middleCards) {
-    //     newMiddleCards.push({});
-    //   }
-    //   middleCards = newMiddleCards;
-    // }
+    let middleCards = makeBustEvent.cards;
+    if (playerToGiveCardsTo.getUserID() !== player.getUserID()) {
+      const newMiddleCards = [];
+      for (const card of middleCards) {
+        newMiddleCards.push({});
+      }
+      middleCards = newMiddleCards;
+    }
     socket.emit(CALL_BUST_RESPONSE, makeBustEvent);
   }
 })

@@ -24,6 +24,7 @@ interface InitialState {
   userID: string,
   playerIndexWhoWon: number | null,
   gameOver: boolean,
+  secondsLeftToReset: number | null
 }
 
 export enum ModalAnimationType {
@@ -34,7 +35,8 @@ export enum ModalAnimationType {
 export interface MessageModalPayload {
   message: string,
   modalAnimation?: ModalAnimationType,
-  disableCloseButton?: boolean
+  disableCloseButton?: boolean,
+  gamePaused?: boolean
 }
 
 export interface ReceiveCardPayload {

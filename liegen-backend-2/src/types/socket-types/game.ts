@@ -1,6 +1,7 @@
 import { CardRanks } from "../../constants.js";
 import { BaseCard, SerializedMiddle, SerializedPlayer } from "../data.js";
 
+export const PLAYERS_GAME_CHANGE_RESPONSE = 'playersGameChangeResponse';
 export const GAME_LOADED = 'gameLoaded';
 export const GAME_LOADED_RESPONSE = 'gameLoadedResponse';
 export const RECEIVE_CARD_RESPONSE = 'receiveCardResponse'
@@ -10,6 +11,7 @@ export const CALL_BUST = 'callBust';
 export const CALL_BUST_RESPONSE = 'callBustResponse';
 export const GAME_OVER = 'gameOver';
 export const GAME_OVER_RESPONSE = 'gameOverResponse';
+export const RESET_TO_LOBBY_RESPONSE = 'resetToLobbyResponse';
 
 // export const EVENT_START_GAME = 'start_game';
 export const EVENT_RECEIVE_CARD = 'receive_card';

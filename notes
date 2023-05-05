@@ -591,3 +591,10 @@ TODO morgen:
 - pauze scherm
 - liegen-backend folder weggooien
 - liegen/src/components/lobby weggooien
+
+
+Bugs:
+- na reloaden wordt middle kaart niet goed getoond
+- bust roepen bij laatste set toont geen animatie
+- win message pas tonen als bust animatie is afgelopen
+- win modal niet kunnen sluiten

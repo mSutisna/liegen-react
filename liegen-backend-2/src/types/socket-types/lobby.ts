@@ -1,5 +1,6 @@
 import { LobbyPlayerData } from "./general.js";
 
+export const DISCONNECT = 'disconnect';
 export const PLAYERS_CHANGE = 'playersChange';
 export const READY_CHANGE = 'readyChange';
 export const START = 'start';

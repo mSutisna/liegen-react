@@ -1,8 +1,8 @@
 import { type Server } from "socket.io"
 import { HANDLERS_STATE, SocketWithExtraData } from "../types/socket-types/general.js"
 import { sessionStore } from "../utils/SessionStore.js";
-import { createPlayersLobbyDataPayload } from "./general.js";
-import { READY_CHANGE, START, START_RESPONSE, PLAYERS_CHANGE, DEFINITIVE_START } from "../types/socket-types/lobby.js";
+import { createPlayersDataPayload, disconnectListener } from "./general.js";
+import { READY_CHANGE, START, START_RESPONSE, PLAYERS_CHANGE, DEFINITIVE_START, DISCONNECT } from "../types/socket-types/lobby.js";
 import { game } from "../models/Game.js";
 import { createIndexedSocketCollection } from "../utils/helper-function.js";
 import { setHandlers } from "./set-handlers.js";
@@ -14,11 +14,15 @@ export const registerLobbyHandlers = (io: Server, socket: SocketWithExtraData) =
   socket.on(START, () => {
     startListener(io, socket)
   })
+  socket.on(DISCONNECT, () => {
+    disconnectListener(io, socket)
+  })
 }
 
 export const unregisterLobbyHandlers = (socket: SocketWithExtraData) => {
   socket.removeAllListeners(READY_CHANGE);
   socket.removeAllListeners(START);
+  socket.removeAllListeners(DISCONNECT);
 }
 
 const readyListener = (io: Server, socket: SocketWithExtraData) => {
@@ -28,7 +32,7 @@ const readyListener = (io: Server, socket: SocketWithExtraData) => {
   }
   session.ready = !session.ready;
   sessionStore.saveSession(socket.data.sessionID, session);
-  const playersPayload = createPlayersLobbyDataPayload();
+  const playersPayload = createPlayersDataPayload();
   io.emit(PLAYERS_CHANGE, {
     players: playersPayload
   })
@@ -63,7 +67,7 @@ const startListener = (io: Server, socket: SocketWithExtraData) => {
   }
   sessions = sessionStore.findAllSessions();
   game.startGame(sessions, indexedSocketCollection);
-  const playersPayload = createPlayersLobbyDataPayload();
+  const playersPayload = createPlayersDataPayload();
 
   for (const playerSocket of Object.values(indexedSocketCollection)) {
     playerSocket.emit(DEFINITIVE_START, {

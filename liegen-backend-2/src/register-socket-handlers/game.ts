@@ -4,6 +4,8 @@ import { gameEventEmitter } from "../utils/GameEventEmitter.js";
 import { sessionStore } from "../utils/SessionStore.js";
 import { game } from "../models/Game.js"
 import { GAME_LOADED, MAKE_SET, CALL_BUST, GAME_OVER, MakeSetData, CallBustData } from "../types/socket-types/game.js";
+import { DISCONNECT } from "../types/socket-types/lobby.js";
+import { disconnectListener } from "./general.js";
 
 export const registerGameHandlers = (io: Server, socket: SocketWithExtraData) => {
   gameEventEmitter.setGame(game);
@@ -12,6 +14,9 @@ export const registerGameHandlers = (io: Server, socket: SocketWithExtraData) =>
   socket.on(MAKE_SET, makeSetCallBack);
   socket.on(CALL_BUST, callBustCallback);
   socket.on(GAME_OVER, gameOverCallBack);
+  socket.on(DISCONNECT, () => {
+    disconnectListener(io, socket)
+  })
 }
 
 export const unregisterGameHandlers = (socket: SocketWithExtraData) => {
@@ -19,6 +24,7 @@ export const unregisterGameHandlers = (socket: SocketWithExtraData) => {
   socket.removeAllListeners(MAKE_SET);
   socket.removeAllListeners(CALL_BUST);
   socket.removeAllListeners(GAME_OVER);
+  socket.removeAllListeners(DISCONNECT);
 }
 
 const gameLoadedCallback = (io: Server, socket: SocketWithExtraData) => {

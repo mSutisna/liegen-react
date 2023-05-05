@@ -5,7 +5,7 @@ import { SocketWithExtraData } from "../types/socket-types/general.js";
 import Deck from "./Deck.js";
 import Middle from "./Middle.js";
 import MiddleSet from './Set.js'; 
-import { CALL_BUST_RESPONSE, CallBustData, EVENT_CALL_BUST, EVENT_MAKE_SET, MAKE_SET_RESPONSE, MakeSetData } from "../types/socket-types/game.js";
+import { CALL_BUST_RESPONSE, CallBustData, EVENT_CALL_BUST, EVENT_MAKE_SET, MAKE_SET_RESPONSE, MakeSetData, RESET_TO_LOBBY_RESPONSE } from "../types/socket-types/game.js";
 import { buildCardsFromJsonData } from "../utils/helper-function.js";
 import { gameEventEmitter } from "../utils/GameEventEmitter.js";
 import { EventCallBust, EventMakeSet } from "../types/events.js";
@@ -24,6 +24,7 @@ export default class Game {
   callBustInProgress: boolean;
   gameOver: boolean;
   resettingToLobby: boolean;
+  secondsLeftToReset: number | null;
 
   constructor() {
     this.state = GameStates.IDLE;
@@ -37,6 +38,9 @@ export default class Game {
     this.callBustInProgress = false;
     this.gameOver = false;
     this.resettingToLobby = false;
+    this.gameOver = false;
+    this.playerIndexWhoWon = null;
+    this.secondsLeftToReset = null;
   }
 
   getState() : GameStates {
@@ -65,6 +69,9 @@ export default class Game {
   }
 
   dealCards() {
+    if (this.state !== GameStates.STARTED) {
+      return;
+    }
     this.state = GameStates.PLAYING;
     this.deck.dealCards(this.getPlayers())
   }
@@ -182,10 +189,12 @@ export default class Game {
 
 
   async callBust(data: CallBustData) {
+    console.log('CALL BUST!!!!')
     const playerIndex = data.playerIndex;
     const playerToCallBust = game.getPlayerByIndex(playerIndex); 
     const socket = playerToCallBust.getSocket();
     if (this.callBustInProgress) {
+      console.log('WEIRD1')
       socket.emit(CALL_BUST_RESPONSE, {
         error: 'Somebody else calling bust on the last set. You have to wait till the bust of that set is over.'
       })
@@ -193,6 +202,7 @@ export default class Game {
     }
     const set = this.middle.getSet();
     if (!set) {
+      console.log('WEIRD2')
       socket.emit(CALL_BUST_RESPONSE, {
         error: 'Can\'t call bust because there is no set to bust.'
       });
@@ -201,6 +211,7 @@ export default class Game {
     const setActualCards = set.getActualCards();
     const setPlayer = set.getPlayer();
     if (setPlayer === playerToCallBust) {
+      console.log('WEIRD3')
       socket.emit(CALL_BUST_RESPONSE, {
         error: 'You can\'t call bust on your own set.'
       });
@@ -220,6 +231,7 @@ export default class Game {
     let playerIndexWhoWon = null;
     if (setPlayer.getCards().length === 0) {
       gameOver = true;
+      this.state = GameStates.GAME_OVER;
       playerIndexWhoWon = this.getIndexForPlayer(setPlayer);
     }
     this.gameOver = gameOver;
@@ -234,28 +246,44 @@ export default class Game {
       setActualCards,
       gameOver
     }
+    console.log('what the kanker aids??')
     gameEventEmitter.emit(EVENT_CALL_BUST, eventCallBust);
     this.callBustInProgress = false;
-    // if (this.gameOver && !this.resettingToLobby) {
-    //   this.resettingToLobby = true;
-    //   this.resetGame();
-    //   let secondsLeftToReset = 10;
-    //   const interval = setInterval(() => {
-    //     const redirect = secondsLeftToReset === 0;
-    //     for (const player of sessionStore.getPlayers()) {
-    //       const socket = player.getSocket();
-    //       socket.emit(EVENT_RESET_TO_LOBBY, {
-    //         playerWhoWonIndex: playerIndexWhoWon,
-    //         secondsLeftToReset,
-    //         redirect
-    //       })
-    //     }
-    //     secondsLeftToReset--;
-    //     if (redirect) {
-    //       clearInterval(interval);
-    //     }
-    //   }, 1000)
-    // }
+    if (this.gameOver && !this.resettingToLobby) {
+      this.resettingToLobby = true;
+      let secondsLeftToReset = 10;
+      const interval = setInterval(() => {
+        const redirect = secondsLeftToReset === 0;
+        for (const player of this.getPlayers()) {
+          const socket = player.getSocket();
+          socket.emit(RESET_TO_LOBBY_RESPONSE, {
+            playerWhoWonIndex: playerIndexWhoWon,
+            secondsLeftToReset,
+            redirect
+          })
+        }
+        secondsLeftToReset--;
+        if (redirect) {
+          this.resetGame();
+          clearInterval(interval);
+        }
+      }, 1000)
+    }
+  }
+
+  resetGame() {
+    this.deck = new Deck();
+    this.middle = new Middle();
+    this.selectedPlayerIndex = 0;
+    this.gameOver = false;
+    this.playerIndexWhoWon = null;
+    this.makeSetInProgress = false;
+    this.callBustInProgress = false;
+    this.resettingToLobby = false;
+    this.state = GameStates.IDLE;
+    for (const player of this.getPlayers()) {
+      player.cards = [];
+    }
   }
 
   getPlayerByIndex(index: number) {
@@ -302,6 +330,7 @@ export default class Game {
       playerIndex,
       gameOver: this.gameOver,
       playerIndexWhoWon: this.playerIndexWhoWon,
+      secondsLeftToReset: this.secondsLeftToReset,
     }
   }
 }

@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { sessionStore } from "../utils/SessionStore.js";
 import { MAX_AMOUNT_OF_PLAYERS } from '../constants.js'
 import { SessionData } from "../types/data.js";
-import { sendPlayerChangesLobby, createPlayersLobbyDataPayload } from "./general.js";
+import { sendPlayerChangesLobby, createPlayersDataPayload } from "./general.js";
 import { setHandlers } from "./set-handlers.js";
 
 export const registerEnterUsernameHandlers = (io: Server, socket: SocketWithExtraData) => {
@@ -56,7 +56,7 @@ const registerCallback = (io: Server, socket: SocketWithExtraData, { username })
       sessionID: socket.data.sessionID,
     });
 
-    const playersLobbyPayload = createPlayersLobbyDataPayload();
+    const playersLobbyPayload = createPlayersDataPayload();
     socket.emit(REGISTER_RESPONSE, {
       userID: socket.data.userID,
       players: playersLobbyPayload

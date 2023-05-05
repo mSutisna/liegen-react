@@ -48,4 +48,5 @@ export interface SerializedGame  {
   userID: string,
   gameOver: boolean,
   playerIndexWhoWon: number | null,
+  secondsLeftToReset: number | null
 }

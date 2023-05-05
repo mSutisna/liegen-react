@@ -29,7 +29,10 @@ import {
   receiveCard,
   makeSet,
   displayNewMessage,
-  callBust
+  callBust,
+  updateMessage,
+  updatePlayers,
+  resetModal
 } from "../../slices/gameSlice";
 import { 
   AnimationStatus, 
@@ -43,23 +46,22 @@ import { RootState } from '../../store';
 import { getImageUrls } from '../../utilities/image-store/image-urls';
 import MessageModal from './MessageModal'; 
 import AllCardsModal from './AllCardsModal';
-import { createPlayersOrder } from '../../utilities/general-helper-functions';
 import InitialState, { MakeSetPayload, ModalAnimationType, ReceiveCardPayload } from '../../types/redux/game';
 import { registerGameHandlers, unregisterGameHandlers } from '../../register-socket-handlers/game';
 import {
   GAME_LOADED,
-  MAKE_SET,
-  CALL_BUST,
-  GAME_OVER, 
-  HandleGameLoadedResponse,
+  HandleReceiveCardResponse,
   HandleMakeSetResponse,
   HandleCallBustResponse,
-  HandleGameOverResponse,
-  HandleReceiveCardResponse,
+  HandleResetToLobbyResponse,
   MakeSetDataResponse,
-  CallBustResponse
+  CallBustResponse,
+  ResetToLobbyResponse,
+  HandlePlayersGameChangeResponse
 } from '../../types/pages/game';
 import socket from "../../utilities/Socket";
+import { LobbyPlayerData } from '../../types/pages/lobby';
+
 
 
 function Game() {
@@ -122,7 +124,8 @@ function Game() {
   }>({
     width: window.innerWidth,
     height: window.innerHeight,
-  })
+  });
+
   useLayoutEffect(() => {
     const handleWindowResize = () => {
       setScreenSize({
@@ -140,21 +143,44 @@ function Game() {
       window.removeEventListener('resize', handleWindowResize);
     }
   }, [screenSize.width, screenSize.height, cardUrlsRegular, cardUrlsMobile]);
+
+  useEffect(() => {
+    if (game.gameOver) {
+      const message = createGameOverMessage(players, game.playerIndexWhoWon ?? -1 , game.mainPlayerIndex, game.secondsLeftToReset ?? 0);
+      displayNewMessage(dispatch, message, ModalAnimationType.WIN, true);
+    }
+  }, [game]);
+
+  useEffect(() => {
+    const notConnectedPlayers = [];
+    for (const player of game.players) {
+      if (!player.connected) {
+        notConnectedPlayers.push(player.username);
+      }
+    }
+    if (notConnectedPlayers.length > 0) {
+      const message = `The game has been paused because the following players are disconnected: '${notConnectedPlayers.join('\',\' ')}'. \n\n
+       The disconnected players must connect with the game again for the game to continue.`;
+      displayNewMessage(dispatch, message, ModalAnimationType.REGULAR, true, true);
+      return;
+    } else if (messageModalData.gamePaused) {
+      resetModal(dispatch);
+    }
+  }, [players])
   
   const amountOfPlayers = players.length;
   useEffect(() => {
-    // const fetchPlayers = async () => {
-    //   // const players = generatePlayers();
-    //   const playersOrder = createPlayersOrder(players, currentPlayerIndex);
-    //   dispatch(setPlayers(players));
-    //   dispatch(setPlayersOrder(playersOrder))
-    // }
-    // fetchPlayers();
     const setImageUrls = async () => {
       const imageUrls = await getImageUrls();
       dispatch(setCardUrls(imageUrls));
     }
     setImageUrls();
+
+    const playersGameChangeCallback: HandlePlayersGameChangeResponse = (data: {
+      players: Array<LobbyPlayerData>
+    }) => {
+      dispatch(updatePlayers(data.players))
+    }
 
     const receiveCardCallback: HandleReceiveCardResponse = (data: ReceiveCardPayload) => {
       dispatch(receiveCard(data))
@@ -173,15 +199,24 @@ function Game() {
       }
       dispatch(callBust(data));
     } 
-    const gameOverCallback: HandleGameOverResponse = () => {
-
+    const resetToLobbyCallback: HandleResetToLobbyResponse = (data: ResetToLobbyResponse) => {
+      if (data.redirect) {
+        window.location.href = document.location.origin;
+        return;
+      }
+      const message = createGameOverMessage(players, data.playerWhoWonIndex, game.mainPlayerIndex, data.secondsLeftToReset)
+      if (messageModalData.modalAnimation !== ModalAnimationType.WIN) {
+        displayNewMessage(dispatch, message, ModalAnimationType.WIN, true);
+      } else {
+        updateMessage(dispatch, message);
+      }
     }
-
     registerGameHandlers(
+      playersGameChangeCallback,
       receiveCardCallback,
       makeSetCallback,
       callBustCallback,
-      gameOverCallback
+      resetToLobbyCallback
     );
     socket.emit(GAME_LOADED)
     return unregisterGameHandlers;
@@ -306,6 +341,20 @@ function Game() {
       </div> */}
     </div>
   )
+}
+
+const createGameOverMessage = (
+  players: Array<PlayerInterface>,
+  playerIndexWhoWon: number,
+  mainPlayerIndex: number,
+  secondsLeftToReset: number
+) : string => {
+  const winningPlayer = players[playerIndexWhoWon];
+  const player = players[mainPlayerIndex];
+  const winMessage = winningPlayer.userID === player.userID
+    ? 'You won!'
+    : `Player: '${player.name}' has won!`;
+  return `${winMessage} \n\n You will be returned to the loby in ${secondsLeftToReset} seconds.`
 }
 
 export default Game;

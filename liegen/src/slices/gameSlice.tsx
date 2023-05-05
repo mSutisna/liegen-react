@@ -65,12 +65,14 @@ const initialState: InitialState = {
     visible: false,
     message: '',
     modalAnimation: ModalAnimationType.REGULAR,
-    disableCloseButton: false
+    disableCloseButton: false,
+    gamePaused: false,
   },
   clockwise: true,
   allCardsModalVisible: false,
   playerIndexWhoWon: null,
-  gameOver: false
+  gameOver: false,
+  secondsLeftToReset: null
 };
 
 export const gameSlice = createSlice({
@@ -192,7 +194,7 @@ export const gameSlice = createSlice({
           playerToCallBust: null,
           setAnimationStatus: AnimationStatus.FINISHED,
           bustAnimationStatus: AnimationStatus.IDLE,
-          callBustResponse: null
+          callBustResponse: null,
         };
       }
   
@@ -205,7 +207,22 @@ export const gameSlice = createSlice({
       state.userID = data.userID;
       state.gameOver = data.gameOver;
       state.playerIndexWhoWon = data.playerIndexWhoWon;
+      state.secondsLeftToReset = data.secondsLeftToReset;
       state.playersOrder = createPlayersOrder(state.players, state.mainPlayerIndex);
+    },
+    updatePlayers: (state: InitialState, action: PayloadAction<Array<LobbyPlayerData>>) => {
+      console.log({
+        payload: action.payload
+      })
+      for (const lobbyPlayer of action.payload) {
+        const index = state.players.findIndex(player => lobbyPlayer.userID === player.userID);
+        if (index === -1) {
+          continue;
+        }
+        let player = state.players[index];
+        player = {...player, ...lobbyPlayer};
+        state.players[index] = player;
+      }
     },
     setPlayersOrder: (state: InitialState, action: PayloadAction<Array<number>>) => {
       state.playersOrder = action.payload;
@@ -398,13 +415,18 @@ export const gameSlice = createSlice({
       state.messageModal.message = data.message;
       state.messageModal.disableCloseButton = data.disableCloseButton ?? false;
       state.messageModal.modalAnimation = data.modalAnimation ?? ModalAnimationType.REGULAR;
+      state.messageModal.gamePaused = data.gamePaused ?? false;
+      console.log({gamePaused: data.gamePaused})
+    },
+    updateModalMessage: (state: InitialState, action: PayloadAction<string>) => {
+      state.messageModal.message = action.payload;
     },
     setVisibilityMessageModal: (state: InitialState, action: PayloadAction<boolean>) => {
       state.messageModal.visible = action.payload;
     },
     setVisibilityAllCardsModal: (state: InitialState, action: PayloadAction<boolean>) => {
       state.allCardsModalVisible = action.payload;
-    }
+    },
   },
 });
 
@@ -412,6 +434,7 @@ export const gameSlice = createSlice({
 export const {
   setUserID,
   setPlayers,
+  updatePlayers,
   setMainPlayerIndex,
   initGame,
   setPlayersOrder,
@@ -436,23 +459,44 @@ export const {
 } = gameSlice.actions;
 
 const helpFunctions = {
+  resetModal: async (
+    dispatch: Dispatch<AnyAction>,
+  ) => {
+    await dispatch(gameSlice.actions.setMessageModalMessage({
+      message: '',
+      modalAnimation: ModalAnimationType.REGULAR,
+      disableCloseButton: false,
+      gamePaused: false,
+    }))
+    dispatch(gameSlice.actions.setVisibilityMessageModal(false));
+  },
   displayNewMessage: async (
     dispatch: Dispatch<AnyAction>,
     message: string,
     modalAnimation: ModalAnimationType = ModalAnimationType.REGULAR,
-    disableCloseButton: boolean = false
+    disableCloseButton: boolean = false,
+    gamePaused: boolean = false
   ) => {
     await dispatch(gameSlice.actions.setVisibilityMessageModal(true));
     dispatch(gameSlice.actions.setMessageModalMessage({
       message,
       modalAnimation,
-      disableCloseButton
+      disableCloseButton,
+      gamePaused
     }))
+  },
+  updateMessage: async (
+    dispatch: Dispatch<AnyAction>,
+    message: string
+  ) => {
+    dispatch(gameSlice.actions.updateModalMessage(message))
   }
 };
 
 export const {
-  displayNewMessage
+  resetModal,
+  displayNewMessage,
+  updateMessage
 } = helpFunctions;
 
 

@@ -5,7 +5,8 @@ export const MAX_AMOUNT_OF_PLAYERS = 4;
 export enum GameStates {
   IDLE = 'idle',
   STARTED = 'started',
-  PLAYING = 'playing'
+  PLAYING = 'playing',
+  GAME_OVER = 'gameOver'
 }
 
 export enum CardSuits {

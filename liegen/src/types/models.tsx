@@ -27,6 +27,7 @@ export interface InitGameData {
   userID: string,
   gameOver: boolean,
   playerIndexWhoWon: number | null,
+  secondsLeftToReset: number | null
 }
 
 export interface SerializedSet {
@@ -143,7 +144,8 @@ export interface MessageModalData {
   visible: boolean,
   message: string,
   modalAnimation: ModalAnimationType,
-  disableCloseButton: boolean
+  disableCloseButton: boolean,
+  gamePaused: boolean,
 }
 
 export type CardPosition = {row: number, column: number};
